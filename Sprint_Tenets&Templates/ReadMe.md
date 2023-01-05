@@ -8,11 +8,11 @@ This document describes the rules and structure of a sprint at X-CCC
 
 Github has a very evolved ecosystem and will be the central place for tracking sprints, feature requests, bugs, user stories and sprint boards.
 
-## Sprint cadence
+## Sprint Cadence
 
-Weekly sprints. Will run Monday to Monday.
+Weekly sprints will run Monday to Monday.
 
-## Sprint meetings
+## Sprint Meetings
 
 - Sprint Demos & Retro(30m): Every Tuesday 8AM PST (09:00PM PKT)
 - Sprint Planning(30m): Every Wednesday 10PM PST (11:00AM PKT)

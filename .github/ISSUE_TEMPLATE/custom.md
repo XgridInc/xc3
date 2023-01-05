@@ -2,16 +2,7 @@
 name: Custom issue template
 about: Sample Template for creating GitHub issues
 title: GitHub Issue Template
-labels: ''
-assignees: ''
-
----
-
----
-name: Feature request
-about: Suggest an idea
-title: ""
-labels: enhancement
+labels: ""
 assignees: ""
 ---
 
