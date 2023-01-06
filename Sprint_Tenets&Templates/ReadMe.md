@@ -10,17 +10,18 @@ Github has a very evolved ecosystem and will be the central place for tracking s
 
 ## Sprint Cadence
 
-Weekly sprints will run Monday to Monday.
+By-Weekly sprints will run from Monday to Monday.
 
 ## Sprint Meetings
 
-- Sprint Demos & Retro(30m): Every Tuesday 8AM PST (09:00PM PKT)
-- Sprint Planning(30m): Every Wednesday 10PM PST (11:00AM PKT)
-- Backlog Grooming(30m): Every Friday 10PM PST (11:00 AM PKT)
+- [Sprint Planning(60m)](https://meet.google.com/tqp-fqev-rtb?authuser=0): Weekly on Monday (11:00AM - 12:00PM PKT)
+- [Backlog Grooming(60m)](https://meet.google.com/zzi-qzsb-qeb?authuser=0): Weekly on Friday (12:00PM - 01:00PM PKT)
+- [Sprint Demos & Retro(30m)](https://meet.google.com/hgp-vrhr-aiy?authuser=0): Weekly on Tuesday (09:30PM - 10:00PM PKT)
 
 ### Daily Updates
 
 - Daily standup updates should be sent to ccr-dev channel no later than 5 PM PKT.
+- - [Daily Standup](https://meet.google.com/zsv-zpii-aeg?authuser=0): Weekly on Weekdays (04:30PM - 04:45PM PKT)
 
 ### Sprint Demos & Retro
 
