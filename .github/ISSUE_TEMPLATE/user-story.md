@@ -1,7 +1,7 @@
 ---
-name: Custom issue template
-about: Sample Template for creating GitHub issues
-title: GitHub Issue Template
+name: Custom User Story Template
+about: Sample Template for creating GitHub User Stories
+title: GitHub User Story Template
 labels: ""
 assignees: ""
 ---
