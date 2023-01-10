@@ -46,7 +46,7 @@ By-Weekly sprints will run from Monday to Monday.
 ---
 
 - We'll be using labels for organizing the tickets
-- Primarily Epic label will be used for the user-stories related to one project i.e. epic_data_visulizatin
+- Primarily Epic label will be used for the user-stories related to one project i.e. epic_data_visualization
 - Time estimation for a sprint should be 5 days
 - When extending an issue to the next week, you're required to add another label as `moved-from-<sprint-name>`
-- Description of each ticket should be according to the template provided in GitHub Backlog
+- Description of each ticket should be according to the template provided in [GitHub Backlog](https://github.com/orgs/X-CBG/projects/65)
