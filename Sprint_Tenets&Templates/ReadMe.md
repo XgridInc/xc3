@@ -10,7 +10,7 @@ Github has a very evolved ecosystem and will be the central place for tracking s
 
 ## Sprint Cadence
 
-By-Weekly sprints will run from Monday to Monday.
+Weekly sprints will run from Monday to Monday.
 
 ## Sprint Meetings
 
