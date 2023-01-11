@@ -11,7 +11,7 @@ This file explains how you'll be working within X-CCC repository.
 - First of all, you should create a `feature branch` from the `main` branch of the central repository.
 - After completing the code, a PR needs to be created from the `feature branch` to the `main` branch.
 - Then remaining members have to review and approve the code.
-- Atleast 2 approvals are required to merge the Pull Request
+- The Pull Request must have at least one approval from the External Team and two approvals from the XCCC Team before it can be merged.
 - At the end, you'll be able to merge the code.
 
 ### Service Level Agreement:
