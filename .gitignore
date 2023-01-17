@@ -1,0 +1,24 @@
+.history/*
+# Ignore all files in the .terraform directory
+*/.terraform/*
+
+# Ignore the terraform.tfstate file
+*/terraform.tfstate
+
+# Ignore the terraform.tfstate.backup file
+*/terraform.tfstate.backup
+
+# Ignore all files in the .terraform.d directory
+*/.terraform.d/*
+
+# Ignore the .terraform-version file
+*/.terraform-version
+
+# Ignore all files in the .terraform-plugins directory
+*/.terraform-plugins/*
+
+*/*.pem
+*/xccc-key.pub
+*/xccc-key
+*/*.out
+**/networking/*
