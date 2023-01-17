@@ -40,8 +40,10 @@ def lambda_handler(event, context):
                subset = item["ResourceARN"].split(':')
                subset_len = len(subset)
                if subset_len == 6:
+                   #adding service and resource id 
                   subset_list.append(subset[2]+":"+subset[5])
                else:
+                   #adding service and resource id 
                    subset_list.append(subset[2]+":"+subset[5]+":"+subset[6])
     except botocore.exceptions.ClientError as error:
         if error.response['Error']['Code'] == 'LimitExceededException':
@@ -71,4 +73,3 @@ def lambda_handler(event, context):
         },
         'body': result_from_child['body']
     }
-
