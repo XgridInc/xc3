@@ -2,6 +2,7 @@ import json
 import boto3
 import os
 import botocore
+import logging
 
 """
 Resource Inventory Method.
@@ -14,7 +15,7 @@ Returns:
     It return list of ec2 instances in provided aws region.
 
 Raises:
-    Authorization: Authorization error,
+    Lambda Invoke Error: Raise error if lambda invoke api call not execute,
     KeyError: Raise error if resourcegroupstaggingapi call not execute.
 """
 
@@ -26,45 +27,44 @@ def lambda_handler(event, context):
     cost_analysis_lambda = "testing-lambda"
     lambda_client = boto3.client('lambda')
     region_name = json.loads(event['body'])['region']
-    client_resource = boto3.client('resourcegroupstaggingapi',region_name= region_name)
     try:
-       response = client_resource.get_resources(ResourceTypeFilters= ['ec2:instance'] )
-       response_dict = json.dumps(response)
-       parse_string = json.loads(response_dict)
-       dict_len = len(parse_string["ResourceTagMappingList"])
-       if dict_len == 0:
-          result_list = {'Region': region_name, 'ResourceList': ['']}
-          case_list.append(result_list)
-       else:
-           for item in parse_string["ResourceTagMappingList"]:
-               subset = item["ResourceARN"].split(':')
-               subset_len = len(subset)
-               if subset_len == 6:
+        client_resource = boto3.client('resourcegroupstaggingapi',region_name= region_name)
+    except Exception as e:
+        logging.error("Error creating boto3 client: " + str(e))
+    try:
+        response = client_resource.get_resources(ResourceTypeFilters= ['ec2:instance'])
+    except Exception as e:
+        logging.error("Error calling get resource api: " + str(e))
+    response_dict = json.dumps(response)
+    parse_string = json.loads(response_dict)
+    dict_len = len(parse_string["ResourceTagMappingList"])
+    if dict_len == 0:
+       result_list = {'Region': region_name, 'ResourceList': ['']}
+       case_list.append(result_list)
+    else:
+        for item in parse_string["ResourceTagMappingList"]:
+            subset = item["ResourceARN"].split(':')
+            subset_len = len(subset)
+            if subset_len == 6:
                    #adding service and resource id 
-                  subset_list.append(subset[2]+":"+subset[5])
-               else:
+               subset_list.append(subset[2]+":"+subset[5])
+            else:
                    #adding service and resource id 
-                   subset_list.append(subset[2]+":"+subset[5]+":"+subset[6])
-    except botocore.exceptions.ClientError as error:
-        if error.response['Error']['Code'] == 'LimitExceededException':
-           print('API call limit exceeded; backing off and retrying...')
-        else:
-            raise error
+                subset_list.append(subset[2]+":"+subset[5]+":"+subset[6])
     result_list = {'Region': region_name, 'ResourceList': subset_list}
     case_list.append(result_list)
+    logging.info(case_list)
+    functionName = 'arn:aws:lambda:{0}:{1}:function:{2}'.format(runtime_region,account_id,cost_analysis_lambda)
     try:
-       cost_lambda_response = lambda_client.invoke(
-        FunctionName = 'arn:aws:lambda:{0}:{1}:function:{2}'.format(runtime_region,account_id,cost_analysis_lambda),
-        InvocationType = 'RequestResponse',
-        Payload = json.dumps(case_list[0])
+        cost_lambda_response = lambda_client.invoke(
+            FunctionName = functionName,
+            InvocationType = 'RequestResponse',
+            Payload = json.dumps(case_list[0])
         )
-       result_from_child = json.load(cost_lambda_response['Payload'])
-       print(result_from_child['body'])
-    except botocore.exceptions.ClientError as error:
-        if error.response['Error']['Code'] == 'LimitExceededException':
-           print('API call limit exceeded; backing off and retrying...')
-        else:
-           raise error
+    except Exception as e:
+        logging.error("Error in invoking lambda function: " + str(e))
+    result_from_child = json.load(cost_lambda_response['Payload'])
+    logging.info(result_from_child['body'])
     return {
         'statusCode': 200,
         'headers': {
