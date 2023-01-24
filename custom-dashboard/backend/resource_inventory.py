@@ -4,6 +4,9 @@ import os
 import botocore
 import logging
 
+runtime_region = os.environ['AWS_REGION']
+lambda_client = boto3.client('lambda')
+
 def lambda_handler(event, context):
     """
     Resource Inventory Method.
@@ -19,19 +22,13 @@ def lambda_handler(event, context):
         Lambda Invoke Error: Raise error if lambda invoke api call not execute,
         KeyError: Raise error if resourcegroupstaggingapi call not execute.
     """
-    runtime_region = os.environ['AWS_REGION']
     account_id = context.invoked_function_arn.split(':')[4]
     subset_list=[]
     case_list=[]
     cost_analysis_lambda = "testing-lambda"
-    lambda_client = boto3.client('lambda')
     region_name = json.loads(event['body'])['region']
     try:
-        client_resource = boto3.client('resourcegroupstaggingapi',region_name= region_name)
-    except Exception as e:
-        logging.error("Error creating boto3 client: " + str(e))
-    try:
-        response = client_resource.get_resources(ResourceTypeFilters= ['ec2:instance'])
+        response = resource_client.get_resources(ResourceTypeFilters= ['ec2:instance'])
     except Exception as e:
         logging.error("Error calling get resource api: " + str(e))
     response_dict = json.dumps(response)

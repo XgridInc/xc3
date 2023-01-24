@@ -4,6 +4,10 @@ import botocore
 from datetime import date , timedelta
 import logging
 
+ec2_resource = boto3.resource('ec2', region_name=event['Region'])
+ec2_client = boto3.client('ec2', region_name=event['Region'])
+ce_client = boto3.client('ce')
+
 def lambda_handler(event, context):
     """
     Resource Cost and Status Method.
@@ -25,14 +29,14 @@ def lambda_handler(event, context):
         status = {'Resource_ID': '', 'Cost': '', 'Status': ''}
         amount.append(status)
     else: 
-        try:
-            ec2_client = boto3.resource('ec2', region_name=event['Region'])
-        except Exception as e:
-            logging.error("Error creating ec2 resource: " + str(e))
-        try:
-            ec2 = boto3.client('ec2', region_name=event['Region'])
-        except Exception as e:
-            logging.error("Error creating ec2 client: " + str(e))
+         try:
+             ec2_resource = boto3.resource('ec2', region_name=event['Region'])
+         except Exception as e:
+             logging.error("Error creating ec2 resource: " + str(e))
+         try:
+             ec2_client = boto3.client('ec2', region_name=event['Region'])
+         except Exception as e:
+             logging.error("Error creating ec2 client: " + str(e))
         end = date.today()
         start = end - timedelta(days=cost_by_days)
         end_date = str(end)
@@ -41,7 +45,7 @@ def lambda_handler(event, context):
         resource_for_ce = []
         resourceStatus = []
         try:
-            reservations = ec2.describe_instances(Filters=[
+            reservations = ec2_client.describe_instances(Filters=[
             {
                 "Name": "instance-state-name",
                 "Values": ["terminated"],
@@ -62,7 +66,7 @@ def lambda_handler(event, context):
                    continue
                 else:
                     try:
-                        response = ec2_client.Instance(resource_id).state
+                        response = ec2_resource.Instance(resource_id).state
                     except Exception as e:
                         logging.error("Error in calling ec2 instance state: " + str(e))
                     resultSet = {'resource': resource, 'resource_ce': resource_id, 'status':response['Name']}
@@ -74,15 +78,11 @@ def lambda_handler(event, context):
                    continue
                 else:
                     try:
-                        response = ec2_client.Instance(resource_id).state
+                        response = ec2_resource.Instance(resource_id).state
                     except Exception as e:
                         logging.error("Error in calling ec2 instance state: " + str(e))
                     resultSet = {'resource': resource, 'resource_ce': resource_id, 'status':response['Name']}
                     resource_for_ce.append(resultSet)
-        try:
-            ce_client = boto3.client('ce')
-        except Exception as e:
-            logging.error("Error in creating ce client: " + str(e))
         for item in resource_for_ce:
             try:
                 ce_response = ce_client.get_cost_and_usage_with_resources(

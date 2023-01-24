@@ -3,6 +3,8 @@ import boto3
 import botocore
 import logging
 
+client = boto3.client('ec2')
+
 def lambda_handler(event, context):
 
     """
@@ -18,10 +20,6 @@ def lambda_handler(event, context):
     Raises:
         Instance State: Raise error if ec2 instance api not execute.
     """
-    try:
-       client = boto3.client('ec2')
-    except Exception as e:
-        logging.error("Error creating boto3 client: " + str(e))
     instance_id = json.loads(event['body'])['resource_id']
     status = json.loads(event['body'])['status']
     logging.info(instance_id)
