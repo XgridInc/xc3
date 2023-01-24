@@ -3,21 +3,21 @@ import boto3
 import botocore
 import logging
 
-"""
-Instance State Change Method.
-
-Args:
-    instance_id: EC2 instance id is passing from event.
-    status: EC2 instance state is passing from event.
-
-Returns:
-    It stop/start provided ec2 instance based on provided status.
-
-Raises:
-    Instance State: Raise error if ec2 instance api not execute.
-"""
-
 def lambda_handler(event, context):
+
+    """
+    Instance State Change Method.
+
+    Args:
+        instance_id: EC2 instance id is passing from event.
+        status: EC2 instance state is passing from event.
+
+    Returns:
+        It stop/start provided ec2 instance based on provided status.
+
+    Raises:
+        Instance State: Raise error if ec2 instance api not execute.
+    """
     try:
        client = boto3.client('ec2')
     except Exception as e:

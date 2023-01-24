@@ -4,22 +4,21 @@ import os
 import botocore
 import logging
 
-"""
-Resource Inventory Method.
-
-Args:
-    Region: AWS region.
-    Accound ID: AWS account id.
-
-Returns:
-    It return list of ec2 instances in provided aws region.
-
-Raises:
-    Lambda Invoke Error: Raise error if lambda invoke api call not execute,
-    KeyError: Raise error if resourcegroupstaggingapi call not execute.
-"""
-
 def lambda_handler(event, context):
+    """
+    Resource Inventory Method.
+
+    Args:
+        Region: AWS region.
+        Accound ID: AWS account id.
+
+    Returns:
+        It return list of ec2 instances in provided aws region.
+
+    Raises:
+        Lambda Invoke Error: Raise error if lambda invoke api call not execute,
+        KeyError: Raise error if resourcegroupstaggingapi call not execute.
+    """
     runtime_region = os.environ['AWS_REGION']
     account_id = context.invoked_function_arn.split(':')[4]
     subset_list=[]

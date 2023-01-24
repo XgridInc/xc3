@@ -4,21 +4,20 @@ import botocore
 from datetime import date , timedelta
 import logging
 
-"""
-Resource Cost and Status Method.
-
-Args:
-    resource_list: Set of EC2 instances.
-    Region: AWS Region.
-
-Returns:
-    It returns cost and status of provided ec2 instances from last 14 days.
-
-Raises:
-    KeyError: Raise error if provided instances not exist and cost explorer api not executed.
-"""
-
 def lambda_handler(event, context):
+    """
+    Resource Cost and Status Method.
+
+    Args:
+        resource_list: Set of EC2 instances.
+        Region: AWS Region.
+
+    Returns:
+        It returns cost and status of provided ec2 instances from last 14 days.
+
+    Raises:
+        KeyError: Raise error if provided instances not exist and cost explorer api not executed.
+    """
     amount = []
     cost_by_days = 14
     data_from_parent = event['ResourceList']
