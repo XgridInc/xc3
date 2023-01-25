@@ -1,8 +1,3 @@
-variable "region" {
-  type        = string
-  description = "AWS region where resources will be deployed"
-}
-
 variable "vpc_id" {
   type        = string
   description = "The ID of the VPC where the resources will be created"
@@ -37,4 +32,14 @@ variable "ses_email_address" {
 variable "sqs_queue_name" {
   type        = string
   description = "The name of the SQS queue"
+}
+
+variable "namespace" {
+  type        = string
+  description = "The namespace referring to an env"
+}
+
+variable "key" {
+  type        = string
+  description = "The name of the key used for an env"
 }

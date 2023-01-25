@@ -1,8 +1,8 @@
-data "aws_ami_ids" "ubuntu" {
-  owners = ["self"]
+data "aws_ami" "ubuntu" {
+  owners = ["099720109477"]
 
   filter {
-    name   = "xccc-ec2-ami-id"
-    values = ["ubuntu/images/ubuntu-*-*-amd64-server-*"]
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220914"]
   }
 }
