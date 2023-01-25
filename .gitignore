@@ -1,4 +1,4 @@
-.history/*
+**/.history/*
 # Ignore all files in the .terraform directory
 */.terraform/*
 
@@ -21,4 +21,3 @@
 */xccc-key.pub
 */xccc-key
 */*.out
-**/networking/*
