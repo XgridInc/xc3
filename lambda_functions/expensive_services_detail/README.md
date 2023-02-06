@@ -1,6 +1,6 @@
 # Overview
 
-This lambda function uses the AWS Cost Explorer API to find the 5 most expensive services in a specific AWS region over the last 14 days. This code is intended to be used as an AWS Lambda function, and it uses the Prometheus client library to push the data to a Prometheus Push Gateway.
+This lambda function uses the AWS Cost Explorer API to find the 5 most expensive services in a provided AWS region over the last 14 days. This code is intended to be used as an AWS Lambda function, and it uses the Prometheus client library to push the data to a Prometheus Push Gateway.
 
 The script imports several libraries at the top, including json, boto3, os,  logging, date, timedelta, and prometheus_client.
 

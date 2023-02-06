@@ -1,24 +1,24 @@
-import json
 import boto3
+import json
 import os
 import logging
-from datetime import date , timedelta
+from datetime import date, timedelta
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
-runtime_region = os.environ['AWS_REGION']
-# Initialize boto3 client
+# Initialize and Connect to the AWS EC2 Service
 try:
-    ce_client = boto3.client('ce')
+    ec2_client = boto3.client('ec2')
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 
 def lambda_handler(event, context):
 
     """
-    List 5 top most expensive services in specific aws region.
+    List 5 top most expensive services in provided aws region.
 
     Args:
         Account ID: AWS account id.
+        Region: AWS region
 
     Returns:
         It pushes the 5 most expensive services name and cost with AWS region to Prometheus using push gateway.
@@ -27,59 +27,100 @@ def lambda_handler(event, context):
         KeyError: Raise error if cost explorer API call does not execute.
     """
     account_id = context.invoked_function_arn.split(':')[4]
+    # Cost of last 14 days
     cost_by_days = 14
     end_date = str(date.today())
     start_date = str(date.today() - timedelta(days=cost_by_days))
-
-    # Get the cost and usage data
+    parent_list = []
     try:
-        response = ce_client.get_cost_and_usage(
-            TimePeriod={
-                'Start': start_date,
-                'End': end_date
-            },
-            Granularity='MONTHLY',
-            Metrics=['UnblendedCost'],
-            GroupBy=[{
-                'Type': 'DIMENSION',
-                'Key': 'SERVICE'
-            }]
-        )
-        
+        # Get the list of all regions
+        regions = [region["RegionName"] for region in ec2_client.describe_regions()["Regions"]]
+    
     except Exception as e:
-        logging.error("Error getting response from cost and usage api: " + str(e))
+        logging.error("Error getting response from ec2 describe region api : " + str(e))
         return {
             'statusCode': 500,
             'body': json.dumps({"Error": str(e)})
         }
-        
-    # get top 5 most expensive services 
-    top_5_services = sorted(response['ResultsByTime'][0]['Groups'], key=lambda x: x['Metrics']['UnblendedCost']['Amount'], reverse=True)[:5]
+
+    # Loop through each region
+    for region in regions:
+        top_5_resources = []
+        # Connect to the AWS Cost Explorer API for the region
+        try:    
+            ce_region = boto3.client("ce", region_name=region)
+        except Exception as e:
+            logging.error("Error creating boto3 client: " + str(e))
+            return {
+                'statusCode': 500,
+                'body': json.dumps({"Error": str(e)})
+            }    
     
-    # Initialize the Prometheus registry and gauge
+        # Retrieve the cost and usage data for the defined time period
+        try:
+            cost_and_usage = ce_region.get_cost_and_usage(
+                TimePeriod={"Start": start_date, "End": end_date},
+                Granularity="MONTHLY",
+                Metrics=["UnblendedCost"],
+                Filter={
+                    "Dimensions": {
+                        "Key": "REGION",
+                        "Values": [region],
+                    }
+                },
+                GroupBy=[{"Type": "DIMENSION", "Key": "SERVICE"}],
+            )
+        except Exception as e:
+            logging.error("Error getting response from cost and usage api: " + str(e))
+            return {
+                'statusCode': 500,
+                'body': json.dumps({"Error": str(e)})
+            }
+    
+        # Extract the cost data
+        cost_data = cost_and_usage["ResultsByTime"][0]["Groups"]
+    
+        # Sort the cost data in descending order
+        sorted_cost_data = sorted(
+            cost_data, key=lambda x: x["Metrics"]["UnblendedCost"]["Amount"], reverse=True
+        )
+    
+        # Get the top 5 most expensive resources
+        top_5_resources = sorted_cost_data[:5]    
+    
+        # Print the top 5 most expensive resources and their costs
+        for resource in top_5_resources:
+            resourcedata = {
+                "Region": region,
+                "Service": resource["Keys"][0],
+                "Cost": resource["Metrics"]["UnblendedCost"]["Amount"],
+            }
+            parent_list.append(resourcedata)
+    
+    logging.info(parent_list)
+    
+    # Adding the extracted cost data to the Prometheus gauge as labels for service, region, and cost.
     try:
         registry = CollectorRegistry()
         gauge = Gauge("Expensive_Services_Detail", "AWS Services Cost Detail",
            labelnames=["service", "cost", "region", "account"], 
            registry=registry)
-        for service in top_5_services:
-            service_name = service['Keys'][0]
-            service_amount = service['Metrics']['UnblendedCost']['Amount']
-            # Add the service costs to the gauge
-            gauge.labels(service_name,service_amount,runtime_region,account_id).set(service_amount)
-        # Push the gauge data to Prometheus    
-        push_to_gateway(os.environ['prometheus_ip'], job='Most_Expensive_Services', registry=registry)
-        
+        for i in range(len(parent_list)):
+            service = parent_list[i]['Service']
+            region = parent_list[i]['Region']
+            cost = parent_list[i]['Cost']
+            gauge.labels(service, cost, region, account_id).set(cost)
+    
+            # Push the metric to the Prometheus Gateway
+            push_to_gateway(os.environ['prometheus_ip'], job='Most_Expensive_Services', registry=registry)
     except Exception as e:
         logging.error("Error initializing Prometheus Registry and Gauge: " + str(e))
         return {
             'statusCode': 500,
             'body': json.dumps({"Error": str(e)})
         }
-        
     # Return the response    
     return {
         'statusCode': 200,
         'body': json.dumps("Metrics Pushed")
     }
-
