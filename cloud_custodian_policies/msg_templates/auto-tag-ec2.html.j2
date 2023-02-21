@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{# You can set any mandatory tags here, and they will be formatted/outputted in the message #}
+{% set requiredTags = ['Application','Owner'] %}
+
+{# The macros below format some resource attributes for better presentation #}
+{% macro getTag(resource, tagKey) -%}
+	{% if resource.get('Tags') %}
+		{% for t in resource.get('Tags') %} 	
+			{%  if t.get('Key') == tagKey %}
+				{{ t.get('Value') }}    							
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+{%- endmacro %}
+
+{% macro extractList(resource, column) -%}
+		{% for p in resource.get(column) %}
+			{{ p }},
+		{% endfor %}
+{%- endmacro %}
+	
+{% macro columnHeading(columnNames, tableWidth) -%}
+	<table>
+	{% for columnName in columnNames %}
+		<th>{{ columnName }}</th>
+	{% endfor %}
+{%- endmacro %}
+
+{# The macro below creates the table:
+   Formatting can be dependent on the column names that are passed in 
+#}
+{% macro columnData(resources, columnNames) -%}
+	{% for resource in resources %}
+		<tr>
+		{% for columnName in columnNames %}
+			{% if columnName in requiredTags %}
+				<td>{{ getTag(resource,columnName) }}</td>
+			{% elif columnName == 'tag.Name' %}
+				<td>{{ getTag(resource,'Name') }}</td>
+			{% elif columnName == 'InstanceCount' %}
+				<td align="center">{{ resource['Instances'] | length }}</td>		
+			{% elif columnName == 'VolumeConsumedReadWriteOps' %}
+				<td>{{ resource['c7n.metrics']['AWS/EBS.VolumeConsumedReadWriteOps.Maximum'][0]['Maximum'] }}</td>
+			{% elif columnName == 'PublicIp' %}
+				<td>{{ resource['NetworkInterfaces'][0].get('Association')['PublicIp'] }}</td>										
+			{% else %}
+				<td>{{ resource[columnName] }}</td>
+			{% endif %}
+		{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
+{%- endmacro %}	
+
+{# Main #}
+{% macro createTable(columnNames, resources, tableWidth) %}
+	{{ columnHeading(columnNames, tableWidth) }}				
+	{{ columnData(resources, columnNames) }}
+{%- endmacro %}
+
+<head>
+    <title>Custodian Notification - {{  account  }}</title>
+</head>
+
+<style>
+	table {
+		width: {{ tableWidth }};
+		border-spacing: 0px;
+		box-shadow: 5px 5px 5px grey;
+	}
+	table tr:first-child th:first-child {
+		border-top-left-radius: 7px;
+	}
+	table tr:first-child th:last-child {
+		border-top-right-radius: 7px;
+	}
+	table tr:last-child td:first-child {
+		border-bottom-left-radius: 7px;
+	}
+	table tr:last-child td:last-child {
+		border-bottom-right-radius: 7px;
+	}
+	td {
+		border: 1px solid grey; 
+		padding: 4px;	
+	}
+	th {
+		background: linear-gradient(#0c2b5b,#a1bae2);
+		color: white;
+		border: 1px solid #a1bae2;
+		text-align: center;
+		padding: 5px;
+	}
+	tr:nth-child(even) {			
+		background-color: #f2f2f2;			
+	}
+	tr:hover {
+		background: #d7e3f7;
+		color: black;
+	}
+</style>
+
+<body>
+    <ul>
+		{# Below, notifications for any resource-type can be formatted with specific columns #}	  				
+		{% if policy['resource'] == "ec2" %}
+			<p> The following EC2 Resource has been tagged with Owner and its details are mentioned below: </p>
+			
+			<li>{{  "Account: %s" | format(account)  }}</li>
+			<li>{{  "Region: %s" | format(region)  }}</li>
+			<li>{{  "Owner: %s" | format(event["detail"]["userIdentity"]["userName"])}}</li>
+			<li>{{  "Instance Tags: %s" | format(resources[0]["Tags"])  }}</li>
+			<li>{{  "Instance ID: %s" | format(resources[0]["InstanceId"])  }}</li>
+		
+
+			 				   
+		{# If no special formatting is defined for a resource type, all attributes will be formatted in the email #}
+		{% else %}  							 
+			<table style="width:100%; border:1px dashed black; border-collapse:collapse;"> 	
+    			<tr>
+    				{% for column in resources[0] %}
+	    				<th>{{ column }}</th>
+    				{% endfor %}
+  				</tr>  			
+			{% set columnlen = resources[0]|length|int %}
+			{% for resource in resources %}
+				<tr>
+					{% for column in resource %}
+						<td>{{ resource[column] }}</td>
+					{% endfor %}	
+				</tr>
+			{% endfor %}  					
+			</table>
+		{% endif %}	  				  							  										  			 							  				
+		
+		
+		<h3>{{  action['action_desc']  }}</h3>		
+		
+		<h4>Thank you,</h4>
+		<h4>Xgrid Cost Control Team</h4>
+		<h5>
+			For more information, please contact the us at
+				<a href="mailto:xccc@xgrid.co"> XCCC-Team</a>
+		</h5>
+    </ul>
+</body>
+</html>

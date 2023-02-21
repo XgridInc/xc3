@@ -1,0 +1,21 @@
+policies:
+- name: ec2-auto-tag-user
+  resource: ec2
+  mode:
+    type: cloudtrail
+    role: arn:aws:iam::{account_id}:role/onboarding-custodian-role
+    events:
+      - RunInstances
+  filters:
+    - tag:Owner: absent
+  actions:
+    - type: auto-tag-user
+      tag: Owner
+    - type: notify
+      template: xccc.html
+      subject: "[XCCC] EC2 Instance Tagging with Owner Information"
+      to:
+      - mfaheem@xgrid.co
+      transport:
+        type: sqs
+        queue: https://sqs.eu-west-1.amazonaws.com/{account_id}/cloud-custodian-queue
