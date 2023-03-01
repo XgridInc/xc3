@@ -1,8 +1,3 @@
-variable "profile" {
-  type        = string
-  description = "The name of AWS Profile"
-}
-
 variable "region" {
   type        = string
   description = "AWS region where resources will be deployed"
@@ -12,9 +7,14 @@ variable "vpc_cidr_block" {
   description = "VPC CIDR Block"
 }
 
-variable "subnet1_cidr_block" {
+variable "public_subnet_cidr_block" {
   type        = string
-  description = "The CIDR Block of the subnet 1"
+  description = "The CIDR Block of the public subnet"
+}
+
+variable "private_subnet_cidr_block" {
+  type        = string
+  description = "The CIDR Block of the private subnet"
 }
 
 variable "ses_email_address" {
@@ -39,11 +39,6 @@ variable "ssh_key" {
   description = "The Name of SSH Key Pair for EC2 instance"
 }
 
-variable "allow_traffic" {
-  type        = string
-  description = "CIDR Block to allow traffic"
-}
-
 variable "security_group_ingress" {
   type = map(object({
     description = string
@@ -53,4 +48,9 @@ variable "security_group_ingress" {
     cidr_blocks = list(string)
   }))
   description = "Security Group Ingress Rules"
+}
+
+variable "creator_email" {
+  type        = string
+  description = "Email address of a person who is provisioning the infrastructure"
 }

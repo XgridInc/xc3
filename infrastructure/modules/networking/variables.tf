@@ -3,9 +3,14 @@ variable "vpc_cidr_block" {
   description = "AWS VPC CIDR range"
 }
 
-variable "subnet1_cidr_block" {
+variable "public_subnet_cidr_block" {
   type        = string
-  description = "AWS VPC CIDR range for subnet 1"
+  description = "AWS VPC CIDR range for public subnet"
+}
+
+variable "private_subnet_cidr_block" {
+  type        = string
+  description = "AWS VPC CIDR range for private subnet"
 }
 
 variable "namespace" {
@@ -13,14 +18,19 @@ variable "namespace" {
   description = "The namespace referring to an environment"
 }
 
+variable "owner_email" {
+  type        = string
+  description = "Email address of the team working in this project"
+}
+
+variable "creator_email" {
+  type        = string
+  description = "Email address of a person who is provisioning the infrastructure of x-ccc"
+}
+
 variable "key" {
   type        = string
   description = "The name of the key used for an environment"
-}
-
-variable "allow_traffic" {
-  type        = string
-  description = "CIDR Block to allow traffic"
 }
 
 variable "security_group_ingress" {

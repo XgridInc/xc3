@@ -13,6 +13,16 @@ variable "security_group_id" {
   description = "The ID of the security group that will be associated with the resources"
 }
 
+variable "public_subnet_id" {
+  type        = string
+  description = "The ID of the public subnet where the bastion host server will be created"
+}
+
+variable "public_security_group_id" {
+  type        = string
+  description = "The ID of the security group that will be associated with the bastion host"
+}
+
 variable "instance_type" {
   type        = string
   description = "The type of the EC2 instance"
@@ -42,4 +52,14 @@ variable "namespace" {
 variable "key" {
   type        = string
   description = "The name of the key used for an env"
+}
+
+variable "owner_email" {
+  type        = string
+  description = "Email address of a owner who is leading the team"
+}
+
+variable "creator_email" {
+  type        = string
+  description = "Email address of a person who is provisioning the infrastructure"
 }

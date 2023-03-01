@@ -1,8 +1,6 @@
-# Assumption: An IAM role for EC2 might be given by the customer, 
-# So we will be making the following logic dynamic if IAM role is provided.
-
-
-# Creating IAM Role for EC2 Instance 
+# Assumption: An IAM role for EC2 might be given by the customer,
+# So we will be making the following logic dynamic if IAM role is provided. 
+# Creating IAM Role for EC2 Instance
 resource "aws_iam_role" "this" {
   name = "${var.key}-sts-role"
   assume_role_policy = jsonencode({
@@ -43,11 +41,29 @@ resource "aws_instance" "this" {
   subnet_id                   = var.subnet_id
   security_groups             = [var.security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
-
-  user_data = file("${path.module}/startup-script.sh")
+  user_data                   = file("${path.module}/startup-script.sh")
 
   tags = {
     Name = "${var.namespace}-EC2"
+  }
+}
+
+# Creating Bastion Host Server
+
+resource "aws_instance" "bastion_host" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = var.instance_type
+  associate_public_ip_address = true
+  key_name                    = aws_key_pair.this.key_name
+  subnet_id                   = var.public_subnet_id
+  security_groups             = [var.public_security_group_id]
+  iam_instance_profile        = aws_iam_instance_profile.this.name
+
+  tags = {
+    Name    = "${var.namespace}-Bastion-Host-Server"
+    Project = var.namespace
+    Owner   = var.owner_email
+    Creator = var.creator_email
   }
 }
 
@@ -67,3 +83,4 @@ resource "aws_sqs_queue" "this" {
   name = var.sqs_queue_name
   tags = { Name = "${var.namespace}-SQS-KEY" }
 }
+
