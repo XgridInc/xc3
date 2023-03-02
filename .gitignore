@@ -21,3 +21,6 @@
 */xccc-key.pub
 */xccc-key
 */*.out
+
+**/.env
+**/*.png

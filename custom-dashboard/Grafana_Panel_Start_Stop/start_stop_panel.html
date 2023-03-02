@@ -1,0 +1,12 @@
+<div id="table_data">
+    {{#each data}}
+    <table>
+        <tr>
+            <td class="resourceid">{{iam_role_service_resource_id}}</td>
+            <td>{{iam_role_service_cost}}</td>
+            <td class="status"><button class="editbtn" id="checking" type="submit">{{iam_role_service_state}}</button>
+            </td>
+        </tr>
+    </table>
+    {{/each}}
+</div>
