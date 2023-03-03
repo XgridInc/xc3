@@ -15,17 +15,18 @@ locals {
       source_security_group_id = "${aws_security_group.serverless_sg.id}"
     }
   }
+
+  tags = {
+    Owner   = var.owner_email
+    Creator = var.creator_email
+    Project = var.namespace
+  }
 }
 resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = "true"
 
-  tags = {
-    Name    = "${var.namespace}-VPC"
-    Project = "${var.namespace}"
-    Owner   = "${var.owner_email}"
-    Creator = "${var.creator_email}"
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-VPC" }))
 }
 
 resource "aws_subnet" "public_subnet" {
@@ -33,12 +34,8 @@ resource "aws_subnet" "public_subnet" {
   cidr_block              = var.public_subnet_cidr_block
   map_public_ip_on_launch = true
 
-  tags = {
-    Name    = "${var.namespace}-Public-Subnet-1"
-    Project = "${var.namespace}"
-    Owner   = "${var.owner_email}"
-    Creator = "${var.creator_email}"
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Public-Subnet-1" }))
+
 }
 
 resource "aws_subnet" "private_subnet" {
@@ -46,12 +43,8 @@ resource "aws_subnet" "private_subnet" {
   cidr_block              = var.private_subnet_cidr_block
   map_public_ip_on_launch = false
 
-  tags = {
-    Name    = "${var.namespace}-Private-Subnet-1"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Private-Subnet-1" }))
+
 }
 
 resource "aws_security_group" "private_sg" {
@@ -65,12 +58,8 @@ resource "aws_security_group" "private_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name    = "${var.namespace}-Private-SG"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Private-SG" }))
+
 }
 
 resource "aws_security_group_rule" "private_sg_rule" {
@@ -107,7 +96,7 @@ resource "aws_security_group" "public_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.allow_traffic]
   }
   egress {
     description = "output from bastion host"
@@ -116,12 +105,9 @@ resource "aws_security_group" "public_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = {
-    Name    = "${var.namespace}-Public-SG"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Public-SG" }))
+
 }
 
 # Creating a Security Group for lambda-ec2 accessibility
@@ -144,12 +130,9 @@ resource "aws_security_group" "serverless_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = {
-    Name    = "${var.namespace}-Serverless-SG"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Serverless-SG" }))
+
 }
 
 # Creating Internet Gateway to make subnet public
@@ -157,12 +140,8 @@ resource "aws_security_group" "serverless_sg" {
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
-  tags = {
-    Name    = "${var.namespace}-Internet-Gateway"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Internet-Gateway" }))
+
 }
 
 # Creating Custom Route Table for Public Subnet
@@ -175,12 +154,8 @@ resource "aws_route_table" "this" {
     gateway_id = aws_internet_gateway.this.id
   }
 
-  tags = {
-    Name    = "${var.namespace}-Public-Route-Table"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Public-Route-Table" }))
+
 }
 
 resource "aws_route_table_association" "this" {
@@ -191,12 +166,9 @@ resource "aws_route_table_association" "this" {
 # Creating an Elastic IP for the NAT Gateway!
 resource "aws_eip" "this" {
   vpc = true
-  tags = {
-    Name    = "${var.namespace}-eip"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-eip" }))
+
 }
 
 # Creating a NAT Gateway!
@@ -206,12 +178,9 @@ resource "aws_nat_gateway" "this" {
 
   # Associating it in the Public Subnet!
   subnet_id = aws_subnet.public_subnet.id
-  tags = {
-    Name    = "${var.namespace}-Nat-Gateway"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Nat-Gateway" }))
+
 }
 
 # Creating a Route Table for the Nat Gateway!
@@ -223,12 +192,8 @@ resource "aws_route_table" "private_rt" {
     nat_gateway_id = aws_nat_gateway.this.id
   }
 
-  tags = {
-    Name    = "${var.namespace}-Private-Route-Table"
-    Project = var.namespace
-    Owner   = var.owner_email
-    Creator = var.creator_email
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Private-Route-Table" }))
+
 
 }
 

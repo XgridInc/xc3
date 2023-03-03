@@ -8,6 +8,11 @@ variable "public_subnet_cidr_block" {
   description = "AWS VPC CIDR range for public subnet"
 }
 
+variable "allow_traffic" {
+  type        = string
+  description = "IP Address to access bastion host server"
+}
+
 variable "private_subnet_cidr_block" {
   type        = string
   description = "AWS VPC CIDR range for private subnet"

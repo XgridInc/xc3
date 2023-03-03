@@ -17,6 +17,11 @@ variable "private_subnet_cidr_block" {
   description = "The CIDR Block of the private subnet"
 }
 
+variable "allow_traffic" {
+  type        = string
+  description = "IP Address to access bastion host server"
+}
+
 variable "ses_email_address" {
   type        = string
   description = "The email address for SES identity"
@@ -24,8 +29,18 @@ variable "ses_email_address" {
 
 variable "sqs_queue_name" {
   type        = string
-  default     = "xccc-notification-queue"
   description = "The name of the SQS queue"
+}
+
+variable "sns_topic_name" {
+  type        = string
+  description = "The name of the SNS Topic"
+}
+
+variable "s3_xccc_bucket" {
+  type        = string
+  default     = "xccc-metadata-bucket"
+  description = "The name of the S3 Bucket"
 }
 
 variable "instance_type" {
@@ -53,4 +68,20 @@ variable "security_group_ingress" {
 variable "creator_email" {
   type        = string
   description = "Email address of a person who is provisioning the infrastructure"
+}
+
+variable "prometheus_layer" {
+  description = "S3 key for prometheus layer"
+}
+
+variable "mysql_layer" {
+  description = "S3 key for mysql layer"
+}
+
+variable "username" {
+  type = string
+}
+
+variable "password" {
+  type = string
 }

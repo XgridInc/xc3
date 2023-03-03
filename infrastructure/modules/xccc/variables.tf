@@ -1,3 +1,8 @@
+variable "region" {
+  type        = string
+  description = "The name of the region in which infrastructure will be provisioned"
+}
+
 variable "vpc_id" {
   type        = string
   description = "The ID of the VPC where the resources will be created"
@@ -44,6 +49,24 @@ variable "sqs_queue_name" {
   description = "The name of the SQS queue"
 }
 
+variable "sns_topic_name" {
+  type        = string
+  description = "The name of the sns topic"
+}
+
+variable "s3_xccc_bucket" {
+  type        = string
+  description = "The name of the S3 bucket for storage of cc policies metadata"
+}
+
+variable "prometheus_layer" {
+  description = "S3 key for prometheus layer"
+}
+
+variable "mysql_layer" {
+  description = "S3 key for mysql layer"
+}
+
 variable "namespace" {
   type        = string
   description = "The namespace referring to an env"
@@ -61,5 +84,14 @@ variable "owner_email" {
 
 variable "creator_email" {
   type        = string
-  description = "Email address of a person who is provisioning the infrastructure"
+  description = "The name of the S3 bucket for storage of cc policies metadata"
 }
+
+variable "username" {
+  type = string
+}
+
+variable "password" {
+  type = string
+}
+

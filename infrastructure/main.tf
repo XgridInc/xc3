@@ -12,6 +12,7 @@ module "networking" {
   vpc_cidr_block            = var.vpc_cidr_block
   public_subnet_cidr_block  = var.public_subnet_cidr_block
   private_subnet_cidr_block = var.private_subnet_cidr_block
+  allow_traffic             = var.allow_traffic
   security_group_ingress    = var.security_group_ingress
   namespace                 = local.namespace
   creator_email             = var.creator_email
@@ -37,4 +38,11 @@ module "xccc" {
   key                      = local.key
   owner_email              = local.owner_email
   creator_email            = var.creator_email
+  region                   = var.region
+  sns_topic_name           = var.sns_topic_name
+  s3_xccc_bucket           = var.s3_xccc_bucket
+  prometheus_layer         = var.prometheus_layer
+  mysql_layer              = var.mysql_layer
+  username                 = var.username
+  password                 = var.password
 }
