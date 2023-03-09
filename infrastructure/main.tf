@@ -1,5 +1,4 @@
 locals {
-  namespace   = "X-CCC"
   owner_email = "xccc@xgrid.co"
   key         = "xccc"
 }
@@ -14,7 +13,7 @@ module "networking" {
   private_subnet_cidr_block = var.private_subnet_cidr_block
   allow_traffic             = var.allow_traffic
   security_group_ingress    = var.security_group_ingress
-  namespace                 = local.namespace
+  namespace                 = var.namespace
   creator_email             = var.creator_email
   owner_email               = local.owner_email
   key                       = local.key
@@ -34,7 +33,7 @@ module "xccc" {
   sqs_queue_name           = var.sqs_queue_name
   ssh_key                  = var.ssh_key
   instance_type            = var.instance_type
-  namespace                = local.namespace
+  namespace                = var.namespace
   key                      = local.key
   owner_email              = local.owner_email
   creator_email            = var.creator_email
@@ -45,4 +44,21 @@ module "xccc" {
   mysql_layer              = var.mysql_layer
   username                 = var.username
   password                 = var.password
+}
+
+// Terraform Module for Serverless Application
+module "serverless" {
+  source                     = "./modules/serverless"
+  namespace                  = var.namespace
+  owner_email                = local.owner_email
+  creator_email              = var.creator_email
+  total_account_cost_lambda  = var.total_account_cost_lambda
+  subnet_id                  = module.networking.private_subnet_id
+  security_group_id          = module.networking.serverless_security_group_id
+  prometheus_ip              = module.xccc.private_ip
+  prometheus_layer           = module.xccc.prometheus_layer_arn
+  timeout                    = var.timeout
+  memory_size                = var.memory_size
+  account_id                 = var.account_id
+  total_account_cost_cronjob = var.total_account_cost_cronjob
 }
