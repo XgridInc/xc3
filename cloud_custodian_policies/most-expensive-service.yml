@@ -1,0 +1,12 @@
+policies:
+  - name: most-expensive-service
+    resource: account
+    mode:
+       role: arn:aws:iam::{account_id}:role/onboarding-custodian-role
+       type: periodic
+       schedule: 'cron(0 5 * * ? *)'
+    actions:
+      - type: invoke-lambda
+        function: arn:aws:lambda:{region}:{account_id}:function:{expensive_service_lambda}
+        timeout: 300
+        async: false

@@ -22,5 +22,5 @@
 */xccc-key
 */*.out
 */*.env
-*/*.zip
+**/*.zip
 **/*.png

@@ -4,6 +4,7 @@
 provider "registry.terraform.io/hashicorp/archive" {
   version = "2.3.0"
   hashes = [
+    "h1:NaDbOqAcA9d8DiAS5/6+5smXwN3/+twJGb3QRiz6pNw=",
     "h1:OmE1tPjiST8iQp6fC0N3Xzur+q2RvgvD7Lz0TpKSRBw=",
     "zh:0869128d13abe12b297b0cd13b8767f10d6bf047f5afc4215615aabc39c2eb4f",
     "zh:481ed837d63ba3aa45dd8736da83e911e3509dee0e7961bf5c00ed2644f807b3",

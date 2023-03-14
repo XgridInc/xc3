@@ -14,6 +14,13 @@ locals {
       protocol                 = "tcp"
       source_security_group_id = "${aws_security_group.serverless_sg.id}"
     }
+    "mysql" = {
+      description              = "MySQL Server"
+      from_port                = 3306
+      to_port                  = 3306
+      protocol                 = "tcp"
+      source_security_group_id = "${aws_security_group.serverless_sg.id}"
+    }
   }
 
   tags = {
@@ -48,7 +55,7 @@ resource "aws_subnet" "private_subnet" {
 }
 
 resource "aws_security_group" "private_sg" {
-  name        = "${var.key}_private_security_group"
+  name        = "${var.namespace}_private_security_group"
   vpc_id      = aws_vpc.this.id
   description = "Security Group Rules"
   egress {
@@ -89,14 +96,14 @@ resource "aws_security_group_rule" "private_default_sg_rule" {
 # Creating a Security Group for bastion host
 resource "aws_security_group" "public_sg" {
   description = "X-CCC Bastion host access for updates"
-  name        = "${var.key}_public_security_group"
+  name        = "${var.namespace}_public_security_group"
   vpc_id      = aws_vpc.this.id
   ingress {
     description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.allow_traffic]
+    cidr_blocks = var.allow_traffic
   }
   egress {
     description = "output from bastion host"
@@ -113,7 +120,7 @@ resource "aws_security_group" "public_sg" {
 # Creating a Security Group for lambda-ec2 accessibility
 resource "aws_security_group" "serverless_sg" {
   description = "X-CCC serverless module access for updates"
-  name        = "${var.key}_serverless_security_group"
+  name        = "${var.namespace}_serverless_security_group"
   vpc_id      = aws_vpc.this.id
   ingress {
     description = "All Traffic"

@@ -9,7 +9,7 @@ variable "public_subnet_cidr_block" {
 }
 
 variable "allow_traffic" {
-  type        = string
+  type        = list(string)
   description = "IP Address to access bastion host server"
 }
 

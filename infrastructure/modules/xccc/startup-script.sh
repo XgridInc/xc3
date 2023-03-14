@@ -29,9 +29,40 @@ source custodian/bin/activate
 pip install c7n c7n-mailer
 deactivate
 
-#Install prometheus/grafana/pushgateway
-export ADMIN_USER=${username}
-export ADMIN_PASSWORD=${password}
-git clone https://github.com/Einsteinish/Docker-Compose-Prometheus-and-Grafana.git
-cd Docker-Compose-Prometheus-and-Grafana
-sudo docker-compose up -d
+#Install Prometheus
+sudo mkdir /etc/prometheus
+cd /etc/prometheus/ && sudo touch prometheus.yml
+sudo mkdir -p /data/prometheus
+sudo chmod 777 /data/prometheus /etc/prometheus/*
+sudo docker pull prom/prometheus
+sudo docker run -d --name=prometheus -p 9090:9090 -v /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
+
+
+# install pushgateway
+docker pull prom/pushgateway
+docker run -d -p 9091:9091 --name=pushgateway prom/pushgateway
+sudo cat > /etc/prometheus/prometheus.yml << EOF
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node_exporter'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9100']
+
+  - job_name: 'pushgateway'
+    honor_labels: true
+    static_configs:
+      - targets: ['localhost:9091']
+EOF
+sudo docker restart prometheus
+
+# Install Grafana
+#sudo docker run -d --name grafana -p 3000:3000 grafana/grafana
+sudo docker run -d -p 3000:3000 grafana/grafana-enterprise

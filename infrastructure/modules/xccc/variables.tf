@@ -44,21 +44,6 @@ variable "ses_email_address" {
   description = "The email address for SES identity"
 }
 
-variable "sqs_queue_name" {
-  type        = string
-  description = "The name of the SQS queue"
-}
-
-variable "sns_topic_name" {
-  type        = string
-  description = "The name of the sns topic"
-}
-
-variable "s3_xccc_bucket" {
-  type        = string
-  description = "The name of the S3 bucket for storage of cc policies metadata"
-}
-
 variable "prometheus_layer" {
   description = "S3 key for prometheus layer"
 }
@@ -72,11 +57,6 @@ variable "namespace" {
   description = "The namespace referring to an env"
 }
 
-variable "key" {
-  type        = string
-  description = "The name of the key used for an env"
-}
-
 variable "owner_email" {
   type        = string
   description = "Email address of a owner who is leading the team"
@@ -86,12 +66,3 @@ variable "creator_email" {
   type        = string
   description = "The name of the S3 bucket for storage of cc policies metadata"
 }
-
-variable "username" {
-  type = string
-}
-
-variable "password" {
-  type = string
-}
-

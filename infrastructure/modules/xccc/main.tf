@@ -7,9 +7,58 @@ locals {
 }
 # Assumption: An IAM role for EC2 might be given by the customer,
 # So we will be making the following logic dynamic if IAM role is provided. 
+resource "aws_iam_role_policy" "this" {
+  name = "${var.namespace}-sts-role-policy"
+  role = aws_iam_role.this.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "IAMUserWorkflow"
+        Action = [
+          "s3:PutObject",
+          "lambda:GetFunction",
+          "lambda:CreateFunction",
+          "lambda:InvokeFunction",
+          "iam:PassRole",
+          "lambda:TagResource",
+          "lambda:GetFunctionConfiguration",
+          "lambda:AddPermission",
+          "events:DescribeRule",
+          "events:PutRule",
+          "events:PutTargets",
+          "events:ListTargetsByRule",
+          "lambda:UpdateFunctionCode",
+          "events:ListRules"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.this.id}",
+          "arn:aws:s3:::${aws_s3_bucket.this.id}/*",
+          "arn:aws:lambda:*:*:function:*",
+          "arn:aws:events:*:*:rule:*",
+          "arn:aws:events:*:*:rule/*"
+        ]
+      },
+      {
+        Sid = "IAMUserAccess"
+        Action = [
+          "iam:ListUsers",
+          "iam:GetUser",
+          "iam:ListRoles",
+          "iam:GetRole",
+          "iam:ListAccountAliases"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 # Creating IAM Role for EC2 Instance
 resource "aws_iam_role" "this" {
-  name = "${var.key}-sts-role"
+  name = "${var.namespace}-sts-role"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -22,8 +71,13 @@ resource "aws_iam_role" "this" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"]
-  tags                = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2-Role" }))
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+    "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess",
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  ]
+  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2-Role" }))
 }
 
 # Creating EC2 Instance profile
@@ -42,13 +96,9 @@ resource "aws_instance" "this" {
   associate_public_ip_address = false
   key_name                    = aws_key_pair.this.key_name
   subnet_id                   = var.subnet_id
-  security_groups             = [var.security_group_id]
+  vpc_security_group_ids      = [var.security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
-  user_data = templatefile("${path.module}/startup-script.sh",
-    {
-      username = "${var.username}"
-      password = "${var.password}"
-  })
+  user_data                   = file("${path.module}/startup-script.sh")
 
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2" }))
 }
@@ -61,15 +111,15 @@ resource "aws_instance" "bastion_host" {
   associate_public_ip_address = true
   key_name                    = aws_key_pair.this.key_name
   subnet_id                   = var.public_subnet_id
-  security_groups             = [var.public_security_group_id]
+  vpc_security_group_ids      = [var.public_security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
 
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Bastion-Host-Server" }))
 }
 
 resource "aws_key_pair" "this" {
-  key_name   = "${var.key}-key"
-  public_key = file("${var.key}-key.pub")
+  key_name   = var.ssh_key
+  public_key = file("${var.ssh_key}.pub")
   tags       = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-SSH-KEY" }))
 }
 
@@ -80,19 +130,19 @@ resource "aws_ses_email_identity" "this" {
 }
 
 resource "aws_sqs_queue" "this" {
-  name = var.sqs_queue_name
+  name = "${var.namespace}-notification-queue"
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-SQS-KEY" }))
 }
 
 #Configuring SNS for passing payload to lambda functions
 resource "aws_sns_topic" "this" {
-  name = var.sns_topic_name
+  name = "${var.namespace}-notification-topic"
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-SNS-Topic" }))
 }
 
 #Configuring S3 bucket for storage of cloud custodian policies metadata
 resource "aws_s3_bucket" "this" {
-  bucket        = var.s3_xccc_bucket
+  bucket        = "${var.namespace}-metadata-storage"
   force_destroy = false
   tags          = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Bucket" }))
 }
@@ -135,4 +185,3 @@ resource "aws_lambda_layer_version" "lambda_layer_mysql" {
     null_resource.upload_files_on_s3
   ]
 }
-

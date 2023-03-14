@@ -45,7 +45,7 @@ variable "security_group_id" {
 
 variable "total_account_cost_lambda" {
   type        = string
-  description = "The name of the lambda function that will be used to calculate cost metrics of resources associated with specific IAM User"
+  description = "The name of the lambda function that will be used to calculate cost metrics of provided AWS Account"
 }
 
 variable "account_id" {
@@ -56,4 +56,24 @@ variable "account_id" {
 variable "total_account_cost_cronjob" {
   type        = string
   description = "Cron Job frequency for Total Account Cost"
+}
+
+variable "sns_topic_arn" {
+  type = string
+  description = "SNS Topic for invoking lambda"
+}
+
+variable "s3_xccc_bucket" {
+  type = string
+  description = "X-CCC metadata storage bucket"
+}
+
+variable "mysql_layer" {
+  type = string
+  description = "MySQL layer ARN"
+}
+
+variable "region" {
+  type        = string
+  description = "AWS region where resources will be deployed"
 }

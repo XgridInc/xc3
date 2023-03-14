@@ -1,0 +1,7 @@
+policies:
+  - name: iam-users-in-use
+    resource: iam-user
+    mode:
+       role: arn:aws:iam::{account_id}:role/onboarding-custodian-role
+       type: periodic
+       schedule: 'cron(0 5 * * ? *)'

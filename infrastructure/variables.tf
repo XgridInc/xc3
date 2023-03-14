@@ -1,7 +1,13 @@
+variable "namespace" {
+  type        = string
+  description = "The namespace referring to an env"
+}
+
 variable "region" {
   type        = string
   description = "AWS region where resources will be deployed"
 }
+
 variable "vpc_cidr_block" {
   type        = string
   description = "VPC CIDR Block"
@@ -18,29 +24,13 @@ variable "private_subnet_cidr_block" {
 }
 
 variable "allow_traffic" {
-  type        = string
+  type        = list(string)
   description = "IP Address to access bastion host server"
 }
 
 variable "ses_email_address" {
   type        = string
   description = "The email address for SES identity"
-}
-
-variable "sqs_queue_name" {
-  type        = string
-  description = "The name of the SQS queue"
-}
-
-variable "sns_topic_name" {
-  type        = string
-  description = "The name of the SNS Topic"
-}
-
-variable "s3_xccc_bucket" {
-  type        = string
-  default     = "xccc-metadata-bucket"
-  description = "The name of the S3 Bucket"
 }
 
 variable "instance_type" {
@@ -78,10 +68,26 @@ variable "mysql_layer" {
   description = "S3 key for mysql layer"
 }
 
-variable "username" {
-  type = string
+variable "memory_size" {
+  description = "The amount of memory to allocate to the lambda function"
 }
 
-variable "password" {
-  type = string
+variable "timeout" {
+  type        = number
+  description = "The number of seconds before the lambda function times out"
+}
+
+variable "total_account_cost_lambda" {
+  type        = string
+  description = "The name of the lambda function that will be used to calculate cost metrics of provided AWS Account"
+}
+
+variable "account_id" {
+  type        = string
+  description = "AWS Account id in which infrastructure will be deployed"
+}
+
+variable "total_account_cost_cronjob" {
+  type        = string
+  description = "Cron Job frequency for Total Account Cost"
 }
