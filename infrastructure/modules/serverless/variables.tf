@@ -59,17 +59,16 @@ variable "total_account_cost_cronjob" {
 }
 
 variable "sns_topic_arn" {
-  type = string
+  type        = string
   description = "SNS Topic for invoking lambda"
 }
 
 variable "s3_xccc_bucket" {
-  type = string
   description = "X-CCC metadata storage bucket"
 }
 
 variable "mysql_layer" {
-  type = string
+  type        = string
   description = "MySQL layer ARN"
 }
 
