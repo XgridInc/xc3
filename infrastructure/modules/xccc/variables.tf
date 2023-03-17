@@ -13,19 +13,14 @@ variable "subnet_id" {
   description = "The ID of the subnet where the resources will be created"
 }
 
-variable "security_group_id" {
-  type        = string
-  description = "The ID of the security group that will be associated with the resources"
+variable "security_group_ids" {
+  type        = map(string)
+  description = "security group ids"
 }
 
-variable "public_subnet_id" {
-  type        = string
+variable "public_subnet_ids" {
+  type        = list(string)
   description = "The ID of the public subnet where the bastion host server will be created"
-}
-
-variable "public_security_group_id" {
-  type        = string
-  description = "The ID of the security group that will be associated with the bastion host"
 }
 
 variable "instance_type" {
@@ -65,4 +60,9 @@ variable "owner_email" {
 variable "creator_email" {
   type        = string
   description = "The name of the S3 bucket for storage of cc policies metadata"
+}
+
+variable "domain_name" {
+  type        = string
+  description = "Domain name for SSL Certificates"
 }

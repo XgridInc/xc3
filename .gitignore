@@ -18,8 +18,8 @@
 */.terraform-plugins/*
 
 */*.pem
-*/xccc-key.pub
-*/xccc-key
+*/*-key.pub
+*/*-key
 */*.out
 */*.env
 **/*.zip

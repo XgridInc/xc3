@@ -14,8 +14,8 @@ variable "vpc_cidr_block" {
 }
 
 variable "public_subnet_cidr_block" {
-  type        = string
-  description = "The CIDR Block of the public subnet"
+  type        = map(string)
+  description = "The CIDR Blocks of the public subnet"
 }
 
 variable "private_subnet_cidr_block" {
@@ -90,4 +90,9 @@ variable "account_id" {
 variable "total_account_cost_cronjob" {
   type        = string
   description = "Cron Job frequency for Total Account Cost"
+}
+
+variable "domain_name" {
+  type        = string
+  description = "Domain name for SSL Certificates"
 }

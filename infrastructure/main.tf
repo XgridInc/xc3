@@ -23,20 +23,20 @@ module "networking" {
 module "xccc" {
   source = "./modules/xccc"
 
-  vpc_id                   = module.networking.vpc_id
-  subnet_id                = module.networking.private_subnet_id
-  public_subnet_id         = module.networking.public_subnet_id
-  security_group_id        = module.networking.private_security_group_id
-  public_security_group_id = module.networking.public_security_group_id
-  ses_email_address        = var.ses_email_address
-  ssh_key                  = var.ssh_key
-  instance_type            = var.instance_type
-  namespace                = var.namespace
-  owner_email              = local.owner_email
-  creator_email            = var.creator_email
-  region                   = var.region
-  prometheus_layer         = var.prometheus_layer
-  mysql_layer              = var.mysql_layer
+  vpc_id             = module.networking.vpc_id
+  subnet_id          = module.networking.private_subnet_id
+  public_subnet_ids  = module.networking.public_subnet_ids
+  security_group_ids = module.networking.security_group_ids
+  ses_email_address  = var.ses_email_address
+  ssh_key            = var.ssh_key
+  instance_type      = var.instance_type
+  namespace          = var.namespace
+  owner_email        = local.owner_email
+  creator_email      = var.creator_email
+  region             = var.region
+  prometheus_layer   = var.prometheus_layer
+  mysql_layer        = var.mysql_layer
+  domain_name        = var.domain_name
 }
 
 // Terraform Module for Serverless Application
@@ -47,7 +47,7 @@ module "serverless" {
   creator_email              = var.creator_email
   region                     = var.region
   subnet_id                  = module.networking.private_subnet_id
-  security_group_id          = module.networking.serverless_security_group_id
+  security_group_id          = module.networking.security_group_ids.serverless_security_group_id
   s3_xccc_bucket             = module.xccc.s3_xccc_bucket
   sns_topic_arn              = module.xccc.sns_topic_arn
   prometheus_ip              = module.xccc.private_ip

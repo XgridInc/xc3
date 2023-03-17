@@ -96,9 +96,10 @@ resource "aws_instance" "this" {
   associate_public_ip_address = false
   key_name                    = aws_key_pair.this.key_name
   subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = [var.security_group_id]
-  iam_instance_profile        = aws_iam_instance_profile.this.name
-  user_data                   = file("${path.module}/startup-script.sh")
+  # vpc_security_group_ids      = [var.security_group_id]
+  vpc_security_group_ids = [var.security_group_ids.private_security_group_id]
+  iam_instance_profile   = aws_iam_instance_profile.this.name
+  user_data              = file("${path.module}/startup-script.sh")
 
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2" }))
 }
@@ -110,9 +111,10 @@ resource "aws_instance" "bastion_host" {
   instance_type               = var.instance_type
   associate_public_ip_address = true
   key_name                    = aws_key_pair.this.key_name
-  subnet_id                   = var.public_subnet_id
-  vpc_security_group_ids      = [var.public_security_group_id]
-  iam_instance_profile        = aws_iam_instance_profile.this.name
+  subnet_id                   = var.public_subnet_ids[0]
+  # vpc_security_group_ids      = [var.public_security_group_id]
+  vpc_security_group_ids = [var.security_group_ids.public_security_group_id]
+  iam_instance_profile   = aws_iam_instance_profile.this.name
 
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Bastion-Host-Server" }))
 }
