@@ -1,0 +1,26 @@
+policies:
+
+  - name: ec2-start-instance-on-monday
+    resource: ec2
+    mode:
+       role: arn:aws:iam::{account_id}:role/onboarding-custodian-role
+       type: periodic
+       schedule: "cron(01 12 ? * MON,TUE *)"
+
+    filters:
+       - "State.Name": stopped
+       - type: onhour
+         tag: c7n_on_hours
+         default_tz: utc
+         onhour: 12
+
+    actions:
+       - start
+       - type: notify
+         template: startstop-ec2-instance.html 
+         subject: "EC2 Instance has been started"
+         to:
+          - yaseen.zafar@xgrid.co
+         transport:
+           type: sqs
+           queue: https://sqs.eu-west-1.amazonaws.com/{account_id}/cloud-custodian-queue

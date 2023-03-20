@@ -1,0 +1,26 @@
+policies:
+
+  - name: ec2-stop-instance-on-weekends
+    resource: ec2
+    mode:
+       role: arn:aws:iam::{account_id}:role/onboarding-custodian-role
+       type: periodic
+       schedule: "cron(01 12 ? * SAT,SUN *)"
+
+    filters:
+       - "State.Name": running
+       - type: offhour
+         tag: c7n_off_hours
+         default_tz: utc
+         offhour: 18
+
+    actions:
+       - stop
+       - type: notify
+         template: startstop-ec2-instance.html 
+         subject: "EC2 Instance has been stopped"
+         to:
+          - yaseen.zafar@xgrid.co
+         transport:
+           type: sqs
+           queue: https://sqs.eu-west-1.amazonaws.com/201635854701/cloud-custodian-queue      
