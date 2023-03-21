@@ -1,0 +1,25 @@
+policies:
+- name: eks-auto-tag-user
+  resource: eks
+  mode:
+    type: cloudtrail
+    role: arn:aws:iam::{account_id}:role/onboarding-custodian-role
+    events:
+      - source: "eks.amazonaws.com"
+        event: "CreateCluster"
+        ids: "requestParameters.name"
+  filters:
+    - or:
+        - "tag:Creator": absent
+        - "tag:Owner": absent
+        - "tag:Project": absent	
+  actions:
+    - type: notify
+      template: xccc.html
+      subject: "[Xmop] EKS Cluster non-conformant to tagging Policies"
+      to:
+      - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.eu-west-1.amazonaws.com/{account_id}/cloud-custodian-queue
+        

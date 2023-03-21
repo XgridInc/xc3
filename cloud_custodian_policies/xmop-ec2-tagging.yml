@@ -1,0 +1,26 @@
+policies:
+- name: ec2-auto-tag-user
+  resource: ec2
+  mode:
+    type: cloudtrail
+    role: arn:aws:iam::{account_id}:role/onboarding-custodian-role
+    events:
+      - RunInstances
+    trail: saman-cloudtrail
+  filters:
+    - or:
+        - "tag:Creator": absent
+        - "tag:Owner": absent
+        - "tag:Project": absent	
+  actions:
+    - type: auto-tag-user
+      tag: Creator
+    - type: notify
+      template: xccc.html
+      subject: "[Xmop] EC2 Instance non-conformant to tagging Policies"
+      to:
+      - event-owner
+      transport:
+        type: sqs
+        queue: https://sqs.eu-west-1.amazonaws.com/{account_id}/cloud-custodian-queue
+        
