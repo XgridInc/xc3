@@ -33,11 +33,6 @@ variable "creator_email" {
   description = "Email address of a person who is provisioning the infrastructure of x-ccc"
 }
 
-variable "key" {
-  type        = string
-  description = "The name of the key used for an environment"
-}
-
 variable "security_group_ingress" {
   type = map(object({
     description = string

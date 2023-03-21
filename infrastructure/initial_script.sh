@@ -3,6 +3,7 @@
 aws_region="eu-west-1"
 dynamo_table_name="terraform-lock"
 bucket_name="terraform-state-xccc"
+namespace="x-ccc"
 
 aws s3api create-bucket --bucket ${bucket_name} --region ${aws_region} --create-bucket-configuration LocationConstraint=${aws_region}
 aws s3api put-bucket-versioning --bucket ${bucket_name} --versioning-configuration Status=Enabled --region ${aws_region}
@@ -19,4 +20,7 @@ aws dynamodb create-table \
     --key-schema AttributeName=LockID,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
     --tags Key=backup,Value=short
-    
+
+aws ec2 create-key-pair --key-name ${namespace}-key --tag-specifications \
+    "ResourceType=key-pair,Tags=[{Key=Project,Value=${namespace}},{Key=Owner,Value=xccc@xgrid.co},{Key=Creator,Value=saman.batool@xgrid.co}]" \
+    --query 'KeyMaterial' --output text > ${namespace}-key.pem --region=eu-west-1

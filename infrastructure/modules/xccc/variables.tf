@@ -29,11 +29,6 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
-variable "ssh_key" {
-  type        = string
-  description = "SSH Key Name for the EC2 instance"
-}
-
 variable "ses_email_address" {
   type        = string
   description = "The email address for SES identity"
@@ -41,10 +36,6 @@ variable "ses_email_address" {
 
 variable "prometheus_layer" {
   description = "S3 key for prometheus layer"
-}
-
-variable "mysql_layer" {
-  description = "S3 key for mysql layer"
 }
 
 variable "namespace" {

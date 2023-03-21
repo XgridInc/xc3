@@ -67,11 +67,6 @@ variable "s3_xccc_bucket" {
   description = "X-CCC metadata storage bucket"
 }
 
-variable "mysql_layer" {
-  type        = string
-  description = "MySQL layer ARN"
-}
-
 variable "region" {
   type        = string
   description = "AWS region where resources will be deployed"

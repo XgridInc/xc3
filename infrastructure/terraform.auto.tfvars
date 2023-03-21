@@ -1,4 +1,4 @@
-namespace      = "X-CCC"
+namespace      = "x-ccc"
 region         = "eu-west-1"
 account_id     = "201635854701"
 vpc_cidr_block = "10.0.0.0/24"
@@ -17,7 +17,6 @@ instance_type              = "t2.micro"
 total_account_cost_lambda  = "total_account_cost"
 total_account_cost_cronjob = "cron(0 0 */2 * ? *)"
 prometheus_layer           = "lambda_layers/python.zip"
-mysql_layer                = "lambda_layers/layer-mysql-prometheus.zip"
 memory_size                = 128
 timeout                    = 300
 security_group_ingress = {
@@ -46,13 +45,6 @@ security_group_ingress = {
     description = "HTTPS"
     from_port   = 443
     to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.0.64/26"]
-  },
-  "grafana" = {
-    description = "Grafana"
-    from_port   = 3000
-    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.64/26"]
   }

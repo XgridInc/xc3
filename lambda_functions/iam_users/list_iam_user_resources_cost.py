@@ -2,7 +2,6 @@ import json
 import boto3
 import logging
 import os
-import mysql.connector
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from datetime import date, datetime, timedelta
 
@@ -67,15 +66,6 @@ def cost_of_resources(event, resource_list,account_id):
     # Initialize the Prometheus registry and gauge
     try:
         registry = CollectorRegistry()
-        conn = mysql.connector.connect(
-            host=os.environ["host"],
-            user=os.environ["user"],
-            password=os.environ["password"],
-            database=os.environ["database"],
-            port=os.environ["port"]
-        )
-    
-        cursor = conn.cursor()
         # Creating guage metrics for resource's cost for specific IAM User
         gauge = Gauge("IAM_USER_Resource_Cost_List", "IAM User Resource List And Cost",
            labelnames=["Query_Time","user", "region", "resource", "cumulative_cost", "account_id"], 
@@ -107,24 +97,21 @@ def cost_of_resources(event, resource_list,account_id):
                     #Parsing result from cost method
                     for iterator in range(len(response["ResultsByTime"])):
                         cumulative_cost = cumulative_cost + float(response["ResultsByTime"][iterator]["Total"]["UnblendedCost"]["Amount"])
-                        cursor.execute(f"INSERT INTO user_cost_details (instance_id, amount, time_stamp,region,account_id) VALUES (%s, %s, %s,%s,%s)", (res, cumulative_cost, (datetime.strptime(response["ResultsByTime"][iterator]["TimePeriod"]["End"], '%Y-%m-%dT%H:%M:%SZ')).strftime('%Y-%m-%d %H:%M:%S')
-                        ,region,account_id))  
+                        time_delta = response["ResultsByTime"][iterator]["TimePeriod"]["End"]
+                        metric_time = time_delta.replace("00:00:00","12:02:02")
                     user_region_wise_cost =  user_region_wise_cost + cumulative_cost
-                    gauge.labels((datetime.strptime(response["ResultsByTime"][iterator]["TimePeriod"]["End"], '%Y-%m-%dT%H:%M:%SZ')).strftime(
+                    gauge.labels((datetime.strptime(metric_time, '%Y-%m-%dT%H:%M:%SZ')).strftime(
                         '%Y-%m-%d %H:%M:%S'), user, region, res, cumulative_cost,account_id).set(cumulative_cost)
                 elif "lambda" in res:
                     lambda_service = res.split(":")[-1]
-                    gauge.labels((datetime.strptime(response["ResultsByTime"][iterator]["TimePeriod"]["End"], '%Y-%m-%dT%H:%M:%SZ')).strftime(
+                    time_delta = response["ResultsByTime"][iterator]["TimePeriod"]["End"]
+                    metric_time = time_delta.replace("00:00:00","12:02:02")
+                    gauge.labels((datetime.strptime(metric_time, '%Y-%m-%dT%H:%M:%SZ')).strftime(
                         '%Y-%m-%d %H:%M:%S'), user, region, res, "0", account_id).set(0)
-            g_user_cost.labels(datetime.today().strftime('%Y-%m-%d %H:%M:%S'), user, region, user_region_wise_cost,account_id).set(user_region_wise_cost)
+            g_user_cost.labels(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), user, region, user_region_wise_cost,account_id).set(user_region_wise_cost)
 
                
         # Push the gauge data to Prometheus  
-        # Commit the changes to the database
-        conn.commit()
-        # Close the cursor and connection
-        cursor.close()
-        conn.close()
         push_to_gateway(os.environ['prometheus_ip'], job='IAM_User_Resource_List_Cost_'+regionName, registry=registry)
         push_to_gateway(os.environ['prometheus_ip'], job='IAM_User_Total_Services_Cost_List_'+regionName, registry=registry)
         

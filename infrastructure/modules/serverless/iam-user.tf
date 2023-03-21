@@ -80,16 +80,11 @@ resource "aws_lambda_function" "resources_cost_iam_user" {
   environment {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"
-      host          = var.prometheus_ip
-      user          = data.aws_ssm_parameter.dbusername.value
-      password      = data.aws_ssm_parameter.dbpassword.value
-      database      = data.aws_ssm_parameter.database.value
-      port          = 3306
     }
   }
   memory_size = var.memory_size
   timeout     = var.timeout
-  layers      = [var.prometheus_layer, var.mysql_layer]
+  layers      = [var.prometheus_layer]
   vpc_config {
     subnet_ids         = [var.subnet_id]
     security_group_ids = [var.security_group_id]

@@ -15,7 +15,6 @@ module "networking" {
   namespace                 = var.namespace
   creator_email             = var.creator_email
   owner_email               = local.owner_email
-  key                       = var.ssh_key
 }
 
 // Terraform Module for Xgrid Cloud Cost Control
@@ -28,14 +27,12 @@ module "xccc" {
   public_subnet_ids  = module.networking.public_subnet_ids
   security_group_ids = module.networking.security_group_ids
   ses_email_address  = var.ses_email_address
-  ssh_key            = var.ssh_key
   instance_type      = var.instance_type
   namespace          = var.namespace
   owner_email        = local.owner_email
   creator_email      = var.creator_email
   region             = var.region
   prometheus_layer   = var.prometheus_layer
-  mysql_layer        = var.mysql_layer
   domain_name        = var.domain_name
   hosted_zone_id     = var.hosted_zone_id
 }
@@ -53,7 +50,6 @@ module "serverless" {
   sns_topic_arn              = module.xccc.sns_topic_arn
   prometheus_ip              = module.xccc.private_ip
   prometheus_layer           = module.xccc.prometheus_layer_arn
-  mysql_layer                = module.xccc.mysql_layer_arn
   timeout                    = var.timeout
   memory_size                = var.memory_size
   total_account_cost_lambda  = var.total_account_cost_lambda

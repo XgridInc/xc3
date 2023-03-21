@@ -39,11 +39,6 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
-variable "ssh_key" {
-  type        = string
-  description = "The Name of SSH Key Pair for EC2 instance"
-}
-
 variable "security_group_ingress" {
   type = map(object({
     description = string
@@ -62,10 +57,6 @@ variable "creator_email" {
 
 variable "prometheus_layer" {
   description = "S3 key for prometheus layer"
-}
-
-variable "mysql_layer" {
-  description = "S3 key for mysql layer"
 }
 
 variable "memory_size" {

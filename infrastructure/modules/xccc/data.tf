@@ -7,6 +7,10 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+data "aws_key_pair" "key_pair" {
+  key_name = "${var.namespace}-key"
+}
+
 data "aws_acm_certificate" "issued" {
   domain      = var.domain_name
   most_recent = true
