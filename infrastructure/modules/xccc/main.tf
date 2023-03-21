@@ -99,7 +99,19 @@ resource "aws_instance" "this" {
   # vpc_security_group_ids      = [var.security_group_id]
   vpc_security_group_ids = [var.security_group_ids.private_security_group_id]
   iam_instance_profile   = aws_iam_instance_profile.this.name
-  user_data              = file("${path.module}/startup-script.sh")
+  user_data = templatefile("${path.module}/startup-script.sh.tpl",
+    { env_file = templatefile(
+      "${path.module}/.env-grafana.tpl",
+      {
+        client_id        = aws_cognito_user_pool_client.grafana_client.id,
+        client_secret    = aws_cognito_user_pool_client.grafana_client.client_secret,
+        domain_name      = var.domain_name,
+        user_pool_domain = aws_cognito_user_pool_domain.main.domain,
+        region           = var.region
+      }
+      )
+    }
+  )
 
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2" }))
 }

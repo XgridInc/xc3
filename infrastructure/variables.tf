@@ -96,3 +96,8 @@ variable "domain_name" {
   type        = string
   description = "Domain name for SSL Certificates"
 }
+
+variable "hosted_zone_id" {
+  type        = string
+  description = "Public Hosted Zone ID in the Route 53"
+}

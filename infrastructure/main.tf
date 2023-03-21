@@ -37,6 +37,7 @@ module "xccc" {
   prometheus_layer   = var.prometheus_layer
   mysql_layer        = var.mysql_layer
   domain_name        = var.domain_name
+  hosted_zone_id     = var.hosted_zone_id
 }
 
 // Terraform Module for Serverless Application

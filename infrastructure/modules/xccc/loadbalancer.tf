@@ -7,10 +7,10 @@ resource "aws_lb_target_group" "this" {
 
   health_check {
     path                = "/"
-    timeout             = 60
+    timeout             = 120
     healthy_threshold   = 3
     unhealthy_threshold = 3
-    interval            = 90
+    interval            = 200
   }
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-target-group" }))
 }
@@ -38,17 +38,22 @@ resource "aws_lb_listener" "this" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.this.arn
-
+  certificate_arn   = data.aws_acm_certificate.issued.arn
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
   }
 }
 
-resource "aws_acm_certificate" "this" {
-  domain_name       = var.domain_name
-  validation_method = "DNS"
+resource "aws_route53_record" "xccc_alias" {
+  name    = var.domain_name
+  type    = "A"
+  zone_id = var.hosted_zone_id
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-ssl-certificates" }))
+  alias {
+    name                   = aws_lb.this.dns_name
+    zone_id                = aws_lb.this.zone_id
+    evaluate_target_health = true
+  }
+
 }

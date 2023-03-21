@@ -7,8 +7,9 @@ public_subnet_cidr_block = {
   "eu-west-1c" = "15.0.0.128/26"
 }
 domain_name                = "xccc.xgrid.co"
+hosted_zone_id             = "Z053166920YP1STI0EK5X"
 private_subnet_cidr_block  = "15.0.0.64/26"
-allow_traffic              = ["39.46.215.160/32", "202.69.61.0/24"]
+allow_traffic              = ["39.46.215.160/32", "202.69.61.0/24", "125.209.64.240/28"]
 ses_email_address          = "xccc@xgrid.co"
 creator_email              = "mfaheem@xgrid.co"
 ssh_key                    = "faheem-key"
