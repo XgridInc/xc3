@@ -136,3 +136,18 @@ resource "null_resource" "delete_resource_parsing_zip_file" {
     command = "rm -r ${data.archive_file.resource_parsing_archive.output_path}"
   }
 }
+
+# Define the EventBridge rule
+resource "aws_cloudwatch_event_rule" "resource_list" {
+  name                = "${var.namespace}-xmop-resource-list-rule"
+  description         = "Trigger the Lambda function every week on Monday"
+  schedule_expression = "cron(0 0 * * ? 1)"
+  tags                = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-xmop-resource-list" }))
+}
+
+
+# Define the EventBridge target to invoke the Lambda function
+resource "aws_cloudwatch_event_target" "resource_list" {
+  rule = aws_cloudwatch_event_rule.resource_list.name
+  arn  = aws_lambda_function.resource_list_function.arn
+}

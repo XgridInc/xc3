@@ -96,9 +96,8 @@ resource "aws_instance" "this" {
   associate_public_ip_address = false
   key_name                    = data.aws_key_pair.key_pair.key_name
   subnet_id                   = var.subnet_id
-  # vpc_security_group_ids      = [var.security_group_id]
-  vpc_security_group_ids = [var.security_group_ids.private_security_group_id]
-  iam_instance_profile   = aws_iam_instance_profile.this.name
+  vpc_security_group_ids      = [var.security_group_ids.private_security_group_id]
+  iam_instance_profile        = aws_iam_instance_profile.this.name
   user_data = templatefile("${path.module}/startup-script.sh.tpl",
     { env_file = templatefile(
       "${path.module}/.env-grafana.tpl",
