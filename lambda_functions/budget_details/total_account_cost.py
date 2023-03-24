@@ -1,10 +1,9 @@
 import json
 import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
-from datetime import timedelta
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta, date
 
 # Initialize boto3 client
 try:
@@ -102,6 +101,14 @@ def create_monthly_dict(json_data):
             f"An error occurred: {e}. Please check the input data and try again.")
     return monthly_dict
 
+def days_passed_in_current_year():
+    """
+    Returns the number of days passed in the current year.
+    """
+    today = date.today()
+    first_day_of_year = date(today.year, 1, 1)
+    days_passed = (today - first_day_of_year).days 
+    return days_passed
 
 def lambda_handler(event, context):
     """
@@ -117,7 +124,7 @@ def lambda_handler(event, context):
         raise ValueError("Account ID not provided in event.")
 
      # Collect cost data for the past 90 days
-    cost_by_days = 90
+    cost_by_days = days_passed_in_current_year()
     end_date = str(datetime.now().date())
     start_date = str(datetime.now().date() - timedelta(days=cost_by_days))
 
@@ -130,7 +137,7 @@ def lambda_handler(event, context):
     # Push cost data to Prometheus
     registry = CollectorRegistry()
     g = Gauge('Total_Account_Cost', 'Cost by month',
-              ['month', 'cost', 'tac_account_id'], registry=registry)
+              ['month', 'cost', 'account_id'], registry=registry)
 
     for month, cost in monthly_dict.items():
         if cost >= 0:
