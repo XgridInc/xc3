@@ -74,4 +74,10 @@ variable "region" {
 variable "lambda_names" {
   type        = map(string)
   description = "The names of lambda functions in IAM Role Workflow"
+  default = {
+  "iam_roles_all"          = "../lambda_functions/iam_roles/iam_roles_all.py"
+  "iamrolesservice"        = "../lambda_functions/iam_roles/iamrolesservice.py"
+  "iamrolesservicemapping" = "../lambda_functions/iam_roles/iamrolesservicemapping.py"
+  "instancestatechange"    = "../lambda_functions/iam_roles/instancestatechange.py"
+}
 }

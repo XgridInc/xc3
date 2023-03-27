@@ -9,12 +9,6 @@ public_subnet_cidr_block = {
   "eu-west-1c" = "12.0.0.128/26"
 }
 
-lambda_names = {
-  "iam_roles_all"          = "../lambda_functions/iam_roles/iam_roles_all.py"
-  "iamrolesservice"        = "../lambda_functions/iam_roles/iamrolesservice.py"
-  "iamrolesservicemapping" = "../lambda_functions/iam_roles/iamrolesservicemapping.py"
-  "instancestatechange"    = "../lambda_functions/iam_roles/instancestatechange.py"
-}
 private_subnet_cidr_block  = "12.0.0.64/26"
 allow_traffic              = ["39.46.255.84/32"]
 ses_email_address          = "muhammad.saad@xgrid.co"

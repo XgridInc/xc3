@@ -54,5 +54,4 @@ module "serverless" {
   total_account_cost_lambda  = var.total_account_cost_lambda
   account_id                 = var.account_id
   total_account_cost_cronjob = var.total_account_cost_cronjob
-  lambda_names               = var.lambda_names
 }
