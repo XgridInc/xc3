@@ -137,6 +137,28 @@ resource "null_resource" "delete_resource_parsing_zip_file" {
   }
 }
 
+resource "aws_iam_policy" "this" {
+  name = "${var.namespace}-xmop_resource_list_eventbridge_policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Effect   = "Allow"
+        Resource = aws_lambda_function.resource_list_function.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "this" {
+  policy_arn = aws_iam_policy.this.arn
+  role       = aws_iam_role.resource_list_service_role.name
+}
+
 # Define the EventBridge rule
 resource "aws_cloudwatch_event_rule" "resource_list" {
   name                = "${var.namespace}-xmop-resource-list-rule"
@@ -150,4 +172,12 @@ resource "aws_cloudwatch_event_rule" "resource_list" {
 resource "aws_cloudwatch_event_target" "resource_list" {
   rule = aws_cloudwatch_event_rule.resource_list.name
   arn  = aws_lambda_function.resource_list_function.arn
+}
+
+resource "aws_lambda_permission" "resource_list" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.resource_list_function.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.resource_list.arn
 }

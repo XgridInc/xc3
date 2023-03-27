@@ -29,7 +29,7 @@ resource "aws_iam_role" "most_expensive_service_role" {
     ]
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
-  tags                = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-most_expensive_service_role"}))
+  tags                = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-most_expensive_service_role" }))
 
 }
 
@@ -87,5 +87,49 @@ resource "null_resource" "delete_lambda_zip_file" {
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.most_expensive_service_archive.output_path}"
   }
+}
+
+resource "aws_iam_policy" "most_expensive_service" {
+  name = "${var.namespace}-most_expensive_service_eventbridge_policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Effect   = "Allow"
+        Resource = aws_lambda_function.most_expensive_service.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "most_expensive_service" {
+  policy_arn = aws_iam_policy.most_expensive_service.arn
+  role       = aws_iam_role.most_expensive_service_role.name
+}
+
+# Define the EventBridge rule
+resource "aws_cloudwatch_event_rule" "most_expensive_service" {
+  name                = "${var.namespace}-most_expensive_service-rule"
+  description         = "Trigger the Lambda function every week on Monday"
+  schedule_expression = "cron(0 0 * * ? 1)"
+  tags                = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-most_expensive_service_rule" }))
+}
+
+# Define the EventBridge target to invoke the Lambda function
+resource "aws_cloudwatch_event_target" "most_expensive_service" {
+  rule = aws_cloudwatch_event_rule.most_expensive_service.name
+  arn  = aws_lambda_function.most_expensive_service.arn
+}
+
+resource "aws_lambda_permission" "most_expensive_service" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.most_expensive_service.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.most_expensive_service.arn
 }
 

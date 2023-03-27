@@ -150,8 +150,9 @@ resource "aws_s3_bucket_notification" "list_iam_user_trigger" {
   bucket = var.s3_xccc_bucket.id
   lambda_function {
     lambda_function_arn = aws_lambda_function.list_iam_user.arn
-    filter_prefix       = "iam-user"
+    filter_prefix       = "iam-user/"
     events              = ["s3:ObjectCreated:Put"]
+    filter_suffix       = "resources.json.gz"
   }
 }
 

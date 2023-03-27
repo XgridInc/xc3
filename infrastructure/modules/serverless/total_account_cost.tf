@@ -35,7 +35,7 @@ resource "aws_iam_role" "total_account_cost" {
 
 # Creating Inline policy
 resource "aws_iam_role_policy" "total_account_cost" {
-  name = "${var.total_account_cost_lambda}-ce-policy"
+  name = "${var.namespace}-${var.total_account_cost_lambda}-ce-policy"
   role = aws_iam_role.total_account_cost.id
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -58,7 +58,7 @@ resource "aws_iam_role_policy" "total_account_cost" {
 }
 
 resource "aws_lambda_function" "total_account_cost" {
-  function_name = var.total_account_cost_lambda
+  function_name = "${var.namespace}-${var.total_account_cost_lambda}"
   role          = aws_iam_role.total_account_cost.arn
   runtime       = "python3.9"
   handler       = "${var.total_account_cost_lambda}.lambda_handler"
@@ -89,9 +89,32 @@ resource "null_resource" "delete_zip_file" {
   }
 }
 
+resource "aws_iam_policy" "total_account_cost" {
+  name = "${var.namespace}-total_account_cost_eventbridge_policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Effect   = "Allow"
+        Resource = aws_lambda_function.total_account_cost.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "total_account_cost" {
+  policy_arn = aws_iam_policy.total_account_cost.arn
+  role       = aws_iam_role.total_account_cost.name
+}
+
+
 # Define the EventBridge rule
 resource "aws_cloudwatch_event_rule" "total_account_cost" {
-  name                = "${var.total_account_cost_lambda}-rule"
+  name                = "${var.namespace}-${var.total_account_cost_lambda}-rule"
   description         = "Trigger the Lambda function every two weeks"
   schedule_expression = var.total_account_cost_cronjob
   tags                = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-total-account-cost-rule" }))
@@ -102,4 +125,12 @@ resource "aws_cloudwatch_event_rule" "total_account_cost" {
 resource "aws_cloudwatch_event_target" "total_account_cost" {
   rule = aws_cloudwatch_event_rule.total_account_cost.name
   arn  = aws_lambda_function.total_account_cost.arn
+}
+
+resource "aws_lambda_permission" "total_account_cost" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.total_account_cost.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.total_account_cost.arn
 }

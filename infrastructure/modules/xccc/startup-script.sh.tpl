@@ -16,17 +16,18 @@ pip install c7n c7n-mailer
 deactivate
 
 #Install Prometheus
+sudo docker network create --driver bridge xccc
 sudo mkdir /etc/prometheus
 cd /etc/prometheus/ && sudo touch prometheus.yml
 sudo mkdir -p /data/prometheus
 sudo chmod 777 /data/prometheus /etc/prometheus/*
 sudo docker pull prom/prometheus
-sudo docker run -d --name=prometheus -p 9090:9090 -v /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
+sudo docker run -d --name=prometheus --network=xccc -p 9090:9090 -v /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
 
 
 # install pushgateway
 docker pull prom/pushgateway
-docker run -d -p 9091:9091 --name=pushgateway prom/pushgateway
+docker run -d -p 9091:9091 --name=pushgateway --network=xccc prom/pushgateway
 sudo cat > /etc/prometheus/prometheus.yml << EOF
 global:
   scrape_interval: 15s
@@ -46,8 +47,4 @@ sudo docker restart prometheus
 
 # Install Grafana
 sudo echo "${env_file}" > /home/ubuntu/.env
-sudo docker run -d -p 3000:3000 --name grafana --env-file /home/ubuntu/.env grafana/grafana-enterprise
-sudo docker network create xccc
-sudo docker network connect grafana
-sudo docker network conenct prometheus
-sudo docker network connect pushgateway
+sudo docker run -d -p 3000:3000 --name=grafana --network=xccc --env-file /home/ubuntu/.env grafana/grafana-enterprise
