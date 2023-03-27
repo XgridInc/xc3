@@ -1,0 +1,130 @@
+data "archive_file" "project_spend_cost" {
+  type        = "zip"
+  source_file = "../lambda_functions/budget_details/project_spend_cost.py"
+  output_path = "${path.module}/project_spend_cost.zip"
+}
+
+
+# Creating Inline policy
+resource "aws_iam_role_policy" "ProjectSpendCost" {
+  name = "${var.namespace}-lambda-inline-policy"
+  role = aws_iam_role.ProjectSpendCost.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid = "CostExplorerAccess"
+        Action = [
+          "aws-portal:ViewBilling",
+          "ce:GetCostAndUsage",
+          "ec2:DescribeInstances",
+          "ec2:CreateNetworkInterface",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DeleteNetworkInterface",
+          "ec2:AttachNetworkInterface"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# Creating IAM Role for Lambda functions
+resource "aws_iam_role" "ProjectSpendCost" {
+  name = "${var.namespace}-project-spend-cost-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = "projectspendcostrole"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+  managed_policy_arns = []
+  tags                = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-Project-Spend-Cost-Role" }))
+}
+
+resource "aws_lambda_function" "ProjectSpendCost" {
+  function_name = "${var.namespace}-project-spend-cost"
+  role          = aws_iam_role.ProjectSpendCost.arn
+  runtime       = "python3.9"
+  handler       = "project_spend_lambda.lambda_handler"
+  filename      = data.archive_file.project_spend_cost.output_path
+  environment {
+    variables = {
+      prometheus_ip = "${var.prometheus_ip}:9091"
+    }
+  }
+  memory_size = var.memory_size
+  timeout     = var.timeout
+  layers      = [var.prometheus_layer]
+
+  vpc_config {
+    subnet_ids         = [var.subnet_id]
+    security_group_ids = [var.security_group_id]
+  }
+
+  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-project_cost_function" }))
+
+}
+
+
+resource "null_resource" "delete_project_spend_cost_zip_file" {
+  triggers = {
+    lambda_function_arn = aws_lambda_function.ProjectSpendCost.arn
+  }
+
+  provisioner "local-exec" {
+    command = "rm -r ${data.archive_file.project_spend_cost.output_path}"
+  }
+}
+
+# Define the EventBridge rule
+resource "aws_cloudwatch_event_rule" "project_spend_cost" {
+  name                = "${var.namespace}-project-spend-cost-rule"
+  description         = "Trigger the Lambda function every two weeks"
+  schedule_expression = var.total_account_cost_cronjob
+  tags                = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-project-spend-cost-rule" }))
+}
+
+
+# Define the EventBridge target to invoke the Lambda function
+resource "aws_cloudwatch_event_target" "project_spend_cost" {
+  rule = aws_cloudwatch_event_rule.project_spend_cost.name
+  arn  = aws_lambda_function.ProjectSpendCost.arn
+}
+
+resource "aws_iam_policy" "eventbridge_policy" {
+  name = "eventbridge_policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "lambda:InvokeFunction"
+        ]
+        Effect   = "Allow"
+        Resource = ["${aws_lambda_function.ProjectSpendCost.arn}"]
+      }
+    ]
+  })
+}
+resource "aws_iam_role_policy_attachment" "eventbridge_policy_attachment" {
+  policy_arn = aws_iam_policy.eventbridge_policy.arn
+  role       = aws_iam_role.ProjectSpendCost.name
+}
+
+resource "aws_lambda_permission" "project_spend" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.ProjectSpendCost.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.project_spend_cost.arn
+}

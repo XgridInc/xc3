@@ -22,6 +22,8 @@ aws dynamodb create-table \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
     --tags Key=backup,Value=short
 
+
+
 aws ec2 create-key-pair --key-name ${namespace}-key --tag-specifications \
  "ResourceType=key-pair,Tags=[{Key=Project,Value=${namespace}},{Key=Owner,Value=xccc@xgrid.co},{Key=Creator,Value=saman.batool@xgrid.co}]" \
     --query 'KeyMaterial' --output text > ${namespace}-key.pem --region=eu-west-1

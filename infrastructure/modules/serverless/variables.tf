@@ -13,13 +13,12 @@ variable "creator_email" {
   description = "Email of the the Creator who is provisioning the infrastructure"
 }
 
+
 variable "prometheus_ip" {
-  type        = string
   description = "The IP address of the Prometheus server"
 }
 
 variable "memory_size" {
-  type        = number
   description = "The amount of memory to allocate to the lambda function"
 }
 
@@ -70,4 +69,9 @@ variable "s3_xccc_bucket" {
 variable "region" {
   type        = string
   description = "AWS region where resources will be deployed"
+}
+
+variable "lambda_names" {
+  type        = map(string)
+  description = "The names of lambda functions in IAM Role Workflow"
 }

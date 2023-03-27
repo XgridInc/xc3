@@ -45,6 +45,5 @@ scrape_configs:
 EOF
 sudo docker restart prometheus
 
-# Install Grafana
 sudo echo "${env_file}" > /home/ubuntu/.env
 sudo docker run -d -p 3000:3000 --name=grafana --network=xccc --env-file /home/ubuntu/.env grafana/grafana-enterprise

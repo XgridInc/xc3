@@ -98,8 +98,8 @@ resource "aws_instance" "this" {
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [var.security_group_ids.private_security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
-  user_data = templatefile("${path.module}/startup-script.sh.tpl",
-    { env_file = templatefile(
+  user_data = templatefile("${path.module}/startup-script.sh.tpl", {
+    env_file = templatefile(
       "${path.module}/.env-grafana.tpl",
       {
         client_id        = aws_cognito_user_pool_client.grafana_client.id,
@@ -108,7 +108,7 @@ resource "aws_instance" "this" {
         user_pool_domain = aws_cognito_user_pool_domain.main.domain,
         region           = var.region
       }
-      )
+    )
     }
   )
 

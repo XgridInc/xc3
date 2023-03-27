@@ -17,8 +17,6 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 
-lambda_client = boto3.client("lambda")
-
 
 def lambda_handler(event, context):
     """
@@ -73,4 +71,4 @@ def lambda_handler(event, context):
         iam_role_all_gauge.labels(role_name, region, account_id).set(0)
 
     push_to_gateway(os.environ["prometheus_ip"], job="IAM-roles-all", registry=registry)
-    return {"statusCode": 200, "body": "IAM Roles"}
+    return {"statusCode": 200, "body": json.dumps(list_of_iam_roles)}

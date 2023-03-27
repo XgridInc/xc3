@@ -92,3 +92,8 @@ variable "hosted_zone_id" {
   type        = string
   description = "Public Hosted Zone ID in the Route 53"
 }
+
+variable "lambda_names" {
+  type        = map(string)
+  description = "The names of lambda functions in IAM Role Workflow"
+}

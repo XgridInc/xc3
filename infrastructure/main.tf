@@ -16,7 +16,6 @@ module "networking" {
   creator_email             = var.creator_email
   owner_email               = local.owner_email
 }
-
 // Terraform Module for Xgrid Cloud Cost Control
 
 module "xccc" {
@@ -55,4 +54,5 @@ module "serverless" {
   total_account_cost_lambda  = var.total_account_cost_lambda
   account_id                 = var.account_id
   total_account_cost_cronjob = var.total_account_cost_cronjob
+  lambda_names               = var.lambda_names
 }
