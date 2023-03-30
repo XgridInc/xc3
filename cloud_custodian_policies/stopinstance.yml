@@ -23,4 +23,4 @@ policies:
           - yaseen.zafar@xgrid.co
          transport:
            type: sqs
-           queue: https://sqs.eu-west-1.amazonaws.com/201635854701/cloud-custodian-queue      
+           queue: https://sqs.eu-west-1.amazonaws.com/201635854701/x-ccc-notification-queue      
