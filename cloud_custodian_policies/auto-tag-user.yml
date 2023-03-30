@@ -12,7 +12,7 @@ policies:
     - type: auto-tag-user
       tag: Owner
     - type: notify
-      template: xccc.html
+      template: auto-tag-ec2.html
       subject: "[XCCC] EC2 Instance Tagging with Owner Information"
       to:
       - mfaheem@xgrid.co

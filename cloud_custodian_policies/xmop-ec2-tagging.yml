@@ -15,7 +15,7 @@ policies:
     - type: auto-tag-user
       tag: Creator
     - type: notify
-      template: xccc.html
+      template: xmop-msg-template.html
       subject: "[Xmop] EC2 Instance non-conformant to tagging Policies"
       to:
       - event-owner

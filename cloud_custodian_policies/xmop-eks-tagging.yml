@@ -15,7 +15,7 @@ policies:
         - "tag:Project": absent	
   actions:
     - type: notify
-      template: xccc.html
+      template: xmop-msg-template.html
       subject: "[Xmop] EKS Cluster non-conformant to tagging Policies"
       to:
       - event-owner
