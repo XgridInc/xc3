@@ -2,4 +2,3 @@ queue_url: https://sqs.eu-west-1.amazonaws.com/{account_id}/x-ccc-notification-q
 #topic: cloud-custodian-topic
 role: arn:aws:iam::{account_id}:role/ec2-jenkins-master-role
 from_address: mfaheem@xgrid.co
-region: eu-west-1

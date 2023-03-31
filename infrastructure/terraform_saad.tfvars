@@ -66,5 +66,5 @@ security_group_ingress = {
   }
 }
 
-memory_size    = 128
-timeout        = 300
+memory_size = 128
+timeout     = 300

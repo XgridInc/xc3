@@ -56,10 +56,12 @@ variable "creator_email" {
 }
 
 variable "prometheus_layer" {
+  type        = string
   description = "S3 key for prometheus layer"
 }
 
 variable "memory_size" {
+  type        = number
   description = "The amount of memory to allocate to the lambda function"
 }
 

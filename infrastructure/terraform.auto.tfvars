@@ -14,7 +14,7 @@ ses_email_address          = "xccc@xgrid.co"
 creator_email              = "saman.batool@xgrid.co"
 instance_type              = "t2.micro"
 total_account_cost_lambda  = "total_account_cost"
-total_account_cost_cronjob = "cron(0 0 14 * ? *)"
+total_account_cost_cronjob = "cron(0 0 1,15 * ? *)"
 prometheus_layer           = "lambda_layers/python.zip"
 memory_size                = 128
 timeout                    = 300
@@ -48,4 +48,3 @@ security_group_ingress = {
     cidr_blocks = ["10.0.0.64/26"]
   }
 }
-
