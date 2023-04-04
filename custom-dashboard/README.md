@@ -1,15 +1,17 @@
 # Resource Inventory
-This code is a AWS Lambda function written in Python that takes in an event and context as input. 
+
+This code is a AWS Lambda function written in Python that takes in an event and context as input.
 The function retrieves the tags of EC2 instances in a specified region and sends
-a list of the instances to another Lambda function for cost analysis. It uses the boto3 library to 
+a list of the instances to another Lambda function for cost analysis. It uses the boto3 library to
 interact with the AWS services. The function first retrieves the region name from the input event body,
-which is in JSON format. It then uses the resource group tagging API and the boto3 library to get the resources 
-in the specified region, and filters the resources to only show EC2 instances. It then parses the response and 
-creates a list of the instances' ARNs.It then invokes another Lambda function passing the region and the list 
+which is in JSON format. It then uses the resource group tagging API and the boto3 library to get the resources
+in the specified region, and filters the resources to only show EC2 instances. It then parses the response and
+creates a list of the instances' ARNs.It then invokes another Lambda function passing the region and the list
 of instances as the payload and waits for the response. It returns the response from the second Lambda function as a
 JSON object, including the headers for CORS.
 
 # Resource Cost and Status
+
 This code is a AWS Lambda function written in Python that takes in an event and context as input.
 The function retrieves the cost and usage of resources in the AWS region specified in the event.
 The function first checks if the input data is empty and assigns an empty dictionary in that case.
@@ -19,9 +21,26 @@ and usage data of these resources from the Cost Explorer service using the boto3
 Finally, the function returns a JSON object containing the resource ID, cost, and status of the resources.
 
 # Resource State Change
-This code is a AWS Lambda function written in Python that takes in an event and context as input. 
+
+This code is a AWS Lambda function written in Python that takes in an event and context as input.
 The function starts or stops an EC2 instance based on the request sent in the event. It uses the boto3
-library to interact with the AWS EC2 service. The function first retrieves the instance ID and status of 
-the instance from the input event body, which is in JSON format. It then parses the instance ID to extract 
-the actual instance ID and uses that to start or stop the instance by calling the appropriate method on the EC2 client. 
+library to interact with the AWS EC2 service. The function first retrieves the instance ID and status of
+the instance from the input event body, which is in JSON format. It then parses the instance ID to extract
+the actual instance ID and uses that to start or stop the instance by calling the appropriate method on the EC2 client.
 Finally, it returns the response from the EC2 service in the form of a JSON object, including the headers for CORS.
+
+## License
+
+Copyright (c) 2023, Xgrid Inc, https://xgrid.co
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

@@ -2,7 +2,7 @@
 
 This lambda function uses the AWS Cost Explorer API to find the 5 most expensive services in a provided AWS region over the last 14 days. This code is intended to be used as an AWS Lambda function, and it uses the Prometheus client library to push the data to a Prometheus Push Gateway.
 
-The script imports several libraries at the top, including json, boto3, os,  logging, date, timedelta, and prometheus_client.
+The script imports several libraries at the top, including json, boto3, os, logging, date, timedelta, and prometheus_client.
 
 # Working
 
@@ -13,3 +13,19 @@ The script defines a lambda_handler function that takes two arguments: event, an
 Then, it uses the Cost Explorer API to get the cost and usage data for the specified time period, filtering by the SERVICE dimension. It sorts the services by their costs and takes the first 5 services.
 
 It then uses the Prometheus client library to create a gauge for the data, setting the labels for the gauge with the service name, cost, region, and account ID. Finally, it pushes the gauge data to a Prometheus Push Gateway, defined by the prometheus_ip environment variable. The function returns a JSON response indicating whether the metrics were pushed successfully or not.
+
+## License
+
+Copyright (c) 2023, Xgrid Inc, https://xgrid.co
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
