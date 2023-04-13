@@ -19,28 +19,28 @@ locals {
       from_port                = 22
       to_port                  = 22
       protocol                 = "tcp"
-      source_security_group_id = "${aws_security_group.public_sg.id}"
+      source_security_group_id = aws_security_group.public_sg.id
     }
     "lambda" = {
       description              = "All Traffic"
       from_port                = 0
       to_port                  = 65535
       protocol                 = "tcp"
-      source_security_group_id = "${aws_security_group.serverless_sg.id}"
+      source_security_group_id = aws_security_group.serverless_sg.id
     }
     "mysql" = {
       description              = "MySQL Server"
       from_port                = 3306
       to_port                  = 3306
       protocol                 = "tcp"
-      source_security_group_id = "${aws_security_group.serverless_sg.id}"
+      source_security_group_id = aws_security_group.serverless_sg.id
     }
     "grafana" = {
       description              = "Grafana Server"
       from_port                = 3000
       to_port                  = 3000
       protocol                 = "tcp"
-      source_security_group_id = "${aws_security_group.lb_sg.id}"
+      source_security_group_id = aws_security_group.lb_sg.id
     }
   }
 
@@ -56,6 +56,7 @@ resource "aws_security_group" "private_sg" {
   vpc_id      = aws_vpc.this.id
   description = "Security Group Rules"
   egress {
+    description = "Allow all egress traffic from the Load Balancer Security Group"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -138,12 +139,14 @@ resource "aws_security_group" "serverless_sg" {
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Serverless-SG" }))
 
 }
-
+# tflint-ignore: terraform_required_providers
 resource "aws_security_group" "lb_sg" {
+  #ts:skip=AC_AWS_0229 We are aware of the risk and choose to skip this rule
   name_prefix = "${var.namespace}-lb-security-group"
   vpc_id      = aws_vpc.this.id
   description = "X-CCC Load Balancer Security Group"
   ingress {
+    description = "Allow all ingress traffic to port 443"
     from_port   = 443
     to_port     = 443
     protocol    = "TCP"

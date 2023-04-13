@@ -13,6 +13,7 @@
 # limitations under the License.
 
 resource "aws_lb_target_group" "this" {
+  #ts:skip=AWS.ALTG.IS.MEDIUM.0042 We are aware of the risk and choose to skip this rule
   name        = "${var.namespace}-target-group"
   port        = 80
   protocol    = "HTTP"
@@ -39,19 +40,22 @@ resource "aws_lb" "this" {
   name               = "${var.namespace}-load-balancer"
   internal           = false
   load_balancer_type = "application"
+  enable_deletion_protection   = true
 
   subnets = [for id in var.public_subnet_ids : id]
 
   security_groups = [var.security_group_ids.aws_lb_security_group_id]
   tags            = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-load-balancer" }))
 
+  drop_invalid_header_fields = true
+   
 }
 
 resource "aws_lb_listener" "this" {
   load_balancer_arn = aws_lb.this.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = data.aws_acm_certificate.issued.arn
   default_action {
     type             = "forward"

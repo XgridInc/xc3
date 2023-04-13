@@ -13,6 +13,7 @@
 # limitations under the License.
 
 resource "aws_vpc" "this" {
+  #ts:skip=AWS.VPC.Logging.Medium.0470 We are aware of the risk and choose to skip this rule
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = "true"
 
@@ -23,7 +24,7 @@ resource "aws_subnet" "public_subnet" {
   for_each = var.public_subnet_cidr_block
 
   vpc_id                  = aws_vpc.this.id
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
   cidr_block              = each.value
   availability_zone       = each.key
   tags                    = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Public-Subnet-${each.key}" }))

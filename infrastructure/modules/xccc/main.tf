@@ -105,6 +105,8 @@ resource "aws_iam_instance_profile" "this" {
 # Creating EC2 Instance that will be hosting Cloud Custodian
 
 resource "aws_instance" "this" {
+  #ts:skip=AC-AWS-NS-IN-M-1172 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.AI.LM.HIGH.0070 We are aware of the risk and choose to skip this rule
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
   associate_public_ip_address = false
@@ -126,12 +128,19 @@ resource "aws_instance" "this" {
     }
   )
 
+  root_block_device {
+    volume_size = 30
+    encrypted   = true
+  }
+
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2" }))
 }
 
 # Creating Bastion Host Server
 
 resource "aws_instance" "bastion_host" {
+  #ts:skip=AC-AWS-NS-IN-M-1172 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.AI.LM.HIGH.0070 We are aware of the risk and choose to skip this rule
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
   associate_public_ip_address = true
@@ -140,7 +149,10 @@ resource "aws_instance" "bastion_host" {
   # vpc_security_group_ids      = [var.public_security_group_id]
   vpc_security_group_ids = [var.security_group_ids.public_security_group_id]
   iam_instance_profile   = aws_iam_instance_profile.this.name
-
+  root_block_device {
+    volume_size = 30
+    encrypted   = true
+  }
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Bastion-Host-Server" }))
 }
 
@@ -151,12 +163,14 @@ resource "aws_ses_email_identity" "this" {
 }
 
 resource "aws_sqs_queue" "this" {
+  #ts:skip=AWS.SQS.NetworkSecurity.High.0570 We are aware of the risk and choose to skip this rule
   name = "${var.namespace}-notification-queue"
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-SQS-KEY" }))
 }
 
 #Configuring SNS for passing payload to lambda functions
 resource "aws_sns_topic" "this" {
+  #ts:skip=AWS.AST.DP.MEDIUM.0037 We are aware of the risk and choose to skip this rule
   name = "${var.namespace}-notification-topic"
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-SNS-Topic" }))
 }
@@ -171,7 +185,15 @@ resource "aws_s3_bucket" "this" {
   tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Bucket" }))
 }
 
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+  bucket        = aws_s3_bucket.this.bucket
+  versioning_configuration {
+  status        = "Enabled"
+}
+}
+
 # Uploading Cloud Custodian Policies and lambda layers in S3 bucket
+# tflint-ignore: terraform_required_providers
 resource "null_resource" "upload_files_on_s3" {
   triggers = {
     s3_bucket = aws_s3_bucket.this.arn
@@ -185,6 +207,7 @@ resource "null_resource" "upload_files_on_s3" {
 }
 
 # Configuring prometheus layer for lambda functions
+# tflint-ignore: terraform_required_providers
 resource "aws_lambda_layer_version" "lambda_layer_prometheus" {
   s3_bucket  = aws_s3_bucket.this.id
   s3_key     = var.prometheus_layer

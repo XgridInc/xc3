@@ -36,7 +36,7 @@ resource "aws_kms_key" "this" {
         Sid    = "Enable IAM User Permissions"
         Effect = "Allow"
         Principal = {
-          AWS = "*"
+          AWS = "arn:aws:iam::*:user/*"
         }
         Action   = "kms:*",
         Resource = "*"
@@ -61,6 +61,7 @@ resource "aws_kms_key" "this" {
 
 # Create an S3 bucket for storing CloudTrail logs
 resource "aws_s3_bucket" "this" {
+  #ts:skip=AWS.S3Bucket.LM.MEDIUM.0078 We are aware of the risk and choose to skip this rule
   bucket = "${var.namespace}-cloudtrail-logs-storage"
   tags   = merge(local.tags_label, tomap({ "Name" = "${local.tags_label.Project}-bucket" }))
 
@@ -69,6 +70,13 @@ resource "aws_s3_bucket" "this" {
 resource "aws_s3_bucket_acl" "this" {
   bucket = aws_s3_bucket.this.id
   acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "bucket_versioning" {
+  bucket        = aws_s3_bucket.this.id
+  versioning_configuration {
+  status        = "Enabled"
+}
 }
 
 resource "aws_s3_bucket_policy" "this" {

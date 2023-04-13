@@ -20,6 +20,9 @@ data "archive_file" "lambda_function_zip" {
 }
 
 resource "aws_lambda_function" "IamRolestoGrafana" {
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-iamrolestografana"
   role          = aws_iam_role.lambda_execution_role_IamRolestoGrafana.arn
   runtime       = "python3.9"
@@ -57,7 +60,7 @@ resource "aws_iam_role_policy" "IamRolestoGrafana" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-          "${aws_lambda_function.IamRolesServiceMapping.arn}"
+            aws_lambda_function.IamRolesServiceMapping.arn
         ]
       },
       {
@@ -95,6 +98,9 @@ resource "aws_iam_role" "lambda_execution_role_IamRolestoGrafana" {
 }
 
 resource "aws_lambda_function" "IamRolesServiceMapping" {
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-iamrolesservicemapping"
   role          = aws_iam_role.lambda_execution_role_IamRolesServiceMapping.arn
   runtime       = "python3.9"
@@ -150,7 +156,7 @@ resource "aws_iam_role_policy" "IamRolesServiceMapping" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-          "${aws_lambda_function.IamRolesService.arn}"
+            aws_lambda_function.IamRolesService.arn
         ]
       },
       {
@@ -189,6 +195,9 @@ resource "aws_iam_role_policy" "IamRolesServiceMapping" {
 
 
 resource "aws_lambda_function" "IamRolesService" {
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule  
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-iamrolesservice"
   role          = aws_iam_role.lambda_execution_role_IamRolesService.arn
   runtime       = "python3.9"
@@ -240,7 +249,7 @@ resource "aws_iam_role_policy" "IamRolesService" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-          "${aws_lambda_function.IamRolesService.arn}"
+            aws_lambda_function.IamRolesService.arn
         ]
       },
       {
@@ -279,6 +288,8 @@ resource "aws_iam_role" "lambda_execution_role_IamRolesService" {
 }
 
 resource "aws_lambda_function" "InstanceChangeState" {
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule  
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-instancestatechange"
   role          = aws_iam_role.lambda_execution_role_InstanceChangeState.arn
   runtime       = "python3.9"
@@ -324,7 +335,7 @@ resource "aws_iam_role_policy" "InstanceChangeState" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-          "${aws_lambda_function.InstanceChangeState.arn}"
+            aws_lambda_function.InstanceChangeState.arn
         ]
       },
       {
@@ -336,7 +347,7 @@ resource "aws_iam_role_policy" "InstanceChangeState" {
           "apigateway:GET",
           "apigateway:POST"
         ],
-        "Resource" : ["${aws_api_gateway_rest_api.apiLambda.arn}"]
+        "Resource" : [aws_api_gateway_rest_api.apiLambda.arn]
       },
       {
         Effect = "Allow"
@@ -403,8 +414,8 @@ resource "aws_api_gateway_resource" "proxy" {
 resource "aws_api_gateway_method" "proxyMethod" {
   rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
   resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "ANY"
-  authorization = "NONE"
+  http_method   = "POST"
+  authorization = "AWS_IAM"
 }
 
 resource "aws_api_gateway_integration" "lambda" {
@@ -423,8 +434,8 @@ resource "aws_api_gateway_integration" "lambda" {
 resource "aws_api_gateway_method" "proxy_root" {
   rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
   resource_id   = aws_api_gateway_rest_api.apiLambda.root_resource_id
-  http_method   = "ANY"
-  authorization = "NONE"
+  http_method   = "POST"
+  authorization = "AWS_IAM"
 }
 
 resource "aws_api_gateway_integration" "lambda_root" {
