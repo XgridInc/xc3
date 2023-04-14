@@ -57,3 +57,8 @@ variable "security_group_ingress" {
   }))
   description = "Security Group Ingress Rules"
 }
+
+variable "domain_name" {
+  type        = string
+  description = "Domain name for SSL Certificates"
+}

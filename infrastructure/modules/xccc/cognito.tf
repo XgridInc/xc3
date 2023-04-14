@@ -13,7 +13,8 @@
 # limitations under the License.
 
 resource "aws_cognito_user_pool" "grafana_pool" {
-  name = "${var.namespace}-grafana-userpool"
+  count = var.domain_name != "" ? 1 : 0
+  name  = "${var.namespace}-grafana-userpool"
 
   username_configuration {
     case_sensitive = true
@@ -68,13 +69,15 @@ resource "aws_cognito_user_pool" "grafana_pool" {
 }
 
 resource "aws_cognito_user_pool_domain" "main" {
+  count        = var.domain_name != "" ? 1 : 0
   domain       = var.cognito_domain
-  user_pool_id = aws_cognito_user_pool.grafana_pool.id
+  user_pool_id = aws_cognito_user_pool.grafana_pool[0].id
 }
 
 resource "aws_cognito_user_pool_client" "grafana_client" {
+  count                                = var.domain_name != "" ? 1 : 0
   name                                 = "${var.namespace}-grafana-client"
-  user_pool_id                         = aws_cognito_user_pool.grafana_pool.id
+  user_pool_id                         = aws_cognito_user_pool.grafana_pool[0].id
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows_user_pool_client = true
   access_token_validity                = 60
@@ -90,8 +93,8 @@ resource "aws_cognito_user_pool_client" "grafana_client" {
   allowed_oauth_flows  = ["code"]
   allowed_oauth_scopes = ["email", "openid", "aws.cognito.signin.user.admin", "profile"]
 
-  callback_urls = ["https://${var.domain_name}/generic_oauth", "https://${var.domain_name}/login", "https://${var.domain_name}/login/generic_oauth"]
-  logout_urls   = ["https://${var.domain_name}/login"]
+  callback_urls = ["https://${coalesce(var.domain_name, aws_lb.this.dns_name)}/generic_oauth", "https://${coalesce(var.domain_name, aws_lb.this.dns_name)}/login", "https://${coalesce(var.domain_name, aws_lb.this.dns_name)}/login/generic_oauth"]
+  logout_urls   = ["https://${coalesce(var.domain_name, aws_lb.this.dns_name)}/login"]
 
   explicit_auth_flows = ["ALLOW_ADMIN_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH"]
 
@@ -99,7 +102,8 @@ resource "aws_cognito_user_pool_client" "grafana_client" {
 }
 
 resource "aws_cognito_user_group" "admin_group" {
+  count        = var.domain_name != "" ? 1 : 0
   name         = "Admin"
   description  = "Authentication Group"
-  user_pool_id = aws_cognito_user_pool.grafana_pool.id
+  user_pool_id = aws_cognito_user_pool.grafana_pool[0].id
 }

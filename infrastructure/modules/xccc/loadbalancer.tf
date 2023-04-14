@@ -37,10 +37,10 @@ resource "aws_lb_target_group_attachment" "this" {
 }
 
 resource "aws_lb" "this" {
-  name               = "${var.namespace}-load-balancer"
-  internal           = false
-  load_balancer_type = "application"
-  enable_deletion_protection   = true
+  name                       = "${var.namespace}-load-balancer"
+  internal                   = false
+  load_balancer_type         = "application"
+  enable_deletion_protection = true
 
   subnets = [for id in var.public_subnet_ids : id]
 
@@ -48,15 +48,28 @@ resource "aws_lb" "this" {
   tags            = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-load-balancer" }))
 
   drop_invalid_header_fields = true
-   
+
 }
 
 resource "aws_lb_listener" "this" {
+  count             = var.domain_name != "" ? 1 : 0
   load_balancer_arn = aws_lb.this.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = data.aws_acm_certificate.issued.arn
+  certificate_arn   = data.aws_acm_certificate.issued[0].arn
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+}
+
+resource "aws_lb_listener" "http" {
+  #ts:skip=AWS.ALL.IS.MEDIUM.0046
+  count             = var.domain_name == "" ? 1 : 0
+  load_balancer_arn = aws_lb.this.arn
+  port              = "80"
+  protocol          = "HTTP"
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
@@ -64,6 +77,7 @@ resource "aws_lb_listener" "this" {
 }
 
 resource "aws_route53_record" "xccc_alias" {
+  count   = var.domain_name != "" ? 1 : 0
   name    = var.domain_name
   type    = "A"
   zone_id = var.hosted_zone_id

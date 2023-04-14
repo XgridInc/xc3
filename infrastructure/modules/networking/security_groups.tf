@@ -146,9 +146,9 @@ resource "aws_security_group" "lb_sg" {
   vpc_id      = aws_vpc.this.id
   description = "X-CCC Load Balancer Security Group"
   ingress {
+    from_port   = var.domain_name != "" ? 443 : 80
+    to_port     = var.domain_name != "" ? 443 : 80
     description = "Allow all ingress traffic to port 443"
-    from_port   = 443
-    to_port     = 443
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }

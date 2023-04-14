@@ -49,6 +49,7 @@ variable "ses_email_address" {
 }
 
 variable "prometheus_layer" {
+  type        = string
   description = "S3 key for prometheus layer"
 }
 

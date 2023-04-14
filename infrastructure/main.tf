@@ -33,6 +33,7 @@ module "networking" {
   namespace                 = var.namespace
   creator_email             = var.creator_email
   owner_email               = local.owner_email
+  domain_name               = var.domain_name
 }
 // Terraform Module for Xgrid Cloud Cost Control
 

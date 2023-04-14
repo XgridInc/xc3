@@ -102,6 +102,7 @@ variable "total_account_cost_cronjob" {
 variable "domain_name" {
   type        = string
   description = "Domain name for SSL Certificates"
+  default     = ""
 }
 
 variable "hosted_zone_id" {

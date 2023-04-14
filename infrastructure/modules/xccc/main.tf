@@ -20,7 +20,7 @@ locals {
   }
 }
 # Assumption: An IAM role for EC2 might be given by the customer,
-# So we will be making the following logic dynamic if IAM role is provided. 
+# So we will be making the following logic dynamic if IAM role is provided.
 resource "aws_iam_role_policy" "this" {
   name = "${var.namespace}-sts-role-policy"
   role = aws_iam_role.this.id
@@ -115,16 +115,16 @@ resource "aws_instance" "this" {
   vpc_security_group_ids      = [var.security_group_ids.private_security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
   user_data = templatefile("${path.module}/startup-script.sh.tpl", {
-    env_file = templatefile(
+    env_file = var.domain_name != "" ? templatefile(
       "${path.module}/.env-grafana.tpl",
       {
-        client_id        = aws_cognito_user_pool_client.grafana_client.id,
-        client_secret    = aws_cognito_user_pool_client.grafana_client.client_secret,
+        client_id        = aws_cognito_user_pool_client.grafana_client[0].id,
+        client_secret    = aws_cognito_user_pool_client.grafana_client[0].client_secret,
         domain_name      = var.domain_name,
-        user_pool_domain = aws_cognito_user_pool_domain.main.domain,
+        user_pool_domain = aws_cognito_user_pool_domain.main[0].domain,
         region           = var.region
       }
-    )
+    ) : " "
     }
   )
 
