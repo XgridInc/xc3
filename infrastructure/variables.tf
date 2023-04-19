@@ -69,6 +69,11 @@ variable "creator_email" {
   description = "Email address of a person who is provisioning the infrastructure"
 }
 
+variable "project" {
+  type        = string
+  description = "The name of the Project"
+}
+
 variable "prometheus_layer" {
   type        = string
   description = "S3 key for prometheus layer"
@@ -108,4 +113,9 @@ variable "domain_name" {
 variable "hosted_zone_id" {
   type        = string
   description = "Public Hosted Zone ID in the Route 53"
+}
+
+variable "cron_jobs_schedule" {
+  description = "Cron job schedule"
+  type        = map(string)
 }

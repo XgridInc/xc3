@@ -16,10 +16,10 @@ locals {
   tags = {
     Owner   = var.owner_email
     Creator = var.creator_email
-    Project = var.namespace
+    Project = var.project
   }
 }
-
+# tflint-ignore: terraform_required_providers
 data "archive_file" "total_account_cost" {
   type        = "zip"
   source_file = "../lambda_functions/budget_details/total_account_cost.py"
@@ -27,6 +27,7 @@ data "archive_file" "total_account_cost" {
 }
 
 # Creating IAM Role for Lambda functions
+# tflint-ignore: terraform_required_providers
 resource "aws_iam_role" "total_account_cost" {
   name = "${var.namespace}-${var.total_account_cost_lambda}-role"
   assume_role_policy = jsonencode({
@@ -43,7 +44,7 @@ resource "aws_iam_role" "total_account_cost" {
     ]
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
-  tags                = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Total-Account-Cost-Role" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-Total-Account-Cost-Role" }))
 
 }
 
@@ -66,12 +67,23 @@ resource "aws_iam_role_policy" "total_account_cost" {
           "ec2:DeleteNetworkInterface"
         ]
         "Resource" : "*"
+      },
+      {
+        "Sid" : "SSMParameter",
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter"
+        ]
+        "Resource" : "arn:aws:ssm:*:*:parameter/*"
       }
     ]
   })
 }
 
 resource "aws_lambda_function" "total_account_cost" {
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-${var.total_account_cost_lambda}"
   role          = aws_iam_role.total_account_cost.arn
   runtime       = "python3.9"
@@ -79,8 +91,8 @@ resource "aws_lambda_function" "total_account_cost" {
   filename      = data.archive_file.total_account_cost.output_path
   environment {
     variables = {
-      prometheus_ip = "${var.prometheus_ip}:9091"
-      account_id    = var.account_id
+      prometheus_ip  = "${var.prometheus_ip}:9091"
+      account_detail = var.namespace
     }
   }
   memory_size = var.memory_size
@@ -90,10 +102,10 @@ resource "aws_lambda_function" "total_account_cost" {
     subnet_ids         = [var.subnet_id]
     security_group_ids = [var.security_group_id]
   }
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-total-account-cost" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-total-account-cost" }))
 
 }
-
+# tflint-ignore: terraform_required_providers
 resource "null_resource" "delete_zip_file" {
   triggers = {
     lambda_function_arn = aws_lambda_function.total_account_cost.arn
@@ -131,7 +143,7 @@ resource "aws_cloudwatch_event_rule" "total_account_cost" {
   name                = "${var.namespace}-${var.total_account_cost_lambda}-rule"
   description         = "Trigger the Lambda function every two weeks"
   schedule_expression = var.total_account_cost_cronjob
-  tags                = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-total-account-cost-rule" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-total-account-cost-rule" }))
 }
 
 
@@ -141,6 +153,7 @@ resource "aws_cloudwatch_event_target" "total_account_cost" {
   arn  = aws_lambda_function.total_account_cost.arn
 }
 
+# tflint-ignore: terraform_required_providers
 resource "aws_lambda_permission" "total_account_cost" {
   statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"

@@ -16,7 +16,7 @@ locals {
   tags = {
     Owner   = var.owner_email
     Creator = var.creator_email
-    Project = var.namespace
+    Project = var.project
   }
 }
 # Assumption: An IAM role for EC2 might be given by the customer,
@@ -91,7 +91,7 @@ resource "aws_iam_role" "this" {
     "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   ]
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2-Role" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-EC2-Role" }))
 }
 
 # Creating EC2 Instance profile
@@ -99,7 +99,7 @@ resource "aws_iam_role" "this" {
 resource "aws_iam_instance_profile" "this" {
   name = "${var.namespace}-ec2-profile"
   role = aws_iam_role.this.name
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2-Profile" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-EC2-Profile" }))
 }
 
 # Creating EC2 Instance that will be hosting Cloud Custodian
@@ -133,7 +133,7 @@ resource "aws_instance" "this" {
     encrypted   = true
   }
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-EC2" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-EC2" }))
 }
 
 # Creating Bastion Host Server
@@ -146,14 +146,13 @@ resource "aws_instance" "bastion_host" {
   associate_public_ip_address = true
   key_name                    = data.aws_key_pair.key_pair.key_name
   subnet_id                   = var.public_subnet_ids[0]
-  # vpc_security_group_ids      = [var.public_security_group_id]
-  vpc_security_group_ids = [var.security_group_ids.public_security_group_id]
-  iam_instance_profile   = aws_iam_instance_profile.this.name
+  vpc_security_group_ids      = [var.security_group_ids.public_security_group_id]
+  iam_instance_profile        = aws_iam_instance_profile.this.name
   root_block_device {
     volume_size = 30
     encrypted   = true
   }
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Bastion-Host-Server" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Bastion-Host-Server" }))
 }
 
 # Configuring SES Identity and SQS for email notifications
@@ -165,31 +164,25 @@ resource "aws_ses_email_identity" "this" {
 resource "aws_sqs_queue" "this" {
   #ts:skip=AWS.SQS.NetworkSecurity.High.0570 We are aware of the risk and choose to skip this rule
   name = "${var.namespace}-notification-queue"
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-SQS-KEY" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-SQS-KEY" }))
 }
 
 #Configuring SNS for passing payload to lambda functions
 resource "aws_sns_topic" "this" {
   #ts:skip=AWS.AST.DP.MEDIUM.0037 We are aware of the risk and choose to skip this rule
   name = "${var.namespace}-notification-topic"
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-SNS-Topic" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-SNS-Topic" }))
 }
 
 #Configuring S3 bucket for storage of cloud custodian policies metadata
 resource "aws_s3_bucket" "this" {
+  #ts:skip=AWS.S3Bucket.IAM.High.0370
   bucket        = "${var.namespace}-metadata-storage"
   force_destroy = false
   lifecycle {
     ignore_changes = all
   }
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Bucket" }))
-}
-
-resource "aws_s3_bucket_versioning" "bucket_versioning" {
-  bucket        = aws_s3_bucket.this.bucket
-  versioning_configuration {
-  status        = "Enabled"
-}
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Bucket" }))
 }
 
 # Uploading Cloud Custodian Policies and lambda layers in S3 bucket

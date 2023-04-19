@@ -17,7 +17,7 @@ resource "aws_vpc" "this" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = "true"
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-VPC" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-VPC" }))
 }
 
 resource "aws_subnet" "public_subnet" {
@@ -27,7 +27,7 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = false
   cidr_block              = each.value
   availability_zone       = each.key
-  tags                    = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Public-Subnet-${each.key}" }))
+  tags                    = merge(local.tags, tomap({ "Name" = "${var.namespace}-Public-Subnet-${each.key}" }))
 
 }
 
@@ -36,7 +36,7 @@ resource "aws_subnet" "private_subnet" {
   cidr_block              = var.private_subnet_cidr_block
   map_public_ip_on_launch = false
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Private-Subnet-1" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Private-Subnet-1" }))
 
 }
 
@@ -45,7 +45,7 @@ resource "aws_subnet" "private_subnet" {
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Internet-Gateway" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Internet-Gateway" }))
 
 }
 
@@ -59,7 +59,7 @@ resource "aws_route_table" "this" {
     gateway_id = aws_internet_gateway.this.id
   }
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Public-Route-Table" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Public-Route-Table" }))
 
 }
 
@@ -74,7 +74,7 @@ resource "aws_route_table_association" "this" {
 resource "aws_eip" "this" {
   vpc = true
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-eip" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-eip" }))
 
 }
 
@@ -86,7 +86,7 @@ resource "aws_nat_gateway" "this" {
   # Associating it in the Public Subnet!
   subnet_id = values(aws_subnet.public_subnet)[0].id
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Nat-Gateway" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Nat-Gateway" }))
 
 }
 
@@ -99,7 +99,7 @@ resource "aws_route_table" "private_rt" {
     nat_gateway_id = aws_nat_gateway.this.id
   }
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Private-Route-Table" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Private-Route-Table" }))
 
 
 }

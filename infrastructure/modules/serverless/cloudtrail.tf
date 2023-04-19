@@ -12,14 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-locals {
-  tags_label = {
-    Owner   = var.owner_email
-    Creator = var.creator_email
-    Project = var.namespace
-  }
-}
-
 resource "aws_kms_alias" "this" {
   name          = "alias/${var.namespace}-kms-key"
   target_key_id = aws_kms_key.this.key_id
@@ -36,8 +28,8 @@ resource "aws_kms_key" "this" {
         Sid    = "Enable IAM User Permissions"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::*:user/*"
-        }
+          AWS = "*"
+        },
         Action   = "kms:*",
         Resource = "*"
       },
@@ -55,7 +47,7 @@ resource "aws_kms_key" "this" {
       }
     ]
   })
-  tags = merge(local.tags_label, tomap({ "Name" = "${local.tags_label.Project}-kms-key" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-kms-key" }))
 
 }
 
@@ -63,7 +55,7 @@ resource "aws_kms_key" "this" {
 resource "aws_s3_bucket" "this" {
   #ts:skip=AWS.S3Bucket.LM.MEDIUM.0078 We are aware of the risk and choose to skip this rule
   bucket = "${var.namespace}-cloudtrail-logs-storage"
-  tags   = merge(local.tags_label, tomap({ "Name" = "${local.tags_label.Project}-bucket" }))
+  tags   = merge(local.tags, tomap({ "Name" = "${var.namespace}-bucket" }))
 
 }
 
@@ -73,10 +65,10 @@ resource "aws_s3_bucket_acl" "this" {
 }
 
 resource "aws_s3_bucket_versioning" "bucket_versioning" {
-  bucket        = aws_s3_bucket.this.id
+  bucket = aws_s3_bucket.this.id
   versioning_configuration {
-  status        = "Enabled"
-}
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_policy" "this" {
@@ -126,6 +118,6 @@ resource "aws_cloudtrail" "this" {
     read_write_type           = "All"
     include_management_events = true
   }
-  tags = merge(local.tags_label, tomap({ "Name" = "${local.tags_label.Project}-cloudtrail" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-cloudtrail" }))
 
 }

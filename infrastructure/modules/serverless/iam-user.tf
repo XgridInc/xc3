@@ -12,14 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-locals {
-  common_tags = {
-    Owner   = var.owner_email
-    Creator = var.creator_email
-    Project = var.namespace
-  }
-}
-
 data "archive_file" "lambda_function_listusers_zip" {
   type        = "zip"
   source_file = "../lambda_functions/iam_users/list_iam_users.py"
@@ -82,10 +74,13 @@ resource "aws_iam_role" "lambda_execution_role" {
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
   ]
 
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-IAM-User-Lambda-Role" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-User-Lambda-Role" }))
 }
 
 resource "aws_lambda_function" "resources_cost_iam_user" {
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-list_iam_user_resources_cost"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.9"
@@ -106,7 +101,7 @@ resource "aws_lambda_function" "resources_cost_iam_user" {
   depends_on = [
     aws_lambda_function.list_iam_user
   ]
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-list_resources_cost_metrics" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-list_resources_cost_metrics" }))
 
 }
 
@@ -129,6 +124,9 @@ resource "null_resource" "delete_cost_zip_file" {
 }
 
 resource "aws_lambda_function" "list_iam_user" {
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-list_iam_users"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.9"
@@ -137,8 +135,8 @@ resource "aws_lambda_function" "list_iam_user" {
   environment {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"
-      REGION        = "${var.region}"
-      sns_topic     = "${var.sns_topic_arn}"
+      REGION        = var.region
+      sns_topic     = var.sns_topic_arn
 
     }
   }
@@ -149,7 +147,7 @@ resource "aws_lambda_function" "list_iam_user" {
     subnet_ids         = [var.subnet_id]
     security_group_ids = [var.security_group_id]
   }
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-list_iam_user" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-list_iam_user" }))
 }
 
 resource "aws_lambda_permission" "allow_bucket_for_trigger" {

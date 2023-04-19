@@ -27,12 +27,18 @@ variable "creator_email" {
   description = "Email of the the Creator who is provisioning the infrastructure"
 }
 
+variable "project" {
+  type        = string
+  description = "The name of the Project"
+}
 
 variable "prometheus_ip" {
+  type        = string
   description = "The IP address of the Prometheus server"
 }
 
 variable "memory_size" {
+  type        = number
   description = "The amount of memory to allocate to the lambda function"
 }
 
@@ -76,6 +82,7 @@ variable "sns_topic_arn" {
   description = "SNS Topic for invoking lambda"
 }
 
+# tflint-ignore: terraform_typed_variables
 variable "s3_xccc_bucket" {
   description = "X-CCC metadata storage bucket"
 }
@@ -93,5 +100,15 @@ variable "lambda_names" {
     "iamrolesservice"        = "../lambda_functions/iam_roles/iamrolesservice.py"
     "iamrolesservicemapping" = "../lambda_functions/iam_roles/iamrolesservicemapping.py"
     "instancestatechange"    = "../lambda_functions/iam_roles/instancestatechange.py"
+  }
+}
+
+variable "cron_jobs_schedule" {
+  description = "Cron job schedule"
+  type        = map(string)
+  default = {
+    resource_list_function_cron = "cron(0 0 * * ? 1)"
+    list_linked_accounts_cron   = "cron(0 0 1 * ? *)"
+    most_expensive_service_cron = "cron(0 0 * * ? 1)"
   }
 }

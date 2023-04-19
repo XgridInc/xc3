@@ -47,7 +47,7 @@ locals {
   tags = {
     Owner   = var.owner_email
     Creator = var.creator_email
-    Project = var.namespace
+    Project = var.project
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_security_group" "private_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Private-SG" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Private-SG" }))
 
 }
 
@@ -111,7 +111,7 @@ resource "aws_security_group" "public_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Public-SG" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Public-SG" }))
 
 }
 
@@ -136,7 +136,7 @@ resource "aws_security_group" "serverless_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-Serverless-SG" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Serverless-SG" }))
 
 }
 # tflint-ignore: terraform_required_providers
@@ -160,5 +160,5 @@ resource "aws_security_group" "lb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-lb-sg" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-lb-sg" }))
 }

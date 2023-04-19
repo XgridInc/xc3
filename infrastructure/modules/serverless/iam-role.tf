@@ -44,7 +44,7 @@ resource "aws_lambda_function" "IamRolestoGrafana" {
 
   layers = [var.prometheus_layer]
 
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-iam_roles_to_grafana" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-iam_roles_to_grafana" }))
 
 }
 
@@ -60,7 +60,7 @@ resource "aws_iam_role_policy" "IamRolestoGrafana" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-            aws_lambda_function.IamRolesServiceMapping.arn
+          aws_lambda_function.IamRolesServiceMapping.arn
         ]
       },
       {
@@ -94,7 +94,7 @@ resource "aws_iam_role" "lambda_execution_role_IamRolestoGrafana" {
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
 
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-IAM-Role-to-Grafana" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-to-Grafana" }))
 }
 
 resource "aws_lambda_function" "IamRolesServiceMapping" {
@@ -120,7 +120,7 @@ resource "aws_lambda_function" "IamRolesServiceMapping" {
     security_group_ids = [var.security_group_id]
   }
 
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-iamroleservicemapping" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-iamroleservicemapping" }))
 
 }
 
@@ -141,7 +141,7 @@ resource "aws_iam_role" "lambda_execution_role_IamRolesServiceMapping" {
     ]
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
-  tags                = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-IAM-Role-Service-Mapping" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-Service-Mapping" }))
 }
 
 resource "aws_iam_role_policy" "IamRolesServiceMapping" {
@@ -156,7 +156,7 @@ resource "aws_iam_role_policy" "IamRolesServiceMapping" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-            aws_lambda_function.IamRolesService.arn
+          aws_lambda_function.IamRolesService.arn
         ]
       },
       {
@@ -196,7 +196,7 @@ resource "aws_iam_role_policy" "IamRolesServiceMapping" {
 
 resource "aws_lambda_function" "IamRolesService" {
   #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule  
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-iamrolesservice"
   role          = aws_iam_role.lambda_execution_role_IamRolesService.arn
@@ -217,7 +217,7 @@ resource "aws_lambda_function" "IamRolesService" {
 
   layers = [var.prometheus_layer]
 
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-iamroleservice" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-iamroleservice" }))
 
 }
 
@@ -249,7 +249,7 @@ resource "aws_iam_role_policy" "IamRolesService" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-            aws_lambda_function.IamRolesService.arn
+          aws_lambda_function.IamRolesService.arn
         ]
       },
       {
@@ -284,11 +284,11 @@ resource "aws_iam_role" "lambda_execution_role_IamRolesService" {
     ]
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
-  tags                = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-IAM-Role-Service" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-Service" }))
 }
 
 resource "aws_lambda_function" "InstanceChangeState" {
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule  
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-instancestatechange"
   role          = aws_iam_role.lambda_execution_role_InstanceChangeState.arn
@@ -305,7 +305,7 @@ resource "aws_lambda_function" "InstanceChangeState" {
 
   layers = [var.prometheus_layer]
 
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-instancestatechange" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-instancestatechange" }))
 
 }
 
@@ -335,7 +335,7 @@ resource "aws_iam_role_policy" "InstanceChangeState" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-            aws_lambda_function.InstanceChangeState.arn
+          aws_lambda_function.InstanceChangeState.arn
         ]
       },
       {
@@ -379,7 +379,7 @@ resource "aws_iam_role" "lambda_execution_role_InstanceChangeState" {
     ]
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
-  tags                = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-instance-state-change" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-instance-state-change" }))
 }
 
 resource "aws_lambda_permission" "allow_bucket_for_irtg" {

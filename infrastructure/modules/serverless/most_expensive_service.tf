@@ -12,14 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-locals {
-  tag_name = {
-    Owner   = var.owner_email
-    Creator = var.creator_email
-    Project = var.namespace
-  }
-}
-
 data "archive_file" "most_expensive_service_archive" {
   type        = "zip"
   source_file = "../lambda_functions/expensive_services_detail/most_expensive_service.py"
@@ -43,7 +35,7 @@ resource "aws_iam_role" "most_expensive_service_role" {
     ]
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
-  tags                = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-most_expensive_service_role" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-most_expensive_service_role" }))
 
 }
 
@@ -73,6 +65,9 @@ resource "aws_iam_role_policy" "most_expensive_service_policy" {
 }
 
 resource "aws_lambda_function" "most_expensive_service" {
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-most_expensive_service_lambda"
   role          = aws_iam_role.most_expensive_service_role.arn
   runtime       = "python3.9"
@@ -90,7 +85,7 @@ resource "aws_lambda_function" "most_expensive_service" {
     subnet_ids         = [var.subnet_id]
     security_group_ids = [var.security_group_id]
   }
-  tags = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-most_expensive_service" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-most_expensive_service" }))
 
 }
 
@@ -129,8 +124,8 @@ resource "aws_iam_role_policy_attachment" "most_expensive_service" {
 resource "aws_cloudwatch_event_rule" "most_expensive_service" {
   name                = "${var.namespace}-most_expensive_service-rule"
   description         = "Trigger the Lambda function every week on Monday"
-  schedule_expression = "cron(0 0 * * ? 1)"
-  tags                = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-most_expensive_service_rule" }))
+  schedule_expression = var.cron_jobs_schedule["most_expensive_service_cron"]
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-most_expensive_service_rule" }))
 }
 
 # Define the EventBridge target to invoke the Lambda function
@@ -146,4 +141,3 @@ resource "aws_lambda_permission" "most_expensive_service" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.most_expensive_service.arn
 }
-

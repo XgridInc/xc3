@@ -47,6 +47,11 @@ variable "creator_email" {
   description = "Email address of a person who is provisioning the infrastructure of x-ccc"
 }
 
+variable "project" {
+  type        = string
+  description = "The name of the Project"
+}
+
 variable "security_group_ingress" {
   type = map(object({
     description = string

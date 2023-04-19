@@ -61,14 +61,17 @@ resource "aws_iam_role" "ProjectSpendCost" {
     ]
   })
   managed_policy_arns = []
-  tags                = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-Project-Spend-Cost-Role" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-Project-Spend-Cost-Role" }))
 }
 
 resource "aws_lambda_function" "ProjectSpendCost" {
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-project-spend-cost"
   role          = aws_iam_role.ProjectSpendCost.arn
   runtime       = "python3.9"
-  handler       = "project_spend_lambda.lambda_handler"
+  handler       = "project_spend_cost.lambda_handler"
   filename      = data.archive_file.project_spend_cost.output_path
   environment {
     variables = {
@@ -84,7 +87,7 @@ resource "aws_lambda_function" "ProjectSpendCost" {
     security_group_ids = [var.security_group_id]
   }
 
-  tags = merge(local.common_tags, tomap({ "Name" = "${local.common_tags.Project}-project_cost_function" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-project_cost_function" }))
 
 }
 
@@ -104,7 +107,7 @@ resource "aws_cloudwatch_event_rule" "project_spend_cost" {
   name                = "${var.namespace}-project-spend-cost-rule"
   description         = "Trigger the Lambda function every two weeks"
   schedule_expression = var.total_account_cost_cronjob
-  tags                = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-project-spend-cost-rule" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-project-spend-cost-rule" }))
 }
 
 
@@ -115,7 +118,7 @@ resource "aws_cloudwatch_event_target" "project_spend_cost" {
 }
 
 resource "aws_iam_policy" "eventbridge_policy" {
-  name = "eventbridge_policy"
+  name = "${var.namespace}-eventbridge_policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -125,7 +128,7 @@ resource "aws_iam_policy" "eventbridge_policy" {
           "lambda:InvokeFunction"
         ]
         Effect   = "Allow"
-        Resource = ["${aws_lambda_function.ProjectSpendCost.arn}"]
+        Resource = [aws_lambda_function.ProjectSpendCost.arn]
       }
     ]
   })

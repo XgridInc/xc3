@@ -27,7 +27,7 @@ resource "aws_lb_target_group" "this" {
     unhealthy_threshold = 3
     interval            = 200
   }
-  tags = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-target-group" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-target-group" }))
 }
 
 resource "aws_lb_target_group_attachment" "this" {
@@ -45,7 +45,7 @@ resource "aws_lb" "this" {
   subnets = [for id in var.public_subnet_ids : id]
 
   security_groups = [var.security_group_ids.aws_lb_security_group_id]
-  tags            = merge(local.tags, tomap({ "Name" = "${local.tags.Project}-load-balancer" }))
+  tags            = merge(local.tags, tomap({ "Name" = "${var.namespace}-load-balancer" }))
 
   drop_invalid_header_fields = true
 

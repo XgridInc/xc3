@@ -68,6 +68,12 @@ variable "creator_email" {
   description = "The name of the S3 bucket for storage of cc policies metadata"
 }
 
+variable "project" {
+  type        = string
+  description = "The name of the Project"
+}
+
+
 variable "domain_name" {
   type        = string
   description = "Domain name for SSL Certificates"

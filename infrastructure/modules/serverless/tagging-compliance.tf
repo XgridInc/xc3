@@ -12,23 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-locals {
-  tag_filter = {
-    Owner   = var.owner_email
-    Creator = var.creator_email
-    Project = var.namespace
-  }
-}
-
 data "archive_file" "resource_list_archive" {
   type        = "zip"
-  source_file = "../lambda_functions/xmop-services/resource_list.py"
+  source_file = "../lambda_functions/tagging-compliance/resource_list.py"
   output_path = "${path.module}/resource_list.zip"
 }
 
 data "archive_file" "resource_parsing_archive" {
   type        = "zip"
-  source_file = "../lambda_functions/xmop-services/resource_parsing.py"
+  source_file = "../lambda_functions/tagging-compliance/resource_parsing.py"
   output_path = "${path.module}/resource_parsing.zip"
 }
 
@@ -53,7 +45,7 @@ resource "aws_iam_role" "resource_list_service_role" {
     "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess",
     "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
   ]
-  tags = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-resource_list_service_role" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource_list_service_role" }))
 
 }
 
@@ -90,6 +82,9 @@ resource "aws_iam_role_policy" "resource_list_service_policy" {
 }
 
 resource "aws_lambda_function" "resource_list_function" {
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-resource_list_lambda"
   role          = aws_iam_role.resource_list_service_role.arn
   runtime       = "python3.9"
@@ -106,11 +101,14 @@ resource "aws_lambda_function" "resource_list_function" {
     subnet_ids         = [var.subnet_id]
     security_group_ids = [var.security_group_id]
   }
-  tags = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-resource_list_lambda" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource_list_lambda" }))
 
 }
 
 resource "aws_lambda_function" "resource_parsing_function" {
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-resource_parsing_lambda"
   role          = aws_iam_role.resource_list_service_role.arn
   runtime       = "python3.9"
@@ -120,6 +118,7 @@ resource "aws_lambda_function" "resource_parsing_function" {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"
       account_id    = var.account_id
+      tagging_list  = jsonencode(keys(local.tags))
     }
   }
   memory_size = var.memory_size
@@ -129,7 +128,7 @@ resource "aws_lambda_function" "resource_parsing_function" {
     subnet_ids         = [var.subnet_id]
     security_group_ids = [var.security_group_id]
   }
-  tags = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-resource_parsing_lambda" }))
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource_parsing_lambda" }))
 
 }
 
@@ -152,7 +151,7 @@ resource "null_resource" "delete_resource_parsing_zip_file" {
 }
 
 resource "aws_iam_policy" "this" {
-  name = "${var.namespace}-xmop_resource_list_eventbridge_policy"
+  name = "${var.namespace}-resource_list_eventbridge_policy"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -175,10 +174,10 @@ resource "aws_iam_role_policy_attachment" "this" {
 
 # Define the EventBridge rule
 resource "aws_cloudwatch_event_rule" "resource_list" {
-  name                = "${var.namespace}-xmop-resource-list-rule"
+  name                = "${var.namespace}-resource-list-rule"
   description         = "Trigger the Lambda function every week on Monday"
-  schedule_expression = "cron(0 0 * * ? 1)"
-  tags                = merge(local.tag_name, tomap({ "Name" = "${local.tag_name.Project}-xmop-resource-list" }))
+  schedule_expression = var.cron_jobs_schedule["resource_list_function_cron"]
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource-list" }))
 }
 
 
