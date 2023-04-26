@@ -12,18 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import boto3
+import ast
 import json
-import os
 import logging
-from datetime import date, timedelta
-from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
+import os
+
+import boto3
 
 # Initialize and Connect to the AWS EC2 Service
 try:
-    ec2_client = boto3.client('ec2')
+    client_ssm = boto3.client("ssm")
+    lambda_client = boto3.client("lambda")
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
+
 
 def lambda_handler(event, context):
 
@@ -32,109 +34,56 @@ def lambda_handler(event, context):
 
     Args:
         Account ID: AWS account id.
-        Region: AWS region
-
     Returns:
         It pushes the 5 most expensive services name and cost with AWS region to Prometheus using push gateway.
-
     Raises:
         KeyError: Raise error if cost explorer API call does not execute.
     """
-    account_id = context.invoked_function_arn.split(':')[4]
-    # Cost of last 14 days
-    cost_by_days = 14
-    end_date = str(date.today())
-    start_date = str(date.today() - timedelta(days=cost_by_days))
-    parent_list = []
+    parameter_name = "/" + os.environ["account_detail"] + "/account_details"
+    expensive_service_lambda = os.environ["lambda_function_name"]
     try:
-        # Get the list of all regions
-        regions = [region["RegionName"] for region in ec2_client.describe_regions()["Regions"]]
-    
+        response = client_ssm.get_parameter(Name=parameter_name, WithDecryption=True)
+        parameter_value = response["Parameter"]["Value"]
+        # Converting SSM ListString to List
+        account_details = ast.literal_eval(parameter_value)
+    except ValueError as ve:
+        raise ValueError(
+            f"ValueError occurred: {ve}. Please check the input data format and try again."
+        )
     except Exception as e:
-        logging.error("Error getting response from ec2 describe region api : " + str(e))
-        return {
-            'statusCode': 500,
-            'body': json.dumps({"Error": str(e)})
-        }
+        raise ValueError(
+            f"An error occurred: {e}. Please check the input data and try again."
+        )
 
     # Loop through each region
-    for region in regions:
-        top_5_resources = []
-        # Connect to the AWS Cost Explorer API for the region
-        try:    
-            ce_region = boto3.client("ce", region_name=region)
-        except Exception as e:
-            logging.error("Error creating boto3 client: " + str(e))
-            return {
-                'statusCode': 500,
-                'body': json.dumps({"Error": str(e)})
-            }    
-    
-        # Retrieve the cost and usage data for the defined time period
+    for account_detail in account_details:
+        account_id = account_detail.split("-")[0]
+        # Check that the account ID has 12 digits
+        if len(account_id) != 12 or not account_id.isdigit():
+            raise ValueError("Invalid AWS account ID")
+
+        payload = {"account_id": account_id, "account_detail": account_detail}
         try:
-            cost_and_usage = ce_region.get_cost_and_usage(
-                TimePeriod={"Start": start_date, "End": end_date},
-                Granularity="MONTHLY",
-                Metrics=["UnblendedCost"],
-                Filter={
-                    "Dimensions": {
-                        "Key": "REGION",
-                        "Values": [region],
-                    }
-                },
-                GroupBy=[{"Type": "DIMENSION", "Key": "SERVICE"}],
+            expensive_lambda_response = lambda_client.invoke(
+                FunctionName=expensive_service_lambda,
+                InvocationType="Event",
+                Payload=json.dumps(payload),
             )
+            # Extract the status code from the response
+            status_code = expensive_lambda_response["StatusCode"]
+            if status_code != 202:
+                # Handle unexpected status code
+                logging.error(
+                    f"Unexpected status code {status_code} returned from expensive_service_lambda"
+                )
         except Exception as e:
-            logging.error("Error getting response from cost and usage api: " + str(e))
+            logging.error("Error in invoking lambda function: " + str(e))
             return {
-                'statusCode': 500,
-                'body': json.dumps({"Error": str(e)})
+                "statusCode": 500,
+                "body": "Error invoking expensive_service_lambda",
             }
-    
-        # Extract the cost data
-        cost_data = cost_and_usage["ResultsByTime"][0]["Groups"]
-    
-        # Sort the cost data in descending order
-        sorted_cost_data = sorted(
-            cost_data, key=lambda x: x["Metrics"]["UnblendedCost"]["Amount"], reverse=True
-        )
-    
-        # Get the top 5 most expensive resources
-        top_5_resources = sorted_cost_data[:5]    
-    
-        # Print the top 5 most expensive resources and their costs
-        for resource in top_5_resources:
-            resourcedata = {
-                "Region": region,
-                "Service": resource["Keys"][0],
-                "Cost": resource["Metrics"]["UnblendedCost"]["Amount"],
-            }
-            parent_list.append(resourcedata)
-    
-    logging.info(parent_list)
-    
-    # Adding the extracted cost data to the Prometheus gauge as labels for service, region, and cost.
-    try:
-        registry = CollectorRegistry()
-        gauge = Gauge("Expensive_Services_Detail", "AWS Services Cost Detail",
-           labelnames=["service", "cost", "region", "account"], 
-           registry=registry)
-        for i in range(len(parent_list)):
-            service = parent_list[i]['Service']
-            region = parent_list[i]['Region']
-            cost = parent_list[i]['Cost']
-            gauge.labels(service, cost, region, account_id).set(cost)
-    
-            # Push the metric to the Prometheus Gateway
-            push_to_gateway(os.environ['prometheus_ip'], job='Most_Expensive_Services', registry=registry)
-    except Exception as e:
-        logging.error("Error initializing Prometheus Registry and Gauge: " + str(e))
-        return {
-            'statusCode': 500,
-            'body': json.dumps({"Error": str(e)})
-        }
-    # Return the response    
+
     return {
-        'statusCode': 200,
-        'body': json.dumps("Metrics Pushed")
+        "statusCode": 200,
+        "body": "Invocation of expensive_service_lambda successful",
     }

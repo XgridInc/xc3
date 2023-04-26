@@ -32,6 +32,7 @@ total_account_cost_cronjob = "cron(0 0 1,15 * ? *)"
 prometheus_layer           = "lambda_layers/python.zip"
 memory_size                = 128
 timeout                    = 300
+project                    = "x-ccc"
 security_group_ingress = {
   "pushgateway" = {
     description = "PushGateway"

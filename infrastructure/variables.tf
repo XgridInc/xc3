@@ -118,4 +118,9 @@ variable "hosted_zone_id" {
 variable "cron_jobs_schedule" {
   description = "Cron job schedule"
   type        = map(string)
+  default = {
+    resource_list_function_cron = "cron(0 0 * * ? 1)"
+    list_linked_accounts_cron   = "cron(0 0 1 * ? *)"
+    most_expensive_service_cron = "cron(0 0 * * ? 1)"
+  }
 }

@@ -12,10 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data "archive_file" "most_expensive_service_archive" {
+locals {
+  lambda_archive = {
+    most_expensive_service = {
+      source_dir  = "../lambda_functions/expensive_services_detail"
+      output_path = "${path.module}/most_expensive_service.zip"
+    }
+    cost_metrics_of_expensive_services = {
+      source_dir  = "../lambda_functions/expensive_services_detail"
+      output_path = "${path.module}/cost_metrics_of_expensive_services.zip"
+    }
+  }
+}
+
+# tflint-ignore: terraform_required_providers
+data "archive_file" "lambda_functions" {
+  for_each    = local.lambda_archive
   type        = "zip"
-  source_file = "../lambda_functions/expensive_services_detail/most_expensive_service.py"
-  output_path = "${path.module}/most_expensive_service.zip"
+  source_dir  = each.value.source_dir
+  output_path = each.value.output_path
 }
 
 # Creating IAM Role for Lambda functions
@@ -27,7 +42,7 @@ resource "aws_iam_role" "most_expensive_service_role" {
       {
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid    = "TotalAccountCost"
+        Sid    = "ExpensiveServiceRole"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
@@ -47,7 +62,7 @@ resource "aws_iam_role_policy" "most_expensive_service_policy" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Sid" : "TotalAccountCost",
+        "Sid" : "ExpensiveServicePermission",
         "Effect" : "Allow",
         "Action" : [
           "ce:GetCostAndUsage",
@@ -59,6 +74,24 @@ resource "aws_iam_role_policy" "most_expensive_service_policy" {
           "ec2:DescribeRegions"
         ]
         "Resource" : "*"
+      },
+      {
+        "Sid" : "SSMParameter",
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : "arn:aws:ssm:*:*:parameter/*"
+      },
+      {
+        "Sid" : "LambdaInvokePermission",
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction"
+        ],
+        "Resource" : [
+          "arn:aws:lambda:*:*:function:*"
+        ]
       }
     ]
   })
@@ -72,15 +105,15 @@ resource "aws_lambda_function" "most_expensive_service" {
   role          = aws_iam_role.most_expensive_service_role.arn
   runtime       = "python3.9"
   handler       = "most_expensive_service.lambda_handler"
-  filename      = data.archive_file.most_expensive_service_archive.output_path
+  filename      = values(data.archive_file.lambda_functions)[0].output_path
   environment {
     variables = {
-      prometheus_ip = "${var.prometheus_ip}:9091"
+      account_detail       = var.namespace
+      lambda_function_name = aws_lambda_function.cost_metrics_of_expensive_services.arn
     }
   }
   memory_size = var.memory_size
   timeout     = var.timeout
-  layers      = [var.prometheus_layer]
   vpc_config {
     subnet_ids         = [var.subnet_id]
     security_group_ids = [var.security_group_id]
@@ -89,12 +122,40 @@ resource "aws_lambda_function" "most_expensive_service" {
 
 }
 
-resource "null_resource" "delete_lambda_zip_file" {
-  triggers = {
-    lambda_function_arn = aws_lambda_function.most_expensive_service.arn
+resource "aws_lambda_function" "cost_metrics_of_expensive_services" {
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
+  function_name = "${var.namespace}-cost_metrics_of_expensive_services"
+  role          = aws_iam_role.most_expensive_service_role.arn
+  runtime       = "python3.9"
+  handler       = "cost_metrics_of_expensive_services.lambda_handler"
+  filename      = values(data.archive_file.lambda_functions)[1].output_path
+  environment {
+    variables = {
+      prometheus_ip = "${var.prometheus_ip}:9091"
+    }
   }
+  layers      = [var.prometheus_layer]
+  memory_size = var.memory_size
+  timeout     = var.timeout
+  vpc_config {
+    subnet_ids         = [var.subnet_id]
+    security_group_ids = [var.security_group_id]
+  }
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-cost_metrics_of_expensive_services" }))
+
+}
+
+resource "null_resource" "delete_lambda_zip_files" {
+  for_each = local.lambda_archive
+
+  triggers = {
+    lambda_function_arn = "arn:aws:lambda:${var.region}:${var.account_id}:function:${each.key}"
+  }
+
   provisioner "local-exec" {
-    command = "rm -r ${data.archive_file.most_expensive_service_archive.output_path}"
+    command = "rm -rf ${each.value.output_path}"
   }
 }
 

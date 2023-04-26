@@ -173,7 +173,7 @@ def lambda_handler(event, context):
     )
 
     # Retrieve account ID from ssm
-    parameter_name = os.environ["account_detail"] + "/account_details"
+    parameter_name = "/" + os.environ["account_detail"] + "/account_details"
 
     try:
         response = client_ssm.get_parameter(Name=parameter_name, WithDecryption=True)
