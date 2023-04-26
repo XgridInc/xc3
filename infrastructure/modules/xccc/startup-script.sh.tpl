@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright (c) 2023, Xgrid Inc, https://xgrid.co
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,4 +59,29 @@ EOF
 sudo docker restart prometheus
 
 sudo echo "${env_file}" > /home/ubuntu/.env
-sudo docker run -d -p 3000:3000 --name=grafana --network=xccc --env-file /home/ubuntu/.env grafana/grafana-enterprise
+
+sudo echo "${dashboard}" > /home/ubuntu/dashboard.yml
+sudo echo "${datasource}" > /home/ubuntu/datasource.yml
+
+sudo mkdir ~/content
+sudo mkdir ~/plugins
+
+if ! [ -x "$(command -v docker)" ]; then
+  echo "Error: Docker is not installed." >&2
+  exit 1
+fi
+if ! docker ps | grep -q grafana; then
+    sudo docker run -d -p 3000:3000 --name grafana --network xccc --env-file /home/ubuntu/.env \
+        -e "GF_INSTALL_PLUGINS=marcusolsson-dynamictext-panel" \
+        -e "GF_DEFAULT_HOME_DASHBOARD=LQ93m_o4z" \
+        -v ~/content/:/var/lib/grafana/dashboards \
+        -v ~/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml \
+        -v ~/datasource.yml:/etc/grafana/provisioning/datasources/datasources.yml \
+        grafana/grafana-enterprise
+else
+    echo "Grafana container is already running"
+fi
+if [ $? -ne 0 ]; then
+  echo "Error: failed to start Grafana container." >&2
+  exit 1
+fi

@@ -21,7 +21,7 @@ GF_SERVER_ROOT_URL=https://${domain_name}
 # Session policies
 GF_SESSION_COOKIE_SECURE=true
 GF_SESSION_COOKIE_SAMESITE=lax
-                                    
+
 # Disable internal username/password authentication
 GF_AUTH_BASIC_ENABLED=false
 
@@ -43,7 +43,7 @@ GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP=true
 GF_AUTH_GENERIC_OAUTH_CLIENT_ID=${client_id}
 GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=${client_secret}
 
-# Information scope 
+# Information scope
 GF_AUTH_GENERIC_OAUTH_SCOPES=email profile aws.cognito.signin.user.admin openid
 
 # AWS Cognito OAuth endpoints

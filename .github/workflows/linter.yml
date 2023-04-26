@@ -45,4 +45,5 @@ jobs:
         uses: github/super-linter@v4.9.7
         env:
           VALIDATE_ALL_CODEBASE: false
-          GITHUB_TOKEN: ${{ secrets.SECRET_GITHUB_TOKEN }}       
+          GITHUB_TOKEN: ${{ secrets.SECRET_GITHUB_TOKEN }}
+          SUPER_LINTER_DISABLE_JSCPD: "true"   

@@ -19,7 +19,6 @@ creator_email              = "muhammad.saad@xgrid.co"
 ssh_key                    = "xccc-key"
 instance_type              = "t2.micro"
 total_account_cost_lambda  = "total_account_cost"
-total_account_cost_cronjob = "cron(0 0 14 * ? *)"
 prometheus_layer           = "lambda_layers/python.zip"
 security_group_ingress = {
   "pushgateway" = {

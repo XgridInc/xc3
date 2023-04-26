@@ -124,7 +124,9 @@ resource "aws_instance" "this" {
         user_pool_domain = aws_cognito_user_pool_domain.main[0].domain,
         region           = var.region
       }
-    ) : " "
+    ) : " ",
+    datasource = file("${path.module}/datasource.yml"),
+    dashboard = file("${path.module}/dashboard.yml")
     }
   )
 
