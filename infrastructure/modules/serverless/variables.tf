@@ -107,3 +107,18 @@ variable "cron_jobs_schedule" {
   description = "Cron job schedule"
   type        = map(string)
 }
+
+variable "s3_prefixes" {
+  description = "S3 Prefixes for Cost Reports"
+  type        = map(string)
+  default = {
+    project_spend_prefix     = "cost-metrics/project_cost.json"
+    monthly_cost_prefix      = "cost-metrics/total_account_cost.json"
+    expensive_service_prefix = "cost-metrics/expensive-services/"
+  }
+}
+
+variable "slack_channel_url" {
+  description = "Slack Channel URL"
+  type        = string
+}

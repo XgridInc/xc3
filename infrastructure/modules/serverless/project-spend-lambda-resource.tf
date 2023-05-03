@@ -39,6 +39,15 @@ resource "aws_iam_role_policy" "ProjectSpendCost" {
         ]
         Effect   = "Allow"
         Resource = "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:PutObject"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${var.s3_xccc_bucket.id}/*"
+        ]
       }
     ]
   })
@@ -75,7 +84,9 @@ resource "aws_lambda_function" "ProjectSpendCost" {
   filename      = data.archive_file.project_spend_cost.output_path
   environment {
     variables = {
-      prometheus_ip = "${var.prometheus_ip}:9091"
+      prometheus_ip        = "${var.prometheus_ip}:9091"
+      bucket_name          = var.s3_xccc_bucket.bucket
+      project_spend_prefix = "cost-metrics/project_cost.json"
     }
   }
   memory_size = var.memory_size

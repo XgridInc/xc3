@@ -17,16 +17,23 @@ import json
 import logging
 import os
 from datetime import date, datetime, timedelta
-
+import botocore
 import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
 # Initialize boto3 client
 try:
     client = boto3.client("ce")
+except Exception as e:
+    logging.error("Error creating boto3 client for ce: " + str(e))
+try:
     client_ssm = boto3.client("ssm")
 except Exception as e:
-    logging.error("Error creating boto3 client: " + str(e))
+    logging.error("Error creating boto3 client for ssm: " + str(e))
+try:
+    s3 = boto3.client("s3")
+except Exception as e:
+    logging.error("Error creating boto3 client for s3: " + str(e))
 
 
 def cost_of_account(client, account_id, start_date, end_date):
@@ -189,6 +196,7 @@ def lambda_handler(event, context):
             f"An error occurred: {e}. Please check the input data and try again."
         )
 
+    account_monthly_dict = {}
     for account_detail in account_details:
 
         account_id = account_detail.split("-")[0]
@@ -200,6 +208,8 @@ def lambda_handler(event, context):
         # Getting cost details of specific account
         response = cost_of_account(client, account_id, start_date, end_date)
         monthly_dict = create_monthly_dict(response)
+        # Add account ID and its corresponding monthly dict to the new dict
+        account_monthly_dict[account_detail] = monthly_dict
 
         for month, cost in monthly_dict.items():
             if cost >= 0:
@@ -213,5 +223,25 @@ def lambda_handler(event, context):
         )
     except Exception as e:
         raise ValueError(f"Failed to push cost data to Prometheus: {str(e)}")
+
+    try:
+        # Convert the dictionary to JSON
+        json_data = json.dumps(account_monthly_dict)
+
+        # Upload the file to S3
+        s3.put_object(
+            Bucket=os.environ["bucket_name"],
+            Key=os.environ["monthly_cost_prefix"],
+            Body=json_data,
+        )
+    except botocore.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchBucket":
+            raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
+        elif e.response["Error"]["Code"] == "AccessDenied":
+            raise ValueError(f"Access denied to S3 bucket: {os.environ['bucket_name']}")
+        else:
+            raise ValueError(f"Failed to upload data to S3 bucket: {str(e)}")
+    except Exception as e:
+        raise ValueError(f"Failed to upload data to S3 bucket: {str(e)}")
 
     return {"statusCode": 200, "body": json.dumps(response)}

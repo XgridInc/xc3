@@ -14,20 +14,25 @@
 
 import boto3
 import datetime
+import botocore
 import os
 import logging
 from datetime import timedelta
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
+import json
 
 try:
     ec2_client = boto3.client("ec2")
 except Exception as e:
-    logging.error("Error creating boto3 client: " + str(e))
+    logging.error("Error creating boto3 client for ec2: " + str(e))
+try:
+    s3 = boto3.client("s3")
+except Exception as e:
+    logging.error("Error creating boto3 client for s3: " + str(e))
 try:
     ce_client = boto3.client("ce")
 except Exception as e:
-    logging.error("Error creating boto3 client: " + str(e))
-
+    logging.error("Error creating boto3 client for ce: " + str(e))
 
 
 cost_by_days = 30
@@ -79,6 +84,7 @@ def lambda_handler(event, context):
         )
 
         response = cost_of_project(ce_client, start_date, end_date)
+        project_dict = {}
 
         for group in response["ResultsByTime"][0]["Groups"]:
             tag_key = group["Keys"][0]
@@ -88,12 +94,26 @@ def lambda_handler(event, context):
             tag_value = tag_key.split("$")[1]
             print(tag_value)
             g.labels(tag_value, cost).set(cost)
+            project_dict[tag_value] = cost
+
+        # Convert the dictionary to JSON
+        json_data = json.dumps(project_dict)
+
+        # Upload the file to S3
+        s3.put_object(
+            Bucket=os.environ["bucket_name"],
+            Key=os.environ["project_spend_prefix"],
+            Body=json_data,
+        )
 
         push_to_gateway(
             os.environ["prometheus_ip"], job="Project-Spend-Cost", registry=registry
         )
-        return "Successfully executed."
+        return {"statusCode": 200, "body": json_data}
+    except botocore.exceptions.ClientError as e:
+        logging.error(f"Failed to upload file to S3: {e}")
+        return {"statusCode": 500, "body": "Failed to upload file to S3."}
+
     except Exception as e:
         print(f"Error executing lambda_handler: {e}")
         return "Failed to execute."
-    

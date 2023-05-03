@@ -75,6 +75,15 @@ resource "aws_iam_role_policy" "total_account_cost" {
           "ssm:GetParameter"
         ]
         "Resource" : "arn:aws:ssm:*:*:parameter/*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:PutObject"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${var.s3_xccc_bucket.id}/*"
+        ]
       }
     ]
   })
@@ -91,8 +100,10 @@ resource "aws_lambda_function" "total_account_cost" {
   filename      = data.archive_file.total_account_cost.output_path
   environment {
     variables = {
-      prometheus_ip  = "${var.prometheus_ip}:9091"
-      account_detail = var.namespace
+      prometheus_ip       = "${var.prometheus_ip}:9091"
+      account_detail      = var.namespace
+      bucket_name         = var.s3_xccc_bucket.bucket
+      monthly_cost_prefix = "cost-metrics/total_account_cost.json"
     }
   }
   memory_size = var.memory_size

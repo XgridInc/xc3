@@ -63,3 +63,5 @@ security_group_ingress = {
     cidr_blocks = ["10.0.0.64/26"]
   }
 }
+
+project = "x-ccc"
