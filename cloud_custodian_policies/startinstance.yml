@@ -31,10 +31,10 @@ policies:
     actions:
        - start
        - type: notify
-         template: startstop-ec2-instance.html 
+         template: startstop-ec2-instance.html
          subject: "EC2 Instance has been started"
          to:
-          - yaseen.zafar@xgrid.co
+          - admin@example.co
          transport:
            type: sqs
-           queue: https://sqs.eu-west-1.amazonaws.com/{account_id}/x-ccc-notification-queue
+           queue: https://sqs.eu-west-1.amazonaws.com/{account_id}/xc3-notification-queue

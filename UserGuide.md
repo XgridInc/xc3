@@ -1,4 +1,4 @@
-Welcome to the User Guide for XC3 Project. This guide provides introduction, instructions and information on how to use the XC3 grafana dashboards effectively. 
+Welcome to the User Guide for XC3 Project. This guide provides introduction, instructions and information on how to use the XC3 grafana dashboards effectively.
 
 ## What is XC3?
 
@@ -26,7 +26,7 @@ Viewers have read-only access to Grafana. They can view dashboards and panels, b
 
 Once you've logged in on XC3, you can start using dashboards.
 
-### Home 
+### Home
 
 On Home Page, you can get high-level detail of your AWS Account
 
@@ -48,7 +48,7 @@ On Home Page, you can get high-level detail of your AWS Account
   <img width="1157" alt="Screenshot 2023-03-29 at 12 06 31 PM" src="https://user-images.githubusercontent.com/114464405/228456521-6d647805-55a3-4f32-a887-51a4269968ee.png">
 
 ### IAM Users Dashboard
-- By selecting IAM User Dashboard you can view a list of IAM Users by selecting AWS Account. 
+- By selecting IAM User Dashboard you can view a list of IAM Users by selecting AWS Account.
 - By selecting a specific IAM User in a specific AWS Region you can view the resources, state of resources, and the cumulative cost of resources from the last 14 days spin up by a specific IAM User in the selected AWS Region.
 - By selecting a specific resource, you can view the detailed billing of that resource from the last 14 days.
 - By selecting the specific IAM User in a specific AWS Region you can get the total spend in that AWS Region by specific IAM User.
@@ -67,7 +67,7 @@ On Home Page, you can get high-level detail of your AWS Account
 
 ## Community Support
 
-If you have any questions or run into issues while using XC3, you can ask for help by sending an email to <a href="mailto:xccc@xgrid.co">xccc@xgrid.co</a>
+If you have any questions or run into issues while using XC3, you can ask for help by reaching out on Slack <a href="https://app.slack.com/client/T051FMAMBPU/C051CPC6DHT?cdn_fallback=1">XC3</a>
 
 We hope this guide helps you get started with XC3. If you have any feedback or suggestions for the project, please let us know!
 

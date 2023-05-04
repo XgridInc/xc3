@@ -83,8 +83,8 @@ variable "sns_topic_arn" {
 }
 
 # tflint-ignore: terraform_typed_variables
-variable "s3_xccc_bucket" {
-  description = "X-CCC metadata storage bucket"
+variable "s3_xc3_bucket" {
+  description = "XC3 metadata storage bucket"
 }
 
 variable "region" {
@@ -96,10 +96,10 @@ variable "lambda_names" {
   type        = map(string)
   description = "The names of lambda functions in IAM Role Workflow"
   default = {
-    "iam_roles_all"          = "../lambda_functions/iam_roles/iam_roles_all.py"
-    "iamrolesservice"        = "../lambda_functions/iam_roles/iamrolesservice.py"
-    "iamrolesservicemapping" = "../lambda_functions/iam_roles/iamrolesservicemapping.py"
-    "instancestatechange"    = "../lambda_functions/iam_roles/instancestatechange.py"
+    "iam_roles_all"          = "../src/iam_roles/iam_roles_all.py"
+    "iamrolesservice"        = "../src/iam_roles/iamrolesservice.py"
+    "iamrolesservicemapping" = "../src/iam_roles/iamrolesservicemapping.py"
+    "instancestatechange"    = "../src/iam_roles/instancestatechange.py"
   }
 }
 

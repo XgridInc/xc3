@@ -18,4 +18,4 @@ jobs:
       - name: Run ShellCheck
         uses: a5k-actions/shellchecker@v0.1.7
         with:
-          ignore-files: 'infrastructure/modules/xccc/startup-script.sh.tpl'
+          ignore-files: 'infrastructure/modules/xc3/startup-script.sh.tpl'

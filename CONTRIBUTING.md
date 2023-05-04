@@ -6,12 +6,12 @@ XC3 welcomes contributions from the community. This document outlines the conven
 
 Whether you are a user or contributor, official support channels include the following:
 
-- [Issues](https://github.com/X-CBG/X-CCC/issues)
+- [Issues](https://github.com/X-CBG/XC3/issues)
 - [XC3 Slack](https://app.slack.com/client/T051FMAMBPU/C051CPC6DHT)
 
 Before opening a new issue or submitting a new pull request, it's helpful to search the project -
 It's possible that another user has already reported the issue you're facing, or it may be a known issue
-that we're already aware of. 
+that we're already aware of.
 It is also worth asking on the Slack channels.
 
 ## Where to start?
@@ -51,11 +51,11 @@ The general steps for making a code contribution to XC3 are as follows:
 
 When making a contribution to the repository, please ensure that the following is addressed.
 
-1. Code must be sanitized using [pre-commit-hooks](https://github.com/X-CBG/X-CCC/blob/main/pre-commit-config/.pre-commit-config.yaml)
+1. Code must be sanitized using [pre-commit-hooks](https://github.com/X-CBG/XC3/blob/main/pre-commit-config/.pre-commit-config.yaml)
 2. Ensure that all existing GitHub actions pass.
 3. Commits are signed (see notes below).
 4. Ensure to write tests for any new code addition and to update existing tests when making changes to the codebase.
-5. Code must follow the [Open PR AI Reviewer workflow](https://github.com/X-CBG/X-CCC/blob/main/.github/workflows/openai-pr-reviewer.yml).
+5. Code must follow the [Open PR AI Reviewer Suggestions](https://github.com/X-CBG/XC3/blob/main/.github/workflows/openai-pr-reviewer.yml).
 
 #### Commit Messages
 

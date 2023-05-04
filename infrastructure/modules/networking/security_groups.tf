@@ -93,7 +93,7 @@ resource "aws_security_group_rule" "private_default_sg_rule" {
 
 # Creating a Security Group for bastion host
 resource "aws_security_group" "public_sg" {
-  description = "X-CCC Bastion host access for updates"
+  description = "XC3 Bastion host access for updates"
   name        = "${var.namespace}_public_security_group"
   vpc_id      = aws_vpc.this.id
   ingress {
@@ -117,7 +117,7 @@ resource "aws_security_group" "public_sg" {
 
 # Creating a Security Group for lambda-ec2 accessibility
 resource "aws_security_group" "serverless_sg" {
-  description = "X-CCC serverless module access for updates"
+  description = "XC3 serverless module access for updates"
   name        = "${var.namespace}_serverless_security_group"
   vpc_id      = aws_vpc.this.id
   ingress {
@@ -144,7 +144,7 @@ resource "aws_security_group" "lb_sg" {
   #ts:skip=AC_AWS_0229 We are aware of the risk and choose to skip this rule
   name_prefix = "${var.namespace}-lb-security-group"
   vpc_id      = aws_vpc.this.id
-  description = "X-CCC Load Balancer Security Group"
+  description = "XC3 Load Balancer Security Group"
   ingress {
     from_port   = var.domain_name != "" ? 443 : 80
     to_port     = var.domain_name != "" ? 443 : 80

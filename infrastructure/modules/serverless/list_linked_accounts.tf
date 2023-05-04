@@ -14,7 +14,7 @@
 
 data "archive_file" "list_linked_accounts" {
   type        = "zip"
-  source_file = "../lambda_functions/organization/list_linked_accounts.py"
+  source_file = "../src/organization/list_linked_accounts.py"
   output_path = "${path.module}/list_linked_accounts.zip"
 }
 

@@ -14,7 +14,7 @@
 
 data "archive_file" "cost_report_notifier" {
   type        = "zip"
-  source_file = "../lambda_functions/notifier/cost_report_notifier.py"
+  source_file = "../src/notifier/cost_report_notifier.py"
   output_path = "${path.module}/cost_report_notifier.zip"
 }
 
@@ -33,8 +33,8 @@ resource "aws_iam_role_policy" "cost_report_notifier" {
           "s3:ListBucket"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.s3_xccc_bucket.id}/*",
-          "arn:aws:s3:::${var.s3_xccc_bucket.id}"
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*",
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}"
         ]
       },
       {
@@ -85,7 +85,7 @@ resource "aws_lambda_function" "cost_report_notifier" {
   environment {
     variables = {
       prometheus_ip            = "${var.prometheus_ip}:9091"
-      bucket_name              = var.s3_xccc_bucket.bucket
+      bucket_name              = var.s3_xc3_bucket.bucket
       project_spend_prefix     = var.s3_prefixes.project_spend_prefix
       slack_channel_url        = var.slack_channel_url
       monthly_cost_prefix      = var.s3_prefixes.monthly_cost_prefix
@@ -161,7 +161,7 @@ resource "aws_lambda_permission" "cost_report_notifier" {
 }
 
 resource "aws_lambda_layer_version" "apprise_layer" {
-  s3_bucket  = var.s3_xccc_bucket.id
+  s3_bucket  = var.s3_xc3_bucket.id
   s3_key     = "apprise/python.zip"
   layer_name = "${var.namespace}-apprise-layer"
 

@@ -69,6 +69,11 @@ variable "creator_email" {
   description = "Email address of a person who is provisioning the infrastructure"
 }
 
+variable "owner_email" {
+  type        = string
+  description = "Email address of a person who is owner of the team/project"
+}
+
 variable "project" {
   type        = string
   description = "The name of the Project"

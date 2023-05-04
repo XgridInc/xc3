@@ -26,14 +26,13 @@ policies:
     - or:
         - "tag:Creator": absent
         - "tag:Owner": absent
-        - "tag:Project": absent	
+        - "tag:Project": absent
   actions:
     - type: notify
-      template: xmop-msg-template.html
-      subject: "[Xmop] EKS Cluster non-conformant to tagging Policies"
+      template: tagging-msg-template.html
+      subject: "[XC3] EKS Cluster is non-conformant to tagging Policies"
       to:
       - event-owner
       transport:
         type: sqs
-        queue: https://sqs.eu-west-1.amazonaws.com/{account_id}/x-ccc-notification-queue
-        
+        queue: https://sqs.eu-west-1.amazonaws.com/{account_id}/xc3-notification-queue

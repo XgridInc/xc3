@@ -24,8 +24,8 @@ domain_name                = "xccc.xgrid.co"
 hosted_zone_id             = "Z053166920YP1STI0EK5X"
 private_subnet_cidr_block  = "10.0.0.64/26"
 allow_traffic              = ["39.46.215.160/32", "202.69.61.0/24"]
-ses_email_address          = "xccc@xgrid.co"
-creator_email              = "saman.batool@xgrid.co"
+ses_email_address          = "admin@example.co"
+creator_email              = "admin@example.co"
 instance_type              = "t2.micro"
 total_account_cost_lambda  = "total_account_cost"
 total_account_cost_cronjob = "cron(0 0 1,15 * ? *)"
@@ -63,5 +63,3 @@ security_group_ingress = {
     cidr_blocks = ["10.0.0.64/26"]
   }
 }
-
-project = "x-ccc"

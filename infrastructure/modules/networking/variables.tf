@@ -44,7 +44,7 @@ variable "owner_email" {
 
 variable "creator_email" {
   type        = string
-  description = "Email address of a person who is provisioning the infrastructure of x-ccc"
+  description = "Email address of a person who is provisioning the infrastructure of XC3"
 }
 
 variable "project" {

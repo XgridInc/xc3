@@ -16,8 +16,8 @@
 
 terraform {
   backend "s3" {
-    bucket         = "terraform-state-xccc"
-    key            = "xccc/xccc.tfstate"
+    bucket         = "terraform-state-xccc" // S3 bucket for terraform state management
+    key            = "xccc/xccc.tfstate"    // S3 object key for terraform state file to maintain history of resources
     region         = "eu-west-1"
     dynamodb_table = "terraform-lock"
   }

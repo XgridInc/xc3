@@ -2,7 +2,7 @@
 
 [![Docs](https://img.shields.io/badge/docs-latest-blue)](https://github.com/X-CBG/XC3)
 [![Slack](https://slackin.px.dev/badge.svg)](https://app.slack.com/client/T051FMAMBPU/C051CPC6DHT)
-[![Open AI Reviewer](https://github.com/X-CBG/X-CCC/actions/workflows/openai-pr-reviewer.yml/badge.svg)](https://github.com/X-CBG/X-CCC/actions/workflows/openai-pr-reviewer.yml)
+[![Open AI Reviewer](https://github.com/X-CBG/XC3/actions/workflows/openai-pr-reviewer.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/openai-pr-reviewer.yml)
 [![Code Linter](https://github.com/X-CBG/X-CCC/actions/workflows/linter.yml/badge.svg)](https://github.com/X-CBG/X-CCC/actions/workflows/linter.yml)
 [![Shellcheck](https://github.com/X-CBG/X-CCC/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/X-CBG/X-CCC/actions/workflows/shellcheck.yml)
 [![Code Vulnerability](https://github.com/X-CBG/X-CCC/actions/workflows/checkov.yml/badge.svg)](https://github.com/X-CBG/X-CCC/actions/workflows/checkov.yml)
@@ -12,7 +12,7 @@
 <br>
 
 # XC3
-Xgrid Cloud Cost Control is a cloud agnostic and risk free package offering powered by Cloud Custodian that provides  security enforcement, tagging, unused or invalid resources cleanup, account maintenance, cost control, and backups. It supports managing AWS public cloud environments and provides a visualization of usage of resources in account with support of managing resource utilization on a click.  It spins up automation scripts and triggers lambdas to control cost of running resources in aws accounts and maintain state of each resource on which action performed having real-time visibility into who made what changes from where, enables us to detect misconfigurations and non-compliance. It supports rollback plans to  prevent risks from materializing. Cloud Cost Control  supports conditional policy execution. It generates reports, region vise and maintains state as well. 
+Xgrid Cloud Cost Control is a cloud agnostic and risk free package offering powered by Cloud Custodian that provides  security enforcement, tagging, unused or invalid resources cleanup, account maintenance, cost control, and backups. It supports managing AWS public cloud environments and provides a visualization of usage of resources in account with support of managing resource utilization on a click.  It spins up automation scripts and triggers lambdas to control cost of running resources in aws accounts and maintain state of each resource on which action performed having real-time visibility into who made what changes from where, enables us to detect misconfigurations and non-compliance. It supports rollback plans to  prevent risks from materializing. Cloud Cost Control  supports conditional policy execution. It generates reports, region vise and maintains state as well.
 
 Check the below video for a quick demo of XC3.
 
@@ -51,76 +51,76 @@ Check the below video for a quick demo of XC3.
 ## Pre-requisites
 ------------
 
-1. Clone GitHub repo 
+1. Clone GitHub repo
    ``` git clone https://github.com/X-CBG/XC3.git```
 2. An AWS user with specific permission set user access.
 
    Refer the below IAM Permission Set to setup XC3.
-   
+
    https://drive.google.com/file/d/1yKPwrYgJ-D60_PxmsRWcZNuuaRtV7i4x/view?usp=share_link
-   
+
 3. VPC needs to be present in the master account where you want to set up XC3
 4. A Public and a Private subnet should be available.
-   
+
    Use below AWS documentation to create subnets if necessary.
 
    https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-public-private-vpc.html
-    
-    Note : if no private/public subnets provided then XC3 will create new VPC, private and public subnets and also XC3 will destroy these resources once 
-           user destroys XC3 setup.   
+
+    Note : if no private/public subnets provided then XC3 will create new VPC, private and public subnets and also XC3 will destroy these resources once
+           user destroys XC3 setup.
 5. To store terraform state and maintaing lock, S3 bucket and dynamodb should be available in master account.
-    
+
 6. ACM certificate should be available. It will be associated with loadbalanacer and domain.
-    
+
 7. XC3 will create an EC2 instance during deployment, the user needs to create an AWS key_pair file in order to login to EC2 instance for troubleshooting purpose.
 8. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group id of the bastion/jump/vpn EC2 instance.
 9. The user has to **enable CostExplorer** by following the below link.
 
     https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html
-    
+
     ```
     Note: After enabling CE, it may take up to 24hours for AWS to start capturing your AWS account cost data, hence XC3 may not show the data until CE data is available in AWS account
     ```
 
-   Note : if no private/public subnets provided then X-CCC will create new VPC, private and public subnets and also X-CCC will destroy these resources once
-   user destroys X-CCC setup.
+   Note : if no private/public subnets provided then XC3 will create new VPC, private and public subnets and also XC3 will destroy these resources once
+   user destroys XC3 setup.
 
-6. X-CCC will create an EC2 instance during deployment, the user needs to create an AWS key_pair file in order to login to EC2 instance for troubleshooting purpose.
+6. XC3 will create an EC2 instance during deployment, the user needs to create an AWS key_pair file in order to login to EC2 instance for troubleshooting purpose.
 7. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group id of the bastion/jump/vpn EC2 instance.
 8. The user has to **enable CostExplorer** by following the below link.
 
    https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html
 
    ```
-   Note: After enabling CE, it may take up to 24hours for AWS to start capturing your AWS account cost data, hence X-CCC may not show the data until CE data is available in AWS account
+   Note: After enabling CE, it may take up to 24hours for AWS to start capturing your AWS account cost data, hence XC3 may not show the data until CE data is available in AWS account
    ```
 
 # Deployment
 
 1. Clone the GitHub repo in your local computer to setup XC3 infrastructure.
-   ```bash 
-   git clone https://github.com/X-CBG/XC3.git 
+   ```bash
+   git clone https://github.com/X-CBG/XC3.git
    ```
 
-    
-2. `terraform.auto.tfvars` is the configuration file for the deployment. Use this files to create an `input.tfvars` file. 
-        Copy the mentioned configuration file and modify the parameters.   
-   
+
+2. `terraform.auto.tfvars` is the configuration file for the deployment. Use this files to create an `input.tfvars` file.
+        Copy the mentioned configuration file and modify the parameters.
+
 3. Initialize Terraform. It will initialize all terraform modules/plugins.
         go to `XC3/infrastructure/` directory and run below command
         ```bash
         cd XC3/infrastructure/
         terraform init
         ```
-        ```bash 
+        ```bash
         Expected Output: It will create .terraform directory in XC3/infrastructure/  location
                     Initializing modules...
                     - infrastructure in modules/networking
-                    - infrastructure in modules/xccc
+                    - infrastructure in modules/xc3
                     * provider.aws: version = "~> 4.0."
                     Terraform has been successfully initialized!
             ```
- 
+
 4. Run planner command under `XC3/infrastructure` directory.
 
       ```bash
@@ -133,8 +133,8 @@ Check the below video for a quick demo of XC3.
                     Plan: 20 to add, 0 to change, 0 to destroy.
                     ------------------------------------------------------------------------
         ```
-            
-5. Run actual Apply command under `XC3/infrastructure` directory to deploy all the resources into AWS master account. 
+
+5. Run actual Apply command under `XC3/infrastructure` directory to deploy all the resources into AWS master account.
         This step may take `10-15` mins.
 
       ```bash
@@ -157,13 +157,13 @@ Check the below video for a quick demo of XC3.
       Apply complete! Resources: 20 added, 0 changed, 0 destroyed.
 
       Outputs:
-6. Please copy msg_templates in custodian directory on deployed EC2 instance 
+6. Please copy msg_templates in custodian directory on deployed EC2 instance
     ```
     scp -i "keypair.pem" keypair.pem bastion-host-dns:/directory-to-copy-keypair
     ssh -i "keypair.pem" user@bastion-host-DNS
     cd directory (where keypair copied in above command)
     ssh -i "keypair.pem" user@private-ip-ec2
-    cp -r  ./cloud_custodian_policies/msg_templates/ custodian/lib/python3.x/site-packages/c7n_mailer/msg_templates/ 
+    cp -r  ./cloud_custodian_policies/msg_templates/ custodian/lib/python3.x/site-packages/c7n_mailer/msg_templates/
 
       ```
 7. Please run the following steps on deployed EC2 instance to trigger XC3 lambda functions.
@@ -177,41 +177,41 @@ Check the below video for a quick demo of XC3.
     4. custodian run -s tagging-compliance --region ${aws_region} ec2-tagging.yml --region all
 
     ```
-8. Wait for few minutes before proceeding further for the application to come online. 
+8. Wait for few minutes before proceeding further for the application to come online.
       Verify the readiness of the metrics system. Load the Grafana URL in a browser. Live Grafana UI ensures the system is ready to accept and visualize metrics.
 
     > Verify the readiness of metrics system by accessing Grafana UI: https://xc3.xxx.com/login
 
-    > Verify the readiness of metrics system by accessing Grafana UI: `loadbalancer-dns`. If Hosted zone ID is not provided in `input.tfvars`. 
+    > Verify the readiness of metrics system by accessing Grafana UI: `loadbalancer-dns`. If Hosted zone ID is not provided in `input.tfvars`.
 
 9. Setup is complete here. Users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
 
-10. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month. 
-   
-        Note :        
+10. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
+
+        Note :
             1. If data is not available in Grafana UI then follow the troubleshooting guide at the last section of this page.
 
 # Troubleshooting Guide
 
 case 1:  If data is not showing into Grafana UI, there could be several reasons as shown below.
-     
+
   1. If AWS account was created freshly within last 24 hours then, you need to enable CostExplorer by following below link
-        
-        https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html 
-        
+
+        https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html
+
   2. If the AWS account was created freshly within the last 24 hours then, it may take up to 24 hours for the AWS team to generate cost information in your account.
         you may see below error in lambda logs in Cloudwatch
-        
+
         [ERROR] DataUnavailableException: An error occurred (DataUnavailableException) when calling the GetCostAndUsage operation: Data is not available. Please try to adjust the time period. If just enabled Cost Explorer, data might not be ingested yet
 
-     
+
   3. XC3 Budget Detail/IAM Role/User Workflow lambda may have failed to execute , please check Cloudwatch logs to address the issue.
-     
+
 
 case 2: user not able to change/update/modify default dashboards in Grafana UI
 
    1. You can't change/update default dashboards.
-   2. If you need to make changes, please request for access for Editor/Admin role on 
+   2. If you need to make changes, please request for access for Editor/Admin role on
 
 <br clear="all">
 
@@ -219,7 +219,7 @@ case 2: user not able to change/update/modify default dashboards in Grafana UI
 
 XC3 is a community-driven project; we welcome your contribution! For code contributions, please read our [contribution guide](./CONTRIBUTING.md).
 
-- File a [GitHub issue](https://github.com/X-CBG/X-CCC/issues) to report a bug or request a feature.
+- File a [GitHub issue](https://github.com/X-CBG/XC3/issues) to report a bug or request a feature.
 - Join our [Slack](https://app.slack.com/client/T051FMAMBPU/C051CPC6DHT) for live conversations and quick questions.
 
 <br clear="all">

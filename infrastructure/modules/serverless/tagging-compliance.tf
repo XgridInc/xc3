@@ -14,13 +14,13 @@
 
 data "archive_file" "resource_list_archive" {
   type        = "zip"
-  source_file = "../lambda_functions/tagging-compliance/resource_list.py"
+  source_file = "../src/tagging-compliance/resource_list.py"
   output_path = "${path.module}/resource_list.zip"
 }
 
 data "archive_file" "resource_parsing_archive" {
   type        = "zip"
-  source_file = "../lambda_functions/tagging-compliance/resource_parsing.py"
+  source_file = "../src/tagging-compliance/resource_parsing.py"
   output_path = "${path.module}/resource_parsing.zip"
 }
 

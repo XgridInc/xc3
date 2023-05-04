@@ -14,14 +14,14 @@
 
 data "archive_file" "lambda_function_listusers_zip" {
   type        = "zip"
-  source_file = "../lambda_functions/iam_users/list_iam_users.py"
+  source_file = "../src/iam_users/list_iam_users.py"
   output_path = "${path.module}/list_iam_users.zip"
 
 }
 
 data "archive_file" "lambda_function_listcost_zip" {
   type        = "zip"
-  source_file = "../lambda_functions/iam_users/list_iam_user_resources_cost.py"
+  source_file = "../src/iam_users/list_iam_user_resources_cost.py"
   output_path = "${path.module}/list_iam_user_resources_cost.zip"
 
 }
@@ -155,11 +155,11 @@ resource "aws_lambda_permission" "allow_bucket_for_trigger" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.list_iam_user.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = var.s3_xccc_bucket.arn
+  source_arn    = var.s3_xc3_bucket.arn
 }
 
 resource "aws_s3_bucket_notification" "list_iam_user_trigger" {
-  bucket = var.s3_xccc_bucket.id
+  bucket = var.s3_xc3_bucket.id
   lambda_function {
     lambda_function_arn = aws_lambda_function.list_iam_user.arn
     filter_prefix       = "iam-user/"

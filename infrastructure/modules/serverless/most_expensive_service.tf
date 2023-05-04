@@ -15,21 +15,21 @@
 locals {
   lambda_archive = {
     most_expensive_service = {
-      source_dir  = "../lambda_functions/expensive_services_detail"
+      source_file = "../src/expensive_services_detail/most_expensive_service.py"
       output_path = "${path.module}/most_expensive_service.zip"
     }
     cost_metrics_of_expensive_services = {
-      source_dir  = "../lambda_functions/expensive_services_detail"
+      source_file = "../src/expensive_services_detail/cost_metrics_of_expensive_services.py"
       output_path = "${path.module}/cost_metrics_of_expensive_services.zip"
     }
   }
 }
 
 # tflint-ignore: terraform_required_providers
-data "archive_file" "lambda_functions" {
+data "archive_file" "src" {
   for_each    = local.lambda_archive
   type        = "zip"
-  source_dir  = each.value.source_dir
+  source_file = each.value.source_file
   output_path = each.value.output_path
 }
 
@@ -105,7 +105,7 @@ resource "aws_lambda_function" "most_expensive_service" {
   role          = aws_iam_role.most_expensive_service_role.arn
   runtime       = "python3.9"
   handler       = "most_expensive_service.lambda_handler"
-  filename      = values(data.archive_file.lambda_functions)[0].output_path
+  filename      = values(data.archive_file.src)[1].output_path
   environment {
     variables = {
       account_detail       = var.namespace
@@ -130,7 +130,7 @@ resource "aws_lambda_function" "cost_metrics_of_expensive_services" {
   role          = aws_iam_role.most_expensive_service_role.arn
   runtime       = "python3.9"
   handler       = "cost_metrics_of_expensive_services.lambda_handler"
-  filename      = values(data.archive_file.lambda_functions)[1].output_path
+  filename      = values(data.archive_file.src)[0].output_path
   environment {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"

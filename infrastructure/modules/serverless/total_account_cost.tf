@@ -22,7 +22,7 @@ locals {
 # tflint-ignore: terraform_required_providers
 data "archive_file" "total_account_cost" {
   type        = "zip"
-  source_file = "../lambda_functions/budget_details/total_account_cost.py"
+  source_file = "../src/budget_details/total_account_cost.py"
   output_path = "${path.module}/total_account_cost.zip"
 }
 
@@ -82,7 +82,7 @@ resource "aws_iam_role_policy" "total_account_cost" {
           "s3:PutObject"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.s3_xccc_bucket.id}/*"
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*"
         ]
       }
     ]
@@ -102,7 +102,7 @@ resource "aws_lambda_function" "total_account_cost" {
     variables = {
       prometheus_ip       = "${var.prometheus_ip}:9091"
       account_detail      = var.namespace
-      bucket_name         = var.s3_xccc_bucket.bucket
+      bucket_name         = var.s3_xc3_bucket.bucket
       monthly_cost_prefix = "cost-metrics/total_account_cost.json"
     }
   }

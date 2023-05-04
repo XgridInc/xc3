@@ -14,7 +14,7 @@
 
 data "archive_file" "project_spend_cost" {
   type        = "zip"
-  source_file = "../lambda_functions/budget_details/project_spend_cost.py"
+  source_file = "../src/budget_details/project_spend_cost.py"
   output_path = "${path.module}/project_spend_cost.zip"
 }
 
@@ -46,7 +46,7 @@ resource "aws_iam_role_policy" "ProjectSpendCost" {
           "s3:PutObject"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.s3_xccc_bucket.id}/*"
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*"
         ]
       }
     ]
@@ -85,7 +85,7 @@ resource "aws_lambda_function" "ProjectSpendCost" {
   environment {
     variables = {
       prometheus_ip        = "${var.prometheus_ip}:9091"
-      bucket_name          = var.s3_xccc_bucket.bucket
+      bucket_name          = var.s3_xc3_bucket.bucket
       project_spend_prefix = "cost-metrics/project_cost.json"
     }
   }

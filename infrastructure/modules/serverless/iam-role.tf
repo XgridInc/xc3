@@ -69,7 +69,7 @@ resource "aws_iam_role_policy" "IamRolestoGrafana" {
           "s3:GetObject"
         ],
         "Resource" : [
-          "arn:aws:s3:::${var.s3_xccc_bucket.id}/*"
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*"
         ]
       }
     ]
@@ -186,7 +186,7 @@ resource "aws_iam_role_policy" "IamRolesServiceMapping" {
           "s3:ListBucket"
         ]
         Resource = [
-          "arn:aws:s3:::${var.s3_xccc_bucket.id}/*"
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*"
         ]
       }
     ]
@@ -387,11 +387,11 @@ resource "aws_lambda_permission" "allow_bucket_for_irtg" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.IamRolestoGrafana.arn
   principal     = "s3.amazonaws.com"
-  source_arn    = var.s3_xccc_bucket.arn
+  source_arn    = var.s3_xc3_bucket.arn
 }
 
 resource "aws_s3_bucket_notification" "IamRolestoGrafana_trigger" {
-  bucket = var.s3_xccc_bucket.id
+  bucket = var.s3_xc3_bucket.id
 
   lambda_function {
     lambda_function_arn = aws_lambda_function.IamRolestoGrafana.arn

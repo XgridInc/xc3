@@ -21,9 +21,9 @@ limitations under the License. #}
 {# The macros below format some resource attributes for better presentation #}
 {% macro getTag(resource, tagKey) -%}
 	{% if resource.get('Tags') %}
-		{% for t in resource.get('Tags') %} 	
+		{% for t in resource.get('Tags') %}
 			{%  if t.get('Key') == tagKey %}
-				{{ t.get('Value') }}    							
+				{{ t.get('Value') }}
 			{% endif %}
 		{% endfor %}
 	{% endif %}
@@ -33,7 +33,7 @@ limitations under the License. #}
 			{{ p }},
 		{% endfor %}
 {%- endmacro %}
-	
+
 {% macro columnHeading(columnNames, tableWidth) -%}
 	<table>
 	{% for columnName in columnNames %}
@@ -42,7 +42,7 @@ limitations under the License. #}
 {%- endmacro %}
 
 {# The macro below creates the table:
-   Formatting can be dependent on the column names that are passed in 
+   Formatting can be dependent on the column names that are passed in
 #}
 {% macro columnData(resources, columnNames) -%}
 	{% for resource in resources %}
@@ -53,11 +53,11 @@ limitations under the License. #}
 			{% elif columnName == 'tag.Name' %}
 				<td>{{ getTag(resource,'Name') }}</td>
 			{% elif columnName == 'InstanceCount' %}
-				<td align="center">{{ resource['Instances'] | length }}</td>		
+				<td align="center">{{ resource['Instances'] | length }}</td>
 			{% elif columnName == 'VolumeConsumedReadWriteOps' %}
 				<td>{{ resource['c7n.metrics']['AWS/EBS.VolumeConsumedReadWriteOps.Maximum'][0]['Maximum'] }}</td>
 			{% elif columnName == 'PublicIp' %}
-				<td>{{ resource['NetworkInterfaces'][0].get('Association')['PublicIp'] }}</td>										
+				<td>{{ resource['NetworkInterfaces'][0].get('Association')['PublicIp'] }}</td>
 			{% else %}
 				<td>{{ resource[columnName] }}</td>
 			{% endif %}
@@ -65,11 +65,11 @@ limitations under the License. #}
 		</tr>
 	{% endfor %}
 	</table>
-{%- endmacro %}	
+{%- endmacro %}
 
 {# Main #}
 {% macro createTable(columnNames, resources, tableWidth) %}
-	{{ columnHeading(columnNames, tableWidth) }}				
+	{{ columnHeading(columnNames, tableWidth) }}
 	{{ columnData(resources, columnNames) }}
 {%- endmacro %}
 
@@ -96,8 +96,8 @@ limitations under the License. #}
 		border-bottom-right-radius: 7px;
 	}
 	td {
-		border: 1px solid grey; 
-		padding: 4px;	
+		border: 1px solid grey;
+		padding: 4px;
 	}
 	th {
 		background: linear-gradient(#0c2b5b,#a1bae2);
@@ -106,8 +106,8 @@ limitations under the License. #}
 		text-align: center;
 		padding: 5px;
 	}
-	tr:nth-child(even) {			
-		background-color: #f2f2f2;			
+	tr:nth-child(even) {
+		background-color: #f2f2f2;
 	}
 	tr:hover {
 		background: #d7e3f7;
@@ -119,95 +119,95 @@ limitations under the License. #}
     <ul>
     	<h2><font color="#505151"> {{  "%s - %s" | format(account,region)  }} </h2>
 		<h3> {{  action['violation_desc']  }} </h3>
-		
-		{# Below, notifications for any resource-type can be formatted with specific columns #}	  				
+
+		{# Below, notifications for any resource-type can be formatted with specific columns #}
 		{% if policy['resource'] == "ami" %}
 			{% set columnNames = ['Name','ImageId','CreationDate'] %}
-			{{ createTable(columnNames, resources, '60') }}				
-		  				
+			{{ createTable(columnNames, resources, '60') }}
+
 		{% elif policy['resource'] == "app-elb" %}
 		  	{% set columnNames = ['LoadBalancerName','CreatedTime','Project','Creator','Owner'] %}
-			{{ createTable(columnNames, resources, '80') }}					  				
-									
+			{{ createTable(columnNames, resources, '80') }}
+
 		{% elif policy['resource'] == "asg" %}
 			{% if resources[0]['Invalid'] is defined %}
 		  		{% set columnNames = ['AutoScalingGroupName','InstanceCount','Invalid'] %}
 		  	{% else %}
 		  		{% set columnNames = ['AutoScalingGroupName','InstanceCount','Project','Creator','Owner'] %}
 		  	{% endif %}
-			{{ createTable(columnNames, resources, '60') }}			  				
-			    	
+			{{ createTable(columnNames, resources, '60') }}
+
 		{% elif policy['resource'] == "cache-cluster" %}
 		  	{% set columnNames = ['CacheClusterId','CacheClusterCreateTime','CacheClusterStatus','Project','Creator','Owner'] %}
-			{{ createTable(columnNames, resources, '80') }}			  				  										  				
+			{{ createTable(columnNames, resources, '80') }}
 
 		{% elif policy['resource'] == "cache-snapshot" %}
 			{% set columnNames = ['SnapshotName','CacheClusterId','SnapshotSource','Project','Creator','Owner'] %}
-			{{ createTable(columnNames, resources, '80') }}			  	
+			{{ createTable(columnNames, resources, '80') }}
 
 		{% elif policy['resource'] == "cfn" %}
 			{% set columnNames = ['StackName'] %}
-			{{ createTable(columnNames, resources, '50') }}			     	
-			
+			{{ createTable(columnNames, resources, '50') }}
+
 		{% elif policy['resource'] == "cloudsearch" %}
 			{% set columnNames = ['DomainName'] %}
-			{{ createTable(columnNames, resources, '50') }}		    								    	
-			
+			{{ createTable(columnNames, resources, '50') }}
+
 		{% elif policy['resource'] == "ebs" %}
 			{% set columnNames = ['VolumeId','CreateTime','State','Project','Creator','Owner'] %}
-			{{ createTable(columnNames, resources, '50') }}		 
-			
+			{{ createTable(columnNames, resources, '50') }}
+
 		{% elif policy['resource'] == "ebs-snapshot" %}
 			{% set columnNames = ['SnapshotId','StartTime','Project','Creator','Owner'] %}
-			{{ createTable(columnNames, resources, '80') }}			     		
-			
+			{{ createTable(columnNames, resources, '80') }}
+
 		{% elif policy['resource'] == "ec2" %}
 			{% if resources[0]['MatchedFilters'] == ['PublicIpAddress'] %}
 				{% set columnNames = ['tag.Name','PublicIp','InstanceId'] %}
 			{% else %}
 				{% set columnNames = ['tag.Name','PrivateIpAddress','InstanceId','ImageId','Creator'] %}
 			{% endif %}
-			{{ createTable(columnNames, resources, '80') }}					   
-			
+			{{ createTable(columnNames, resources, '80') }}
+
 		{% elif policy['resource'] == "efs" %}
 			{% set columnNames = ['CreationToken','CreationTime','FileSystemId','CreatorId'] %}
-			{{ createTable(columnNames, resources, '50') }}		
-			  				
+			{{ createTable(columnNames, resources, '50') }}
+
 		{% elif policy['resource'] == "elasticsearch" %}
 			{% set columnNames = ['DomainName','Endpoint'] %}
-			{{ createTable(columnNames, resources, '50') }}		
-			  				
+			{{ createTable(columnNames, resources, '50') }}
+
 		{% elif policy['resource'] == "elb" %}
-	    	{% set columnNames = ['LoadBalancerName','InstanceCount','AvailabilityZones','Project','Creator','Owner'] %}	    		
-			{{ createTable(columnNames, resources, '80') }}			  
+	    	{% set columnNames = ['LoadBalancerName','InstanceCount','AvailabilityZones','Project','Creator','Owner'] %}
+			{{ createTable(columnNames, resources, '80') }}
 
 		{% elif policy['resource'] == "emr" %}
 			{% set columnNames = ['Id','EmrState'] %}
-			{{ createTable(columnNames, resources, '50') }}					
+			{{ createTable(columnNames, resources, '50') }}
 
 		{% elif policy['resource'] == "kinesis" %}
 			{% set columnNames = ['StreamName'] %}
-			{{ createTable(columnNames, resources, '50') }}						
+			{{ createTable(columnNames, resources, '50') }}
 
 		{% elif policy['resource'] == "launch-config" %}
 		    {% set columnNames = ['LaunchConfigurationName'] %}
-			{{ createTable(columnNames, resources, '30') }}		
+			{{ createTable(columnNames, resources, '30') }}
 
 		{% elif policy['resource'] == "log-group" %}
 			{% set columnNames = ['logGroupName'] %}
-			{{ createTable(columnNames, resources, '30') }}			  				  				  	
-			
+			{{ createTable(columnNames, resources, '30') }}
+
 		{% elif policy['resource'] == "rds" %}
 			{% if resources[0]['PubliclyAccessible'] == true or resources[0]['StorageEncrypted'] == false %}
 				{% set columnNames = ['DBInstanceIdentifier','PubliclyAccessible','StorageEncrypted','DBSubnetGroup'] %}
 			{% else %}
 				{% set columnNames = ['DBInstanceIdentifier','Project','Creator','Owner'] %}
-			{% endif %}				
-			{{ createTable(columnNames, resources, '80') }}	
-						
+			{% endif %}
+			{{ createTable(columnNames, resources, '80') }}
+
 		{% elif policy['resource'] == "rds-snapshot" %}
 			{% set columnNames = ['DBSnapshotIdentifier','SnapshotCreateTime','DBInstanceIdentifier','SnapshotType','Project','Creator','Owner'] %}
-			{{ createTable(columnNames, resources, '80') }}				
+			{{ createTable(columnNames, resources, '80') }}
 
 		{% elif policy['resource'] == "redshift" %}
 			{% if resources[0]['PubliclyAccessible'] == true or resources[0]['Encrypted'] == false %}
@@ -216,18 +216,18 @@ limitations under the License. #}
 				{% set columnNames = ['ClusterIdentifier','NodeCount','Project','Creator','Owner'] %}
 			{% endif %}
 			{{ createTable(columnNames, resources, '80') }}
-				  				
+
 		{% elif policy['resource'] == "redshift-snapshot" %}
 			{% set columnNames = ['SnapshotIdentifier','DBName','Project','Creator','Owner'] %}
-			{{ createTable(columnNames, resources, '80') }} 					  				
-					
+			{{ createTable(columnNames, resources, '80') }}
+
 		{% elif policy['resource'] == "s3" %}
 			{% if resources[0]['GlobalPermissions'] is defined %}
 			 	{% set columnNames = ['Name','GlobalPermissions'] %}
 			{% else %}
 				{% set columnNames = ['Name','Project','Creator','Owner'] %}
 			{% endif %}
-			{{ createTable(columnNames, resources, '80') }} 										  								
+			{{ createTable(columnNames, resources, '80') }}
 
 		{% elif policy['resource'] == "security-group" %}
 			{% set columnNames = ['GroupName','tag.Name','GroupId','VpcId'] %}
@@ -235,37 +235,37 @@ limitations under the License. #}
 		{% elif policy['resource'] == "iam-role" %}
                         {% set columnNames = ['RoleName','CreateDate','Arn'] %}
                         {{ createTable(columnNames, resources, '80') }}
-			
+
 		{% elif policy['resource'] == "simpledb" %}
 			{% set columnNames = ['DomainName'] %}
-			{{ createTable(columnNames, resources, '60') }}	
-			
+			{{ createTable(columnNames, resources, '60') }}
+
 		{# If no special formatting is defined for a resource type, all attributes will be formatted in the email #}
-		{% else %}  							 
-			<table style="width:100%; border:1px dashed black; border-collapse:collapse;"> 	
+		{% else %}
+			<table style="width:100%; border:1px dashed black; border-collapse:collapse;">
     			<tr>
     				{% for column in resources[0] %}
 	    				<th>{{ column }}</th>
     				{% endfor %}
-  				</tr>  			
+  				</tr>
 			{% set columnlen = resources[0]|length|int %}
 			{% for resource in resources %}
 				<tr>
 					{% for column in resource %}
 						<td>{{ resource[column] }}</td>
-					{% endfor %}	
+					{% endfor %}
 				</tr>
-			{% endfor %}  					
-			</table>	  				  							  										  			 							  				
+			{% endfor %}
+			</table>
 		{% endif %}
-		
-		<h3>{{  action['action_desc']  }}</h3>		
+
+		<h3>{{  action['action_desc']  }}</h3>
                 <h3>Thank you,</h3>
 		<h3>Xgrid Cloud Cost Control Team</h3>
 
 		<h4>
-			For any other questions,  
-				<a href="mailto:xccc@xgrid.co"> email us</a>
+			For any other questions,
+				<a href="mailto:admin@example.co"> email us</a>
 		</h4>
     </ul>
 </body>

@@ -21,9 +21,9 @@ limitations under the License. #}
 {# The macros below format some resource attributes for better presentation #}
 {% macro getTag(resource, tagKey) -%}
 	{% if resource.get('Tags') %}
-		{% for t in resource.get('Tags') %} 	
+		{% for t in resource.get('Tags') %}
 			{%  if t.get('Key') == tagKey %}
-				{{ t.get('Value') }}    							
+				{{ t.get('Value') }}
 			{% endif %}
 		{% endfor %}
 	{% endif %}
@@ -34,7 +34,7 @@ limitations under the License. #}
 			{{ p }},
 		{% endfor %}
 {%- endmacro %}
-	
+
 {% macro columnHeading(columnNames, tableWidth) -%}
 	<table>
 	{% for columnName in columnNames %}
@@ -43,7 +43,7 @@ limitations under the License. #}
 {%- endmacro %}
 
 {# The macro below creates the table:
-   Formatting can be dependent on the column names that are passed in 
+   Formatting can be dependent on the column names that are passed in
 #}
 {% macro columnData(resources, columnNames) -%}
 	{% for resource in resources %}
@@ -54,11 +54,11 @@ limitations under the License. #}
 			{% elif columnName == 'tag.Name' %}
 				<td>{{ getTag(resource,'Name') }}</td>
 			{% elif columnName == 'InstanceCount' %}
-				<td align="center">{{ resource['Instances'] | length }}</td>		
+				<td align="center">{{ resource['Instances'] | length }}</td>
 			{% elif columnName == 'VolumeConsumedReadWriteOps' %}
 				<td>{{ resource['c7n.metrics']['AWS/EBS.VolumeConsumedReadWriteOps.Maximum'][0]['Maximum'] }}</td>
 			{% elif columnName == 'PublicIp' %}
-				<td>{{ resource['NetworkInterfaces'][0].get('Association')['PublicIp'] }}</td>						
+				<td>{{ resource['NetworkInterfaces'][0].get('Association')['PublicIp'] }}</td>
 			{% else %}
 				<td>{{ resource[columnName] }}</td>
 			{% endif %}
@@ -66,11 +66,11 @@ limitations under the License. #}
 		</tr>
 	{% endfor %}
 	</table>
-{%- endmacro %}	
+{%- endmacro %}
 
 {# Main #}
 {% macro createTable(columnNames, resources, tableWidth) %}
-	{{ columnHeading(columnNames, tableWidth) }}				
+	{{ columnHeading(columnNames, tableWidth) }}
 	{{ columnData(resources, columnNames) }}
 {%- endmacro %}
 
@@ -97,8 +97,8 @@ limitations under the License. #}
 		border-bottom-right-radius: 7px;
 	}
 	td {
-		border: 1px solid grey; 
-		padding: 4px;	
+		border: 1px solid grey;
+		padding: 4px;
 	}
 	th {
 		background: linear-gradient(#0c2b5b,#a1bae2);
@@ -107,8 +107,8 @@ limitations under the License. #}
 		text-align: center;
 		padding: 5px;
 	}
-	tr:nth-child(even) {			
-		background-color: #f2f2f2;			
+	tr:nth-child(even) {
+		background-color: #f2f2f2;
 	}
 	tr:hover {
 		background: #d7e3f7;
@@ -118,7 +118,7 @@ limitations under the License. #}
 
 <body>
     <ul>
-		{# Below, notifications for any resource-type can be formatted with specific columns #}	  				
+		{# Below, notifications for any resource-type can be formatted with specific columns #}
 		{% if policy['resource'] == "ec2" %}
 			<p> The following EC2 Resource is non-conformant to tagging policies shared by XMOps Team. Resource  details are mentioned below: </p>
 			<h2>Following Tags are missing on EC2 Resource</h2>
@@ -142,34 +142,34 @@ limitations under the License. #}
         		  <li>{{ "Cluster Tags: %s" | format(resources[0]["Tags"]) }}</li>
         		  <li>{{ "Cluster Name: %s" | format(resources[0]["name"]) }}</li>
 
-			 				   
+
 		{# If no special formatting is defined for a resource type, all attributes will be formatted in the email #}
-		{% else %}  							 
-			<table style="width:100%; border:1px dashed black; border-collapse:collapse;"> 	
+		{% else %}
+			<table style="width:100%; border:1px dashed black; border-collapse:collapse;">
     			<tr>
     				{% for column in resources[0] %}
 	    				<th>{{ column }}</th>
     				{% endfor %}
-  				</tr>  			
+  				</tr>
 			{% set columnlen = resources[0]|length|int %}
 			{% for resource in resources %}
 				<tr>
 					{% for column in resource %}
 						<td>{{ resource[column] }}</td>
-					{% endfor %}	
+					{% endfor %}
 				</tr>
-			{% endfor %}  					
+			{% endfor %}
 			</table>
-		{% endif %}	  				  							  				  			 							  				
-		
-		
-		<h3>{{  action['action_desc']  }}</h3>		
-		
+		{% endif %}
+
+
+		<h3>{{  action['action_desc']  }}</h3>
+
 		<h4>Thank you,</h4>
-		<h4>Xgrid Cost Control Team</h4>
+		<h4>Xgrid Cloud Cost Control Team</h4>
 		<h5>
 			For more information, please contact the us at
-				<a href="mailto:xccc@xgrid.co"> XCCC-Team</a>
+				<a href="mailto:admin@example.co"> XC3-Team</a>
 		</h5>
     </ul>
 </body>
