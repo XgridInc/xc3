@@ -86,7 +86,7 @@ resource "aws_lambda_function" "ProjectSpendCost" {
     variables = {
       prometheus_ip        = "${var.prometheus_ip}:9091"
       bucket_name          = var.s3_xc3_bucket.bucket
-      project_spend_prefix = "cost-metrics/project_cost.json"
+      project_spend_prefix = var.s3_prefixes.project_spend_prefix
     }
   }
   memory_size = var.memory_size

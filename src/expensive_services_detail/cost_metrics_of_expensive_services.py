@@ -19,6 +19,7 @@ import time
 from datetime import date, timedelta
 
 import boto3
+import botocore
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
 # Initialize and Connect to the AWS EC2 Service
@@ -26,6 +27,10 @@ try:
     ec2_client = boto3.client("ec2")
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
+try:
+    s3 = boto3.client("s3")
+except Exception as e:
+    logging.error("Error creating boto3 client for s3: " + str(e))
 
 
 def get_cost_and_usage_data(client, start, end, region, account_id):
@@ -75,7 +80,7 @@ def get_cost_and_usage_data(client, start, end, region, account_id):
             time.sleep(5)
         except ValueError as ve:
             raise ValueError(
-                f"ValueError occurred: {ve}.\nPlease check the input data format and try again."
+                f"ValueError occurred: {ve}.\nPlease check the input data format."
             )
 
 
@@ -151,7 +156,11 @@ def lambda_handler(event, context):
 
         logging.info(parent_list)
 
-    # Adding the extracted cost data to the Prometheus gauge as labels for service, region, and cost.
+    # Creating an empty list to store the data
+    data_list = []
+
+    # Adding the extracted cost data to the Prometheus
+    # gauge as labels for service, region, and cost.
     try:
         registry = CollectorRegistry()
         gauge = Gauge(
@@ -165,12 +174,33 @@ def lambda_handler(event, context):
             region = parent_list[i]["Region"]
             cost = parent_list[i]["Cost"]
             account_id = parent_list[i]["Account"]
+            data_dict = {"Service": service, "Region": region, "Cost": cost}
+
+            # add the dictionary to the list
+            data_list.append(data_dict)
             gauge.labels(service, cost, region, account_id).set(cost)
 
             # Push the metric to the Prometheus Gateway
             push_to_gateway(
                 os.environ["prometheus_ip"], job=account_id, registry=registry
             )
+        # convert data to JSON
+        json_data = json.dumps(data_list)
+
+        # upload JSON file to S3 bucket
+        bucket_name = os.environ["bucket_name"]
+        key_name = f'{os.environ["expensive_service_prefix"]}/{account_id}.json'
+        try:
+            s3.put_object(Bucket=bucket_name, Key=key_name, Body=json_data)
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "NoSuchBucket":
+                raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
+            elif e.response["Error"]["Code"] == "AccessDenied":
+                raise ValueError(
+                    f"Access denied to S3 bucket: {os.environ['bucket_name']}"
+                )
+            else:
+                raise ValueError(f"Failed to upload data to S3 bucket: {str(e)}")
     except Exception as e:
         logging.error("Error initializing Prometheus Registry and Gauge: " + str(e))
         return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}

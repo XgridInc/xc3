@@ -103,7 +103,7 @@ resource "aws_lambda_function" "total_account_cost" {
       prometheus_ip       = "${var.prometheus_ip}:9091"
       account_detail      = var.namespace
       bucket_name         = var.s3_xc3_bucket.bucket
-      monthly_cost_prefix = "cost-metrics/total_account_cost.json"
+      monthly_cost_prefix = var.s3_prefixes.monthly_cost_prefix
     }
   }
   memory_size = var.memory_size

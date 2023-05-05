@@ -1,6 +1,6 @@
 **/.history/*
 # Ignore all files in the .terraform directory
-*/.terraform/*
+**/.terraform/*
 
 # Ignore the terraform.tfstate file
 */terraform.tfstate
@@ -13,7 +13,7 @@
 
 # Ignore the .terraform-version file
 */.terraform-version
-
+**/.terraform.lock.hcl
 # Ignore all files in the .terraform-plugins directory
 */.terraform-plugins/*
 

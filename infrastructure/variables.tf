@@ -134,4 +134,5 @@ variable "cron_jobs_schedule" {
 variable "slack_channel_url" {
   description = "Slack Channel URL"
   type        = string
+  default     = ""
 }

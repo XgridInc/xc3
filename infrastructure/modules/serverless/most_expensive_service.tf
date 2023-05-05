@@ -90,7 +90,16 @@ resource "aws_iam_role_policy" "most_expensive_service_policy" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-          "arn:aws:lambda:*:*:function:*"
+          "${aws_lambda_function.most_expensive_service.arn}"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:PutObject"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*"
         ]
       }
     ]
@@ -133,7 +142,9 @@ resource "aws_lambda_function" "cost_metrics_of_expensive_services" {
   filename      = values(data.archive_file.src)[0].output_path
   environment {
     variables = {
-      prometheus_ip = "${var.prometheus_ip}:9091"
+      prometheus_ip            = "${var.prometheus_ip}:9091"
+      bucket_name              = var.s3_xc3_bucket.bucket
+      expensive_service_prefix = var.s3_prefixes.expensive_service_prefix
     }
   }
   layers      = [var.prometheus_layer]
