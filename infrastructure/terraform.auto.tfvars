@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace      = "x-ccc"
+namespace      = "xc3"
 region         = "eu-west-1"
 account_id     = "201635854701"
 vpc_cidr_block = "10.0.0.0/24"
@@ -33,7 +33,7 @@ total_account_cost_cronjob = "cron(0 0 1,15 * ? *)"
 prometheus_layer           = "lambda_layers/python.zip"
 memory_size                = 128
 timeout                    = 300
-project                    = "x-ccc"
+project                    = "xc3"
 security_group_ingress = {
   "pushgateway" = {
     description = "PushGateway"
