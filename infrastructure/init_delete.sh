@@ -36,6 +36,8 @@ else
     exit 1
 fi
 
+# Input variable KMS key ID
+key_id=$1
 # AWS Region from config.sh to be used in rest of script
 echo "AWS Region: $aws_region"
 # Dynamodb Table Name to be used in deleting dynamo db table
@@ -45,7 +47,7 @@ echo "Bucket Name: $bucket_name"
 # Project Name that will be used Tag value for Project key to follow tagging compliance best practices
 echo "Project: $project"
 # Domain Name to create ACM Certificate that will be used in creating Route53 Domain
-echo "Domain: $Domain"
+echo "Domain: $domain"
 # Email Address of Owner of Team
 echo "Owner Email: $owner_email"
 # Email Address of Creator who is spinning up the infrastructure
@@ -59,23 +61,36 @@ else
 fi
 
 # Delete Dynamodb table that was used to maintain lock on terraform states
-if aws dynamodb delete-table --table-name "${dynamo_table_name}"; then
+if aws dynamodb delete-table --table-name "${dynamo_table_name}" --region "${aws_region}"; then
     echo "DynamoDB table deleted successfully"
 else
     echo "Error deleting DynamoDB table"
 fi
 
 # Delete EC2 key-pair that was used to ssh into EC2 instances
-if aws ec2 delete-key-pair --key-name "${namespace}-key"; then
-    rm "${namespace}-key.pem"
+if aws ec2 delete-key-pair --key-name "${project}-key"; then
+    rm "${project}-key.pem"
     echo "Key pair deleted successfully"
 else
     echo "Error deleting key pair"
 fi
 
 # Delete ACM Certificat that was used with Route 53 Domain
-if aws acm delete-certificate --certificate-arn "$(aws acm list-certificates --region "${aws_region}" --query "CertificateSummaryList[?DomainName=='${Domain}'].CertificateArn" --output text)"; then
+if aws acm delete-certificate --certificate-arn "$(aws acm list-certificates --region "${aws_region}" --query "CertificateSummaryList[?DomainName=='${domain}'].CertificateArn" --output text)"; then
     echo "ACM certificate deleted successfully"
 else
     echo "Failed to delete ACM certificate"
+fi
+
+# Delete KMS Key Alias
+if aws kms delete-alias --alias-name "alias/${project}-kms-key" --region "${aws_region}"; then
+   echo "KMS Key alias deleted successfully"
+else
+    echo "Failed to delete kms key alias"
+fi
+# Delete KMS key
+if aws kms schedule-key-deletion --key-id ${key_id} --pending-window-in-days 7 --region "${aws_region}"; then
+   echo "KMS key deleted successfully"
+else
+    echo "Failed to delete KMS key"
 fi

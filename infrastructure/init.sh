@@ -17,14 +17,15 @@
 # This script creates an S3 bucket to store the Terraform state file,
 # enables public block access on the S3 bucket, creates a DynamoDB table
 # to maintain a lock on Terraform states, creates an EC2 key pair, and
-# requests an ACM certificate that will be used in a Route 53 Domain.
+# requests an ACM certificate that will be used in a Route 53 domain.
+# KMS key that will be used for data encryption in cloudtrail configuration.
 # It uses the values specified in the `config.sh` file to perform the necessary operations.
 # The `config.sh` file should define the following variables:
 #   - `aws_region`: The AWS Region to use for the resources created by this script.
 #   - `dynamo_table_name`: The name to use for the DynamoDB table that will maintain a lock on Terraform states.
 #   - `bucket_name`: The name to use for the S3 bucket that will store the Terraform state file.
 #   - `project`: The project name to use as the tag value for the `Project` key to follow tagging compliance best practices.
-#   - `Domain`: The domain name to use when creating an ACM certificate that will be used in a Route 53 Domain.
+#   - `domain`: The domain name to use when creating an ACM certificate that will be used in a Route 53 domain.
 #   - `owner_email`: The email address of the owner of the team.
 #   - `creator_email`: The email address of the creator who is spinning up the infrastructure.
 
@@ -47,7 +48,7 @@ echo "Bucket Name: $bucket_name"
 # Project Name that will be used Tag value for Project key to follow tagging compliance best practices
 echo "Project: $project"
 # Domain Name to be used in create ACM Certificate that will be used in creating Route53 Domain
-echo "Domain: $Domain"
+echo "Domain: $domain"
 # Email Address of Owner of Team
 echo "Owner Email: $owner_email"
 # Email Address of Creator who is spinning up the infrastructure
@@ -77,7 +78,8 @@ if aws dynamodb create-table \
     --attribute-definitions AttributeName=LockID,AttributeType=S \
     --key-schema AttributeName=LockID,KeyType=HASH \
     --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
-    --tags Key=backup,Value=short; then
+    --tags Key=backup,Value=short \
+    --region "${aws_region}"; then
     echo "DynamoDB table created successfully"
 else
     echo "Error creating DynamoDB table"
@@ -94,7 +96,7 @@ fi
 
 # Create ACM Certificate that will be used in Route 53 Domain
 if aws acm request-certificate \
-    --domain-name "${Domain}" \
+    --domain-name "${domain}" \
     --validation-method DNS \
     --key-algorithm RSA_2048 \
     --region "${aws_region}" \
@@ -102,4 +104,48 @@ if aws acm request-certificate \
     echo "ACM certificate requested successfully"
 else
     echo "Failed to request ACM certificate"
+fi
+
+# Create the KMS key for cloudtrail and capture the key ID in a variable
+if key_id=$(aws kms create-key \
+        --description "kms key for cloudtrail" \
+        --tags "[{\"TagKey\":\"Project\",\"TagValue\":\"${project}\"}, {\"TagKey\":\"Owner\",\"TagValue\":\"${owner_email}\"}, {\"TagKey\":\"Creator\",\"TagValue\":\"${creator_email}\"}]" \
+        --policy '{
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "Enable IAM User Permissions",
+                "Effect": "Allow",
+                "Principal": {
+                  "AWS": "*"
+                },
+                "Action": "kms:*",
+                "Resource": "*"
+              },
+              {
+                "Sid": "Allow CloudTrail to encrypt logs",
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "cloudtrail.amazonaws.com"
+                },
+                "Action": [
+                  "kms:GenerateDataKey",
+                  "kms:Decrypt"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }' \
+        --output text \
+        --query 'KeyMetadata.KeyId' \
+        --region "${aws_region}"); then
+   echo "KMS Key created successfully"
+else
+    echo "Failed to create KMS key"
+fi
+# Create alias on KMS key
+if aws kms create-alias --alias-name "alias/${project}-kms-key" --target-key-id "${key_id}" --region "${aws_region}" ; then
+   echo "Alias created successfully on KMS key"
+else
+    echo "Failed to create alias on kms key"
 fi

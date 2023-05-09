@@ -90,7 +90,7 @@ resource "aws_iam_role_policy" "most_expensive_service_policy" {
           "lambda:InvokeFunction"
         ],
         "Resource" : [
-          "${aws_lambda_function.most_expensive_service.arn}"
+          "arn:aws:lambda:*:*:function:*"
         ]
       },
       {

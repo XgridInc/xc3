@@ -40,7 +40,7 @@ resource "aws_lb" "this" {
   name                       = "${var.namespace}-load-balancer"
   internal                   = false
   load_balancer_type         = "application"
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   subnets = [for id in var.public_subnet_ids : id]
 

@@ -59,7 +59,7 @@ def lambda_handler(event, context):
     ]
     try:
         result = ssm_client.put_parameter(
-            Name=os.environ["account_detail"] + "/account_details",
+            Name="/" + os.environ["account_detail"] + "/account_details",
             Value=json.dumps(account_details),
             Type="StringList",
             Overwrite=True,
