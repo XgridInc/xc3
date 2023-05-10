@@ -12,13 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-// Terraform Remote State
+// Providers
+
+provider "aws" {
+  region = var.region
+}
 
 terraform {
-  backend "s3" {
-    bucket         = "terraform-state-xc3" // S3 bucket for terraform state management
-    key            = "xc3/xc3.tfstate"     // S3 object key for terraform state file to maintain history of resources
-    region         = "eu-west-1"
-    dynamodb_table = "terraform-lock"
+  required_version = ">= 1.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 4.0"
+
+    }
   }
 }

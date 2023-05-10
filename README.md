@@ -3,9 +3,9 @@
 [![Docs](https://img.shields.io/badge/docs-latest-blue)](https://github.com/X-CBG/XC3)
 [![Slack](https://slackin.px.dev/badge.svg)](https://app.slack.com/client/T051FMAMBPU/C051CPC6DHT)
 [![Open AI Reviewer](https://github.com/X-CBG/XC3/actions/workflows/openai-pr-reviewer.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/openai-pr-reviewer.yml)
-[![Code Linter](https://github.com/X-CBG/X-CCC/actions/workflows/linter.yml/badge.svg)](https://github.com/X-CBG/X-CCC/actions/workflows/linter.yml)
-[![Shellcheck](https://github.com/X-CBG/X-CCC/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/X-CBG/X-CCC/actions/workflows/shellcheck.yml)
-[![Code Vulnerability](https://github.com/X-CBG/X-CCC/actions/workflows/checkov.yml/badge.svg)](https://github.com/X-CBG/X-CCC/actions/workflows/checkov.yml)
+[![Code Linter](https://github.com/X-CBG/XC3/actions/workflows/linter.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/linter.yml)
+[![Shellcheck](https://github.com/X-CBG/XC3/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/shellcheck.yml)
+[![Code Vulnerability](https://github.com/X-CBG/XC3/actions/workflows/checkov.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/checkov.yml)
 
 <br>
 
@@ -53,9 +53,7 @@ Check the below video for a quick demo of XC3.
    ` git clone https://github.com/X-CBG/XC3.git`
 2. An AWS user with specific permission set user access.
 
-   Refer the below IAM Permission Set to setup XC3.
-
-   https://drive.google.com/file/d/1yKPwrYgJ-D60_PxmsRWcZNuuaRtV7i4x/view?usp=share_link
+   Refer the IAM Permission Set created in `pre_requirement` folder to setup XC3.
 
 3. VPC needs to be present in the master account where you want to set up XC3
 4. A Public and a Private subnet should be available.

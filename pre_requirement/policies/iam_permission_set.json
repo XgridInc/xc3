@@ -1,0 +1,244 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "cloudtrail",
+            "Effect": "Allow",
+            "Action": [
+                "cloudtrail:GetTrailStatus",
+                "cloudtrail:AddTags",
+                "cloudtrail:ListTags",
+                "cloudtrail:DescribeTrails",
+                "cloudtrail:StopLogging",
+                "cloudtrail:StartLogging",
+                "cloudtrail:PutEventSelectors",
+                "cloudtrail:UpdateTrail",
+                "cloudtrail:CreateTrail",
+                "cloudtrail:GetEventSelectors"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Cognito",
+            "Action": [
+                "cognito-idp:CreateGroup",
+                "cognito-idp:DescribeUserPoolClient",
+                "cognito-idp:CreateUserPoolDomain",
+                "cognito-idp:CreateUserPool",
+                "cognito-idp:DescribeUserPoolDomain",
+                "cognito-idp:GetUserPoolMfaConfig",
+                "cognito-idp:DescribeUserPoolClient",
+                "cognito-idp:CreateGroup",
+                "cognito-idp:CreateUserPool",
+                "cognito-idp:CreateUserPoolDomain",
+                "cognito-idp:TagResource",
+                "cognito-idp:GetGroup",
+                "cognito-idp:DescribeUserPool"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "Route53",
+            "Effect": "Allow",
+            "Action": [
+                "route53:GetChange",
+                "route53:GetHostedZone",
+                "route53:GetHostedZoneCount",
+                "route53:ChangeResourceRecordSets",
+                "route53:ListResourceRecordSets"
+            ],
+            "Resource": [
+                "arn:aws:route53:::*"
+            ]
+        },
+        {
+            "Sid": "LoadBalancer",
+            "Effect": "Allow",
+            "Action": [
+                "elasticloadbalancing:CreateTargetGroup",
+                "elasticloadbalancing:DeregisterTargets",
+                "elasticloadbalancing:ModifyTargetGroupAttributes",
+                "elasticloadbalancing:AddTags",
+                "elasticloadbalancing:CreateListener",
+                "elasticloadbalancing:SetSecurityGroups",
+                "elasticloadbalancing:RegisterTargets",
+                "elasticloadbalancing:ModifyListener",
+                "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                "elasticloadbalancing:DescribeTags",
+                "elasticloadbalancing:DescribeTargetGroupAttributes",
+                "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                "elasticloadbalancing:DescribeTargetHealth",
+                "elasticloadbalancing:DescribeListeners",
+                "elasticloadbalancing:DescribeTargetGroups",
+                "elasticloadbalancing:CreateLoadBalancer",
+                "elasticloadbalancing:DescribeLoadBalancers"
+            ],
+            "Resource": [
+                "arn:aws:elasticloadbalancing:eu-west-1:*:*",
+                "arn:aws:elasticloadbalancing:eu-west-1:201635854701:targetgroup/*",
+                "arn:aws:elasticloadbalancing:eu-west-1:201635854701:loadbalancer/app/*"
+            ]
+        },
+        {
+            "Sid": "Lambda",
+            "Action": [
+                "lambda:CreateFunction",
+                "lambda:PublishLayerVersion",
+                "lambda:InvokeAsync",
+                "lambda:PutFunctionConcurrency",
+                "lambda:PutFunctionEventInvokeConfig",
+                "lambda:PutFunctionCodeSigningConfig",
+                "lambda:UpdateFunctionUrlConfig",
+                "lambda:CreateFunctionUrlConfig",
+                "lambda:UpdateFunctionEventInvokeConfig",
+                "lambda:UpdateEventSourceMapping",
+                "lambda:InvokeFunctionUrl",
+                "lambda:UpdateFunctionCodeSigningConfig",
+                "lambda:InvokeFunction",
+                "lambda:UpdateFunctionConfiguration",
+                "lambda:UpdateAlias",
+                "lambda:UpdateCodeSigningConfig",
+                "lambda:UpdateFunctionCode",
+                "lambda:PutRuntimeManagementConfig",
+                "lambda:PutProvisionedConcurrencyConfig",
+                "lambda:PublishVersion",
+                "lambda:CreateAlias",
+                "lambda:GetPolicy",
+                "lambda:GetCodeSigningConfig",
+                "lambda:GetFunctionEventInvokeConfig",
+                "lambda:ListFunctionsByCodeSigningConfig",
+                "lambda:AddPermission",
+                "lambda:ListFunctionEventInvokeConfigs",
+                "lambda:GetFunctionCodeSigningConfig",
+                "lambda:ListAliases",
+                "lambda:GetFunction",
+                "lambda:ListFunctions",
+                "lambda:ListCodeSigningConfigs",
+                "lambda:ListLayers",
+                "lambda:ListLayerVersions",
+                "lambda:ListTags",
+                "lambda:GetLayerVersionPolicy",
+                "lambda:GetFunctionConfiguration",
+                "lambda:GetAccountSettings",
+                "lambda:GetLayerVersion",
+                "lambda:ListVersionsByFunction",
+                "lambda:TagResource",
+                "lambda:GetFunctionConcurrency",
+                "lambda:GetProvisionedConcurrencyConfig",
+                "lambda:ListProvisionedConcurrencyConfigs"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:lambda:*:*:function:*",
+                "arn:aws:lambda:*:*:layer:*"
+            ]
+        },
+        {
+            "Sid": "ec2",
+            "Action": [
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:DescribeVolumes",
+                "ec2:CreateKeyPair",
+                "ec2:ImportKeyPair",
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:StopInstances",
+                "ec2:StartInstances",
+                "ec2:CreateSecurityGroup",
+                "ec2:AllocateAddress",
+                "ec2:ReleaseAddress",
+                "ec2:AssociateAddress",
+                "ec2:CreateInternetGateway",
+                "ec2:CreateRouteTable",
+                "ec2:CreateSubnet",
+                "ec2:CreateRoute",
+                "ec2:AssociateRouteTable",
+                "ec2:AttachInternetGateway",
+                "ec2:ModifyVpcAttribute",
+                "ec2:ModifySubnetAttribute",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeRouteTables",
+                "ec2:DescribeAddresses",
+                "ec2:CreateNatGateway",
+                "ec2:AuthorizeSecurityGroupEgress",
+                "ec2:RevokeSecurityGroupEgress",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:RunInstances",
+                "ec2:CreateTags",
+                "ec2:DescribeKeyPairs",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeImages",
+                "ec2:DescribeInstanceTypes",
+                "ec2:CreateNetworkInterface",
+                "ec2:DescribeClassicLinkInstances",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeVpcClassicLinkDnsSupport",
+                "ec2:DescribeSubnets",
+                "ec2:DescribeInternetGateways",
+                "ec2:DescribeRouteTables",
+                "ec2:DescribeNatGateways",
+                "ec2:DescribeNetworkInterfaces",
+                "ec2:DescribeKeyPairs",
+                "ec2:DescribeInstances",
+                "ec2:DescribeVpcAttribute",
+                "ec2:AuthorizeSecurityGroupIngress",
+                "ec2:RunInstances",
+                "ec2:ModifyInstanceAttribute"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "S3",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:CreateBucket",
+                "s3:PutObjectTagging",
+                "s3:GetObjectTagging",
+                "s3:PutBucketTagging",
+                "s3:PutBucketNotification",
+                "s3:GetBucketLocation",
+                "s3:GetBucketPolicy",
+                "s3:PutBucketPolicy",
+                "s3:ListAllMyBuckets",
+                "s3:GetBucketAcl",
+                "s3:PutBucketAcl"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:s3:::*"
+            ]
+        },
+        {
+            "Sid": "EKSClusterInfo",
+            "Action": [
+                "eks:ListClusters",
+                "eks:DescribeCluster",
+                "eks:ListTagsForResource"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:eks:*:*:cluster/*"
+            ]
+        },
+        {
+            "Sid": "ACM",
+            "Effect": "Allow",
+            "Action": [
+                "acm:ListCertificates",
+                "acm:DescribeCertificate",
+                "acm:GetCertificate",
+                "acm:ListTagsForCertificate"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

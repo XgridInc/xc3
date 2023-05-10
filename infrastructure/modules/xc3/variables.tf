@@ -89,3 +89,8 @@ variable "cognito_domain" {
   description = "Cognito Domain"
   default     = "grafana-domain"
 }
+
+variable "grafana_api_gateway" {
+  type        = string
+  description = "The API Gateway link "
+}

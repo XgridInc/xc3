@@ -1,0 +1,166 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:SetQueueAttributes",
+                "sqs:ListQueues",
+                "sqs:GetQueueUrl",
+                "sqs:SendMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:PurgeQueue",
+                "sqs:TagQueue",
+                "sqs:CreateQueue",
+                "Sqs:ListQueueTags"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:sqs:*:*:*"
+            ],
+            "Sid": "SQS"
+        },
+        {
+            "Action": [
+                "iam:GetPolicyVersion",
+                "iam:CreateRole",
+                "iam:AttachRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:AddRoleToInstanceProfile",
+                "iam:GetRole",
+                "iam:GetPolicy",
+                "iam:UpdateAssumeRolePolicy",
+                "iam:GetRolePolicy",
+                "iam:CreateInstanceProfile",
+                "iam:PassRole",
+                "iam:CreatePolicyVersion",
+                "iam:ListInstanceProfilesForRole",
+                "iam:GetInstanceProfile",
+                "iam:CreatePolicy",
+                "iam:GetUser",
+                "iam:TagInstanceProfile",
+                "iam:TagRole",
+                "iam:ListPolicyVersions",
+                "iam:ListRolePolicies",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListUsers",
+                "iam:ListAccountAliases",
+                "iam:ListPolicies"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:iam::*:instance-profile/*",
+                "arn:aws:iam::*:user/*",
+                "arn:aws:iam::*:policy/*",
+                "arn:aws:iam::*:role/*",
+                "*"
+            ],
+            "Sid": "IAM"
+        },
+        {
+            "Action": [
+                "SNS:Publish",
+                "SNS:SetTopicAttributes",
+                "SNS:GetTopicAttributes",
+                "SNS:TagResource",
+                "SNS:Subscribe",
+                "SNS:GetSubscriptionAttributes",
+                "SNS:ListTagsForResource",
+                "SNS:CreateTopic",
+                "SNS:UnSubscribe"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:sns:*:*:*"
+            ],
+            "Sid": "SNS"
+        },
+        {
+            "Action": [
+                "ses:DescribeActiveReceiptRuleSet",
+                "ses:ListConfigurationSets",
+                "ses:VerifyEmailIdentity",
+                "ses:CreateReceiptRuleSet",
+                "ses:CreateEmailIdentity",
+                "ses:GetIdentityVerificationAttributes",
+                "ses:ListReceiptRuleSets",
+                "ses:ListIdentities",
+                "ses:SendEmail",
+                "ses:TagResource",
+                "ses:SendRawEmail",
+                "ses:GetAccount",
+                "ses:ListEmailTemplates",
+                "ses:VerifyDomainIdentity",
+                "ses:SetIdentityDkimEnabled"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:ses:*:*:*"
+            ],
+            "Sid": "SES"
+        },
+        {
+            "Action": [
+                "events:ListRules",
+                "events:ListTargetsByRule",
+                "events:PutRule",
+                "logs:CreateLogStream",
+                "logs:GetLogEvents",
+                "cloudwatch:GetMetricData",
+                "logs:FilterLogEvents",
+                "events:DescribeRule",
+                "logs:DescribeLogGroups",
+                "logs:PutLogEvents",
+                "events:PutTargets",
+                "logs:DescribeLogStreams",
+                "logs:CreateLogGroup",
+                "events:ListEventBuses",
+                "events:TagResource",
+                "events:ListTagsForResource"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "arn:aws:events:*:*:rule/*",
+                "arn:aws:events:*:*:rule",
+                "arn:aws:logs:*:*:*"
+            ],
+            "Sid": "EventBridge"
+        },
+        {
+            "Sid": "ACM",
+            "Effect": "Allow",
+            "Action": [
+                "acm:ListCertificates",
+                "acm:DescribeCertificate",
+                "acm:GetCertificate",
+                "acm:ListTagsForCertificate",
+                "acm:RequestCertificate"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ApiGateway",
+            "Effect": "Allow",
+            "Action": [
+                "apigateway:POST",
+                "apigateway:GET"
+            ],
+            "Resource": [
+                "arn:aws:apigateway:*::/restapis",
+                "arn:aws:apigateway:*::/restapis/*"
+            ]
+        },
+        {
+            "Sid": "dynamodb",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:DescribeTable",
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:UpdateItem"
+            ],
+            "Resource": "arn:aws:dynamodb:*:*:table/*"
+        }
+    ]
+}

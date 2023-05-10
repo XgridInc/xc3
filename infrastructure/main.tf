@@ -37,20 +37,21 @@ module "networking" {
 module "xc3" {
   source = "./modules/xc3"
 
-  vpc_id             = module.networking.vpc_id
-  subnet_id          = module.networking.private_subnet_id
-  public_subnet_ids  = module.networking.public_subnet_ids
-  security_group_ids = module.networking.security_group_ids
-  ses_email_address  = var.ses_email_address
-  instance_type      = var.instance_type
-  namespace          = var.namespace
-  owner_email        = var.owner_email
-  creator_email      = var.creator_email
-  project            = var.project
-  region             = var.region
-  prometheus_layer   = var.prometheus_layer
-  domain_name        = var.domain_name
-  hosted_zone_id     = var.hosted_zone_id
+  vpc_id              = module.networking.vpc_id
+  subnet_id           = module.networking.private_subnet_id
+  public_subnet_ids   = module.networking.public_subnet_ids
+  security_group_ids  = module.networking.security_group_ids
+  ses_email_address   = var.ses_email_address
+  instance_type       = var.instance_type
+  namespace           = var.namespace
+  owner_email         = var.owner_email
+  creator_email       = var.creator_email
+  project             = var.project
+  region              = var.region
+  prometheus_layer    = var.prometheus_layer
+  domain_name         = var.domain_name
+  hosted_zone_id      = var.hosted_zone_id
+  grafana_api_gateway = module.serverless.grafana_api_gateway
 }
 
 // Terraform Module for Serverless Application

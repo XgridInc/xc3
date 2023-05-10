@@ -125,8 +125,10 @@ resource "aws_instance" "this" {
         region           = var.region
       }
     ) : " ",
-    datasource = file("${path.module}/datasource.yml"),
-    dashboard  = file("${path.module}/dashboard.yml")
+    datasource          = file("${path.module}/datasource.yml"),
+    dashboard           = file("${path.module}/dashboard.yml"),
+    grafana_api_gateway = var.grafana_api_gateway,
+    region              = var.region
     }
   )
 

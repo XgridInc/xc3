@@ -54,7 +54,7 @@ Anyone can contribute to the test suite by adding new test cases or improving ex
 
 ## Github Actions Workflow Overview
 
-![image](https://github.com/X-CBG/X-CCC/assets/122358742/ff37c233-7961-40ef-9759-bc642651ae22)
+![image](https://github.com/X-CBG/XC3/assets/122358742/ff37c233-7961-40ef-9759-bc642651ae22)
 
 Here is a possible flow for the case where the tests fail and the changes need to be fixed before the PR can be approved and merged:
 

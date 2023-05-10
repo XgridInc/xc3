@@ -20,28 +20,24 @@
 
 #Install docker
 # Check if Docker is installed
-if [ -x "$(command -v docker)" ]; then
-    echo "Docker is already installed"
+sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo apt-get update -y
+sudo apt install docker.io -y
+sudo service docker start
+if command -v docker &> /dev/null
+then
+    echo "Docker installed successfully"
 else
-    sudo apt-get remove docker docker-engine docker.io containerd runc
-    sudo apt-get update -y
-    sudo apt install docker.io -y
-    sudo service docker start
-    if [ -x "$(command -v docker)" ]; then
-        echo "Docker installed successfully"
-    else
-        echo "Error installing Docker"
-        exit 1
-    fi
+    echo "Failed to install docker"
+    exit 1
 fi
 
-
 # Install cloud custodian
-if  sudo apt install python3-pip -y
-    sudo apt install python3-venv -y
-    sudo python3 -m venv custodian
-    source custodian/bin/activate
-    pip install c7n c7n-mailer
+if sudo apt install python3-pip -y && \
+    sudo apt install python3-venv -y && \
+    sudo python3 -m venv custodian && \
+    source custodian/bin/activate && \
+    sudo pip install c7n c7n-mailer && \
     deactivate
 then
     echo "cloud custodian installed successfully"
@@ -51,32 +47,32 @@ fi
 
 
 #Install Prometheus
-if  sudo docker network create --driver bridge xc3
+if sudo docker network create --driver bridge xc3; then
     sudo mkdir /etc/prometheus
     cd /etc/prometheus/ && sudo touch prometheus.yml
     sudo mkdir -p /data/prometheus
     sudo chmod 777 /data/prometheus /etc/prometheus/*
     sudo docker pull prom/prometheus
     sudo docker run -d --name=prometheus --network=xc3 -p 9090:9090 -v /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus --config.file=/etc/prometheus/prometheus.yml
-then
     echo "Prometheus installed successfully"
 else
     echo "Failed to install Prometheus"
 fi
 
-
-if  docker pull prom/pushgateway
+# Create pushgateway container
+if sudo docker pull prom/pushgateway
 then
     echo "Successfully pulled docker image for pushgateway"
 else
-    echo "Failed to pull docker image for pushgateway
+    echo "Failed to pull docker image for pushgateway"
+fi
 
-if  docker run -d -p 9091:9091 --name=pushgateway --network=xc3 prom/pushgateway
+if sudo docker run -d -p 9091:9091 --name=pushgateway --network=xc3 prom/pushgateway
 then
     echo "Successfully started pushgateway container"
 else
     echo "Failed to start pushgateway container"
-
+fi
 
 # Write the Prometheus config file
 if ! sudo cat > /etc/prometheus/prometheus.yml << EOF
@@ -137,14 +133,12 @@ fi
 
 echo "Pushgateway installed and configured successfully!"
 
-if ! [ -x "$(command -v docker)" ]; then
-  echo "Error: Docker is not installed." >&2
-fi
-
-if ! docker ps | grep -q grafana; then
+if ! sudo docker ps | grep -q grafana; then
     sudo docker run -d -p 3000:3000 --name grafana --network xc3 --env-file /home/ubuntu/.env \
         -e "GF_INSTALL_PLUGINS=marcusolsson-dynamictext-panel" \
         -e "GF_DEFAULT_HOME_DASHBOARD=LQ93m_o4z" \
+        -e "GRAFANA_API_GATEWAY=bhvc3o0i51" \
+        -e "GRAFANA_REGION=eu-west-1" \
         -v ~/content/:/var/lib/grafana/dashboards \
         -v ~/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml \
         -v ~/datasource.yml:/etc/grafana/provisioning/datasources/datasources.yml \
@@ -152,6 +146,7 @@ if ! docker ps | grep -q grafana; then
 else
     echo "Grafana container is already running"
 fi
+
 if [ $? -ne 0 ]; then
   echo "Error: failed to start Grafana container." >&2
   exit 1
