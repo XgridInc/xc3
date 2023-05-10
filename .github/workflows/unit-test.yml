@@ -1,0 +1,38 @@
+name: Python tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Load environment variables
+      uses: decathlon/gh-actions-load-env-file@v1
+      with:
+        path: .env
+
+    - name: Run tests
+      run: pytest tests/**/*.py
+      env:
+        ENV_VAR_1: ${{ env.BUCKET_NAME }}
+        ENV_VAR_2: ${{ env.OBJECT_KEY }}

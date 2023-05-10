@@ -1,0 +1,21 @@
+on:
+  push:
+    # Remove the line above to run when pushing to master
+  pull_request:
+    branches: [main, develop]
+
+name: "Shellcheck"
+permissions: {}
+
+jobs:
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.3.0
+        with:
+          token: ${{ secrets.SECRET_GITHUB_TOKEN }}
+      - name: Run ShellCheck
+        uses: a5k-actions/shellchecker@v0.1.7
+        with:
+          ignore-files: 'infrastructure/modules/xccc/startup-script.sh.tpl'
