@@ -1,11 +1,11 @@
 <br>
 
-[![Docs](https://img.shields.io/badge/docs-latest-blue)(https://github.com/TeamXgrid/xc3)
+[![Docs](https://img.shields.io/badge/docs-latest-blue)](https://github.com/XgridInc/xc3)
 [![Slack](https://slackin.px.dev/badge.svg)](https://app.slack.com/client/T055VHJ0087/C0571UK3SBG)
-[![Open AI Reviewer](https://github.com/TeamXgrid/xc3/actions/workflows/openai-pr-reviewer.yml/badge.svg)](https://github.com/TeamXgrid/xc3/actions/workflows/openai-pr-reviewer.yml)
-[![Code Linter](https://github.com/TeamXgrid/xc3/actions/workflows/linter.yml/badge.svg)](https://github.com/TeamXgrid/xc3/actions/workflows/linter.yml)
-[![Shellcheck](https://github.com/TeamXgrid/xc3/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/TeamXgrid/xc3/actions/workflows/shellcheck.yml)
-[![Code Vulnerability](https://github.com/TeamXgrid/xc3/actions/workflows/checkov.yml/badge.svg)](https://github.com/TeamXgrid/xc3/actions/workflows/checkov.yml)
+[![Open AI Reviewer](https://github.com/XgridInc/xc3/actions/workflows/openai-pr-reviewer.yml/badge.svg)](https://github.com/XgridInc/xc3/actions/workflows/openai-pr-reviewer.yml)
+[![Code Linter](https://github.com/XgridInc/xc3/actions/workflows/linter.yml/badge.svg)](https://github.com/XgridInc/xc3/actions/workflows/linter.yml)
+[![Shellcheck](https://github.com/XgridInc/xc3/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/XgridInc/xc3/actions/workflows/shellcheck.yml)
+[![Code Vulnerability](https://github.com/XgridInc/xc3/actions/workflows/checkov.yml/badge.svg)](https://github.com/XgridInc/xc3/actions/workflows/checkov.yml)
 
 <br>
 
@@ -15,7 +15,7 @@ Xgrid Cloud Cost Control is a cloud agnostic and risk free package offering powe
 
 Check the below video for a quick demo of XC3.
 
-[![XC3 Youtube](https://user-images.githubusercontent.com/114464405/229470468-ab186c9a-c475-40f2-9758-b89a7a3555d9.png)](https://www.youtube.com/watch?v=U9hgDbOBAzA)
+[![XC3 Youtube](https://user-images.githubusercontent.com/114464405/229470468-ab186c9a-c475-40f2-9758-b89a7a3555d9.png)](https://www.youtube.com/watch?v=K4eEcl3wTZ0)
 
 ## Features
 
@@ -50,7 +50,7 @@ Check the below video for a quick demo of XC3.
 ---
 
 1. Clone GitHub repo
-   ` git clone https://github.com/TeamXgrid/xc3.git`
+   ` git clone https://github.com/XgridInc/xc3.git`
 2. An AWS user with specific permission set user access.
 
    Refer the IAM Permission Set created in `pre_requirement` folder to setup XC3.
@@ -70,7 +70,7 @@ Check the below video for a quick demo of XC3.
 6. ACM certificate should be available. It will be associated with loadbalanacer and domain.
 
 7. XC3 will create an EC2 instance during deployment, the user needs to create an AWS key_pair file in order to login to EC2 instance for troubleshooting purpose.
-8. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group id of the bastion/jump/vpn EC2 instance.
+8. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group ID of the bastion/jump/vpn EC2 instance.
 9. The user has to **enable CostExplorer** by following the below link.
 
    https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html
@@ -83,7 +83,7 @@ Check the below video for a quick demo of XC3.
    user destroys XC3 setup.
 
 10. XC3 will create an EC2 instance during deployment, the user needs to create an AWS key_pair file in order to login to EC2 instance for troubleshooting purpose.
-11. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group id of the bastion/jump/vpn EC2 instance.
+11. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group ID of the bastion/jump/vpn EC2 instance.
 12. The user has to **enable CostExplorer** by following the below link.
 
     https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html
@@ -94,10 +94,10 @@ Check the below video for a quick demo of XC3.
 
 # Deployment
 
-1.  Clone the GitHub repo in your local computer to setup XC3 infrastructure.
+1.  Clone the GitHub repository in your local computer to setup XC3 infrastructure.
 
     ```bash
-    git clone https://github.com/TeamXgrid/xc3.git
+    git clone https://github.com/XgridInc/xc3.git
     ```
 2. Install the `prometheus client` library using following commands:
     ```bash
@@ -240,7 +240,7 @@ case 2: user not able to change/update/modify default dashboards in Grafana UI
 
 XC3 is a community-driven project; we welcome your contribution! For code contributions, please read our [contribution guide](./CONTRIBUTING.md).
 
-- File a [GitHub issue](https://github.com/TeamXgrid/xc3/issues) to report a bug or request a feature.
+- File a [GitHub issue](https://github.com/XgridInc/xc3/issues) to report a bug or request a feature.
 - Join our [Slack](https://join.slack.com/t/xgrid-group/shared_invite/zt-1uhzlrt6t-Dx_BqfQJKsHhSug1arbbAQ) for live conversations and quick questions.
 
 <br clear="all">

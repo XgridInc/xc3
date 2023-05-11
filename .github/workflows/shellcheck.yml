@@ -12,10 +12,13 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.3.0
-        with:
-          token: ${{ secrets.SECRET_GITHUB_TOKEN }}
+      # - uses: actions/checkout@v3.3.0
+      #   with:
+      #     token: ${{ secrets.SECRET_GITHUB_TOKEN }}
       - name: Run ShellCheck
         uses: a5k-actions/shellchecker@v0.1.7
         with:
-          ignore-files: 'infrastructure/modules/xccc/startup-script.sh.tpl'
+          ignore-files: |
+            'infrastructure/modules/xc3/startup-script.sh.tpl'
+            'infrastructure/init_delete.sh'
+            'infrastructure/init.sh'

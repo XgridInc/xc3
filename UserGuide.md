@@ -6,7 +6,7 @@ Xgrid Cloud Cost Control is a cloud agnostic and risk-free package offering powe
 
 ## How to Use XC3
 
-Once XC3 infrastructure deployed in your AWS Account, Users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then he/she can set password on domain by sign in using random credentials.
+Once XC3 infrastructure deployed in your AWS Account, Users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then they can set password on domain by sign in using random credentials.
 
 ### User Role Guidelines
 
@@ -30,22 +30,22 @@ Once you've logged in on XC3, you can start using dashboards.
 
 On Home Page, you can get high-level detail of your AWS Account
 
-- To determine the AWS Account Cost, select the account id and get total spend of AWS Account from last three months
-  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/671a7dcc-596c-4f26-b409-00b290137d7b)
+- To determine the AWS Account Cost, select the account ID and get total spend of AWS Account from last three months
+  ![image](https://github.com/XgridInc/xc3/assets/122358742/d494f7c8-0ee2-4630-8cac-6cd3fd00186b)
 
 - To determine the total spend on AWS for a particular project select the AWS account and project to get the cost of that specific project from the last 14 days.
-  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/32560b60-6a43-41a3-ae81-94112596ba65)
+  ![image](https://github.com/XgridInc/xc3/assets/122358742/057f4937-6cd4-4e56-a785-b8b401342f2b)
 
 - To get the top 5 most expensive services in a specific AWS Region, select an AWS account and AWS region to get the top 5 most expensive services in that region from the last 14 days.
-  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/4634ade9-b457-4482-b5b0-9b17c805767e)
+  ![image](https://github.com/XgridInc/xc3/assets/122358742/c3c61f73-f22b-4f37-aac1-e806c383737b)
 
 ### IAM Roles Dashboard
 - By selecting IAM Role Dashboard you can view a list of IAM Roles by selecting AWS Account.
-  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/fb6d20b8-77a3-4415-a0f7-4998bde32303)
+  ![image](https://github.com/XgridInc/xc3/assets/122358742/f2d2490b-0539-4756-8a6a-653ae8370959)
 - By selecting a specific IAM Role in a specific AWS Region you can view the resources, state of resources, and the cumulative cost of resources from the last 14 days associated with a specific IAM Role in the selected AWS Region.
-  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/fa1eb7c7-e745-4926-b762-bb6d6051a3c9)
+  ![image](https://github.com/XgridInc/xc3/assets/122358742/477d67c8-e87c-49c0-bb56-98d62077eb8e)
 - By selecting a specific resource, you can view the detailed billing of that resource from the last 14 days.
-  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/31247b0f-b844-456e-bb8f-cf646f30928f)
+  !![image](https://github.com/XgridInc/xc3/assets/122358742/88460fb9-489e-4183-b267-1322ec3474bd)
 
 ### IAM Users Dashboard
 - By selecting IAM User Dashboard you can view a list of IAM Users by selecting AWS Account.
@@ -63,7 +63,7 @@ On Home Page, you can get high-level detail of your AWS Account
 
       in a specific AWS Region by selecting AWS Account and AWS Region.
 
-  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/28835c64-cf01-4d96-9b04-01d4bcc75bb1)
+  ![image](https://github.com/XgridInc/xc3/assets/122358742/4d75dd2d-cc3d-4129-ac4c-a030f2e8b5de)
 
 ## Community Support
 

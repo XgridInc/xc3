@@ -31,6 +31,7 @@ When running this Cloud Custodian policy, the following resources are created:
 - In addition, a Lambda function for the Custodian Mailer is created. This function is used to send email notifications based on the actions taken by the auto start policy.
 
 Overall, these resources work together to automatically start EC2 instances and provide notification to the relevant parties about the actions taken by the policy.
+
 ![custodianarchi drawio](https://user-images.githubusercontent.com/122358742/222403598-40b557da-5086-4686-b48a-72cdae724a6a.png)
 
 ## 3. Explanation
