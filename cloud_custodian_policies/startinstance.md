@@ -36,6 +36,7 @@ Overall, these resources work together to automatically start EC2 instances and 
 ## 3. Explanation
 
 ![Wholearchitecturestartinstancestart drawio](https://user-images.githubusercontent.com/122358742/222975313-2ba6d054-7063-4509-8498-c118c1b840e2.png)
+
 This policy starts an EC2 instance on the start of weekdays. The instance must have a tag "onhour" with the boolean value `True` and be in the `stopped` state.
 
 The policy is implemented as a Cloud Custodian policy with the resource type of EC2. It runs in periodic mode on a schedule defined by a CRON expression.
