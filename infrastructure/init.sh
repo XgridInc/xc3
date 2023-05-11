@@ -34,6 +34,7 @@ CONFIG_FILE="./config.sh"
 # Load the config.sh file
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=./config.sh
+    # shellcheck disable=SC1091
     source "$CONFIG_FILE"
 else
     echo "Error: config.sh file not found"

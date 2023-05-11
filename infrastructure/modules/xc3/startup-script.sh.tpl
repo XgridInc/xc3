@@ -137,8 +137,8 @@ if ! sudo docker ps | grep -q grafana; then
     sudo docker run -d -p 3000:3000 --name grafana --network xc3 --env-file /home/ubuntu/.env \
         -e "GF_INSTALL_PLUGINS=marcusolsson-dynamictext-panel" \
         -e "GF_DEFAULT_HOME_DASHBOARD=LQ93m_o4z" \
-        -e "GRAFANA_API_GATEWAY=bhvc3o0i51" \
-        -e "GRAFANA_REGION=eu-west-1" \
+        -e "GRAFANA_API_GATEWAY=${grafana_api_gateway}" \
+        -e "GRAFANA_REGION=${region}" \
         -v ~/content/:/var/lib/grafana/dashboards \
         -v ~/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml \
         -v ~/datasource.yml:/etc/grafana/provisioning/datasources/datasources.yml \

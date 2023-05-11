@@ -99,11 +99,18 @@ Check the below video for a quick demo of XC3.
     ```bash
     git clone https://github.com/X-CBG/XC3.git
     ```
-
-2.  `terraform.auto.tfvars` is the configuration file for the deployment. Use this files to create an `input.tfvars` file.
+2. Install the `prometheus client` library using following commands:
+    ```bash
+    cd infrastructure
+    mkdir python
+    cd python
+    pip install prometheus-client
+    zip -r python.zip ./python
+    ```
+3.  `terraform.auto.tfvars` is the configuration file for the deployment. Use this files to create an `input.tfvars` file.
     Copy the mentioned configuration file and modify the parameters.
 
-3.  Initialize Terraform. It will initialize all terraform modules/plugins.
+4.  Initialize Terraform. It will initialize all terraform modules/plugins.
     go to `XC3/infrastructure/` directory and run below command
     `bash
 cd XC3/infrastructure/
@@ -118,7 +125,7 @@ Expected Output: It will create .terraform directory in XC3/infrastructure/  loc
             Terraform has been successfully initialized!
     `
 
-4.  Run planner command under `XC3/infrastructure` directory.
+5.  Run planner command under `XC3/infrastructure` directory.
 
     ```bash
     terraform  plan -var-file=input.tfvars
@@ -131,7 +138,7 @@ Expected Output: It will create .terraform directory in XC3/infrastructure/  loc
                     ------------------------------------------------------------------------
         ```
 
-5.  Run actual Apply command under `XC3/infrastructure` directory to deploy all the resources into AWS master account.
+6.  Run actual Apply command under `XC3/infrastructure` directory to deploy all the resources into AWS master account.
     This step may take `10-15` mins.
 
     ```bash
@@ -156,7 +163,7 @@ Expected Output: It will create .terraform directory in XC3/infrastructure/  loc
     Outputs:
     ````
 
-6.  Please copy msg_templates in custodian directory on deployed EC2 instance
+7.  Please copy msg_templates in custodian directory on deployed EC2 instance
 
     ```
     scp -i "keypair.pem" keypair.pem bastion-host-dns:/directory-to-copy-keypair
@@ -167,7 +174,7 @@ Expected Output: It will create .terraform directory in XC3/infrastructure/  loc
 
     ```
 
-7.  Please run the following steps on deployed EC2 instance to trigger XC3 lambda functions.
+8.  Please run the following steps on deployed EC2 instance to trigger XC3 lambda functions.
 
     ```
      1. custodian run -s s3://${bucket_name}/iam-user --region ${aws_region} iam-user.yml
@@ -180,16 +187,29 @@ Expected Output: It will create .terraform directory in XC3/infrastructure/  loc
 
     ```
 
-8.  Wait for few minutes before proceeding further for the application to come online.
+9.  Wait for few minutes before proceeding further for the application to come online.
     Verify the readiness of the metrics system. Load the Grafana URL in a browser. Live Grafana UI ensures the system is ready to accept and visualize metrics.
 
     > Verify the readiness of metrics system by accessing Grafana UI: https://xc3.xxx.com/login
 
     > Verify the readiness of metrics system by accessing Grafana UI: `loadbalancer-dns`. If Hosted zone ID is not provided in `input.tfvars`.
 
-9.  Setup is complete here. Users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
+10. Now User needs to upload grafana dashbords on S3 bucket created for metadata storage in above step.
+    ```bash
+    cd custom_dashboard
+    aws s3 cp grafana_dashboards s3://${aws_s3_bucket}/content/ --recursive --exclude "*.md"
+    ```
+11. SSH into EC2 instance via Bastion host server and copy grafana dashboards from S3 bucket to local path using following commands:
+    ```bash
+    scp -i "xc3-key" xc3-key bastion-host-public-dns:/home/ubuntu/
+    sudo ssh -i "xc3-key" ubuntu@public-ip of bastion host server
+    cd /home/ubuntu
+    sudo ssh -i "xc3-key" ubuntu@private-ip of prometheus server
+    aws s3 cp s3://${s3_bucket}/content/ ~/content --recursive
+    ```
+12. Now setup is complete.Users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
 
-10. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
+13. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
 
         Note :
             1. If data is not available in Grafana UI then follow the troubleshooting guide at the last section of this page.
