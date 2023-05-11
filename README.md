@@ -15,7 +15,7 @@ Xgrid Cloud Cost Control is a cloud agnostic and risk free package offering powe
 
 Check the below video for a quick demo of XC3.
 
-[![XC3 Youtube](https://user-images.githubusercontent.com/114464405/229470468-ab186c9a-c475-40f2-9758-b89a7a3555d9.png)](https://drive.google.com/file/d/10cTeI9pEKQJ8NNIeFZbxLV0WjOaFfUZW/view?usp=share_link)
+[![XC3 Youtube](https://user-images.githubusercontent.com/114464405/229470468-ab186c9a-c475-40f2-9758-b89a7a3555d9.png)](https://www.youtube.com/watch?v=U9hgDbOBAzA)
 
 ## Features
 
