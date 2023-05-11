@@ -1,11 +1,11 @@
 <br>
 
-[![Docs](https://img.shields.io/badge/docs-latest-blue)](https://github.com/X-CBG/XC3)
-[![Slack](https://slackin.px.dev/badge.svg)](https://app.slack.com/client/T051FMAMBPU/C051CPC6DHT)
-[![Open AI Reviewer](https://github.com/X-CBG/XC3/actions/workflows/openai-pr-reviewer.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/openai-pr-reviewer.yml)
-[![Code Linter](https://github.com/X-CBG/XC3/actions/workflows/linter.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/linter.yml)
-[![Shellcheck](https://github.com/X-CBG/XC3/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/shellcheck.yml)
-[![Code Vulnerability](https://github.com/X-CBG/XC3/actions/workflows/checkov.yml/badge.svg)](https://github.com/X-CBG/XC3/actions/workflows/checkov.yml)
+[![Docs](https://img.shields.io/badge/docs-latest-blue)(https://github.com/TeamXgrid/xc3)
+[![Slack](https://slackin.px.dev/badge.svg)](https://app.slack.com/client/T055VHJ0087/C0571UK3SBG)
+[![Open AI Reviewer](https://github.com/TeamXgrid/xc3/actions/workflows/openai-pr-reviewer.yml/badge.svg)](https://github.com/TeamXgrid/xc3/actions/workflows/openai-pr-reviewer.yml)
+[![Code Linter](https://github.com/TeamXgrid/xc3/actions/workflows/linter.yml/badge.svg)](https://github.com/TeamXgrid/xc3/actions/workflows/linter.yml)
+[![Shellcheck](https://github.com/TeamXgrid/xc3/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/TeamXgrid/xc3/actions/workflows/shellcheck.yml)
+[![Code Vulnerability](https://github.com/TeamXgrid/xc3/actions/workflows/checkov.yml/badge.svg)](https://github.com/TeamXgrid/xc3/actions/workflows/checkov.yml)
 
 <br>
 
@@ -50,7 +50,7 @@ Check the below video for a quick demo of XC3.
 ---
 
 1. Clone GitHub repo
-   ` git clone https://github.com/X-CBG/XC3.git`
+   ` git clone https://github.com/TeamXgrid/xc3.git`
 2. An AWS user with specific permission set user access.
 
    Refer the IAM Permission Set created in `pre_requirement` folder to setup XC3.
@@ -97,7 +97,7 @@ Check the below video for a quick demo of XC3.
 1.  Clone the GitHub repo in your local computer to setup XC3 infrastructure.
 
     ```bash
-    git clone https://github.com/X-CBG/XC3.git
+    git clone https://github.com/TeamXgrid/xc3.git
     ```
 2. Install the `prometheus client` library using following commands:
     ```bash
@@ -240,7 +240,7 @@ case 2: user not able to change/update/modify default dashboards in Grafana UI
 
 XC3 is a community-driven project; we welcome your contribution! For code contributions, please read our [contribution guide](./CONTRIBUTING.md).
 
-- File a [GitHub issue](https://github.com/X-CBG/XC3/issues) to report a bug or request a feature.
+- File a [GitHub issue](https://github.com/TeamXgrid/xc3/issues) to report a bug or request a feature.
 - Join our [Slack](https://join.slack.com/t/xgrid-group/shared_invite/zt-1uhzlrt6t-Dx_BqfQJKsHhSug1arbbAQ) for live conversations and quick questions.
 
 <br clear="all">

@@ -37,7 +37,7 @@ Overall, these resources work together to automatically stop EC2 instances and p
 
 ![Wholearchitecturestartinstancestop drawio(1)](https://user-images.githubusercontent.com/122358742/222975243-5d5bf4fc-d68d-46f3-8235-b9fa52bf4c49.png)
 
-This policy stops an EC2 instance on weekends at 12:01 PM UTC. The instance must have the tag "offhour" with the boolean value `True` and in the `start` state.
+This policy stops an EC2 instance at the start of weekends. The instance must have the tag "offhour" with the boolean value `True` and in the `start` state.
 
 The policy is implemented as a Cloud Custodian policy with the resource type of EC2. It runs in periodic mode on a schedule defined by a CRON expression.
 

@@ -31,21 +31,21 @@ Once you've logged in on XC3, you can start using dashboards.
 On Home Page, you can get high-level detail of your AWS Account
 
 - To determine the AWS Account Cost, select the account id and get total spend of AWS Account from last three months
-  <img width="691" alt="Screenshot 2023-03-29 at 11 53 37 AM" src="https://user-images.githubusercontent.com/114464405/228455340-3611e529-e82f-4b03-9a03-7c1dc1ee6d5f.png">
+  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/671a7dcc-596c-4f26-b409-00b290137d7b)
 
 - To determine the total spend on AWS for a particular project select the AWS account and project to get the cost of that specific project from the last 14 days.
-  <img width="695" alt="Screenshot 2023-03-29 at 12 51 19 PM" src="https://user-images.githubusercontent.com/114464405/228464432-bd9a050e-9d9c-464b-818d-cd5d3c31fcff.png">
+  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/32560b60-6a43-41a3-ae81-94112596ba65)
 
 - To get the top 5 most expensive services in a specific AWS Region, select an AWS account and AWS region to get the top 5 most expensive services in that region from the last 14 days.
-  <img width="1364" alt="Screenshot 2023-03-29 at 11 57 55 AM" src="https://user-images.githubusercontent.com/114464405/228455613-ca25079c-b40a-40b7-947b-97ca7e1bee55.png">
+  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/4634ade9-b457-4482-b5b0-9b17c805767e)
 
 ### IAM Roles Dashboard
 - By selecting IAM Role Dashboard you can view a list of IAM Roles by selecting AWS Account.
-  <img width="801" alt="Screenshot 2023-03-29 at 12 01 42 PM" src="https://user-images.githubusercontent.com/114464405/228455871-d9891b72-78fe-4f89-80d2-816471d6a0da.png">
+  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/fb6d20b8-77a3-4415-a0f7-4998bde32303)
 - By selecting a specific IAM Role in a specific AWS Region you can view the resources, state of resources, and the cumulative cost of resources from the last 14 days associated with a specific IAM Role in the selected AWS Region.
-  <img width="774" alt="Screenshot 2023-03-29 at 12 05 37 PM" src="https://user-images.githubusercontent.com/114464405/228456236-0e549499-0370-434d-9701-58b0054347ae.png">
+  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/fa1eb7c7-e745-4926-b762-bb6d6051a3c9)
 - By selecting a specific resource, you can view the detailed billing of that resource from the last 14 days.
-  <img width="1157" alt="Screenshot 2023-03-29 at 12 06 31 PM" src="https://user-images.githubusercontent.com/114464405/228456521-6d647805-55a3-4f32-a887-51a4269968ee.png">
+  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/31247b0f-b844-456e-bb8f-cf646f30928f)
 
 ### IAM Users Dashboard
 - By selecting IAM User Dashboard you can view a list of IAM Users by selecting AWS Account.
@@ -63,7 +63,7 @@ On Home Page, you can get high-level detail of your AWS Account
 
       in a specific AWS Region by selecting AWS Account and AWS Region.
 
-  <img width="683" alt="Screenshot 2023-03-29 at 12 13 13 PM" src="https://user-images.githubusercontent.com/114464405/228456656-fca6d6cb-2ce4-4dcc-acee-de0c6d3e4458.png">
+  ![image](https://github.com/TeamXgrid/xc3/assets/122358742/28835c64-cf01-4d96-9b04-01d4bcc75bb1)
 
 ## Community Support
 
