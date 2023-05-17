@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Pre-requirements` folder to refer the IAM Permission Set required to setup XC3
 - `Infrastructure` folder with the IaC necessary to provision XC3
 - `src` folder which has the code for all lambda functions
-- `tests` folder to test your IaC implementation and contribution
+- `tests` folder with unit testing implementation v1.0.0 for terraform infrastructure.
 - `workflows` folder which contains the diagram of all the workflows implemented
 - `CODE_OF_CONDUCT.md` file for the Code of Conduct for the community
 - `CONTRIBUTING.md` file which contains the detail on how to contribute to the Project
