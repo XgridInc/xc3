@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release of the `XgridInc/xc3` repository.
 - `cloud_custodian_policies` folder which has the yaml for all the cloud custodian policies
 - `Pre-requirements` folder to refer the IAM Permission Set required to setup XC3
-- `Infrastructure` folder with the IaC necessary to provision XC3
+- `Infrastructure` folder with the necessary IaC to provision XC3 infrastack
 - `src` folder which has the code for all lambda functions
 - `tests` folder with unit testing implementation v1.0.0 for terraform infrastructure.
 - `workflows` folder which contains the diagram of all the workflows implemented
