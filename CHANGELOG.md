@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial release of the `XgridInc/xc3` repository.
-- `cloud_custodian_policies` folder which has the yaml for all the cloud custodian policies
+- `cloud_custodian_policies` folder having cloud custodian policies for tagging compliance, monitoring and alerting
 - `Pre-requirements` folder to refer the IAM Permission Set required to setup XC3
 - `Infrastructure` folder with the necessary IaC to provision XC3 infrastack
 - `src` folder which has the code for all lambda functions
