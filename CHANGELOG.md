@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `workflows` folder which contains the diagram of all the XC3 workflows implemented
 - `CODE_OF_CONDUCT.md` file for the Code of Conduct for the community
 - `CONTRIBUTING.md` file which contains the detail of how to contribute to the Project
-- `ROADMAP.md` file which has the information what is currently implemented and what are the future plans
+- `ROADMAP.md` file which has information about XC3's existing features and its future plans
 - `UserGuide.md` file provides the guide on how to use XC3 Grafana Dashboards effectively
 
 ### Changed
