@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `cloud_custodian_policies` folder having cloud custodian policies for tagging compliance, monitoring and alerting
 - `Pre-requirements` folder to refer the IAM Permission Set required to setup XC3
 - `Infrastructure` folder with the necessary IaC to provision XC3 infrastack
-- `src` folder which has the code for all lambda functions
+- `src` folder having the XC3 backend
 - `tests` folder with unit testing implementation v1.0.0 for terraform infrastructure.
 - `workflows` folder which contains the diagram of all the workflows implemented
 - `CODE_OF_CONDUCT.md` file for the Code of Conduct for the community
