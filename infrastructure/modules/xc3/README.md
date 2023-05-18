@@ -33,6 +33,7 @@ module "xc3" {
 | instance_type          | The EC2 instance type.                              | `string`  |   n/a      | Yes      |
 | ses_email_address      | The email address for SES identity.                 | `string`  |     n/a    | Yes      |
 | prometheus_layer       | The S3 key for prometheus layer used to store layer package. | `string` |     n/a    | Yes      |
+| parent_domain_name     | The domain to read certificate created from script  | `string`  |   n/a      |  Yes     |
 | domain_name            | The domain name for grafana dashboard.               | `string`  |    n/a     | No       |
 | hosted_zone_id         | The public Route 53 hosted zone ID.                  | `string`  |    n/a     | No       |
 | cognito_domain         | The Cognito domain. Default is grafana-domain.       | `string`  | `grafana-domain`| No      |
