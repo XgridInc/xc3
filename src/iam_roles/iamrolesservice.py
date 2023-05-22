@@ -65,6 +65,29 @@ def cost_of_instance(event, client, resource_id, start_date, end_date):
     )
     return response
 
+region_names = {
+    "us-east-1":"N. Virginia",
+    "us-east-2":"Ohio",
+    "us-west-1":"N. California",
+    "us-west-2":"Oregon",
+    "af-south-1":"Cape Town",
+    "ap-east-1": "Hong Kong",
+    "ap-south-1": "Mumbai",
+    "ap-northeast-2": "Seoul",
+    "ap-southeast-1": "Singapore",
+    "me-central-1": "Middle East",
+    "ap-southeast-2": "Sydney",
+    "ap-northeast-1": "Tokyo",
+    "ca-central-1": "Canada",
+    "eu-central-1": "Frankfurt",
+    "eu-west-1": "Ireland",
+    "eu-west-2": "London",
+    "eu-south-1": "Milan",
+    "eu-west-3": "Paris",
+    "eu-north-1": "Stockholm",
+    "me-south-1": "Bahrain",
+    "sa-east-1": "São Paulo"
+}
 
 def lambda_handler(event, context):
     """
@@ -101,7 +124,9 @@ def lambda_handler(event, context):
     end_date = str(datetime.now().date())
     start_date = str(datetime.now().date() - timedelta(days=cost_by_days))
     account_id = context.invoked_function_arn.split(":")[4]
-
+    
+    new_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    
     for i in range(len(roles)):
         arn = roles[i]["Role"]
         role = arn.rsplit("/", 1)[-1]
@@ -169,7 +194,7 @@ def lambda_handler(event, context):
                                         )
                                     ).strftime("%Y-%m-%d %H:%M:%S"),
                                     role,
-                                    role_region,
+                                    f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                                     account_id,
                                     ec2,
                                     cumulative,
@@ -195,7 +220,7 @@ def lambda_handler(event, context):
                                         )
                                     ).strftime("%Y-%m-%d %H:%M:%S"),
                                     role,
-                                    role_region,
+                                    f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                                     account_id,
                                     ec2,
                                     cumulative,
@@ -210,7 +235,7 @@ def lambda_handler(event, context):
                             "%Y-%m-%d %H:%M:%S"
                         ),
                         role,
-                        role_region,
+                        f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                         account_id,
                         detail,
                         "0",

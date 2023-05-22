@@ -18,15 +18,39 @@ import os
 
 import boto3
 
+region_names = {
+    "us-east-1": "N. Virginia",
+    "us-east-2": "Ohio",
+    "us-west-1": "N. California",
+    "us-west-2": "Oregon",
+    "af-south-1": "Cape Town",
+    "ap-east-1": "Hong Kong",
+    "ap-south-1": "Mumbai",
+    "ap-northeast-2": "Seoul",
+    "ap-southeast-1": "Singapore",
+    "ap-southeast-2": "Sydney",
+    "ap-northeast-1": "Tokyo",
+    "ap-northeast-3": "Osaka",
+    "ca-central-1": "Canada",
+    "eu-central-1": "Frankfurt",
+    "eu-west-1": "Ireland",
+    "eu-west-2": "London",
+    "eu-south-1": "Milan",
+    "eu-west-3": "Paris",
+    "eu-north-1": "Stockholm",
+    "me-south-1": "Bahrain",
+    "sa-east-1": "São Paulo"
+}
+
 try:
     ec2_client = boto3.client("ec2")
     lambda_client = boto3.client("lambda")
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 try:
-    regions = [
+    regions = {
         region["RegionName"] for region in ec2_client.describe_regions()["Regions"]
-    ]
+    }
 except Exception as e:
     logging.error("Error describing ec2 regions: " + str(e))
 
@@ -53,6 +77,7 @@ def lambda_handler(event, context):
         except Exception as e:
             logging.error("Error initializing resourcegroupstaggingapi api: " + str(e))
             return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
+
         try:
             response = client_resource.get_resources()
         except Exception as e:
@@ -65,7 +90,9 @@ def lambda_handler(event, context):
         if dict_len == 0:
             continue
         else:
-            result_list = {"Region": region_name, "ResourceList": resources}
+            # Get the region name from the region code
+            region_display_name = f"{region_name} ({region_names.get(region_name, 'Unknown')})"
+            result_list = {"Region": region_display_name, "ResourceList": resources}
             case_list.append(result_list)
     try:
         cost_lambda_response = lambda_client.invoke(

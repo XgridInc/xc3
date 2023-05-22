@@ -83,6 +83,30 @@ def get_cost_and_usage_data(client, start, end, region, account_id):
                 f"ValueError occurred: {ve}.\nPlease check the input data format."
             )
 
+region_names = {
+    "us-east-1":"N. Virginia",
+    "us-east-2":"Ohio",
+    "us-west-1":"N. California",
+    "us-west-2":"Oregon",
+    "af-south-1":"Cape Town",
+    "ap-east-1":"Hong Kong",
+    "ap-south-1":"Mumbai",
+    "ap-northeast-2":"Seoul",
+    "ap-northeast-3":"Osaka",
+    "ap-southeast-1":"Singapore",
+    "ap-southeast-2":"Sydney",
+    "ap-northeast-1":"Tokyo",
+    "ca-central-1":"Canada",
+    "eu-central-1":"Frankfurt",
+    "eu-west-1":"Ireland",
+    "eu-west-2":"London",
+    "eu-south-1":"Milan",
+    "eu-west-3":"Paris",
+    "eu-north-1":"Stockholm",
+    "me-south-1":"Bahrain",
+    "sa-east-1":"São Paulo"
+}
+
 
 def lambda_handler(event, context):
 
@@ -118,7 +142,6 @@ def lambda_handler(event, context):
     # Loop through each region
     for region in regions:
         try:
-            # print(region)
             ce_region = boto3.client("ce", region_name=region)
         except Exception as e:
             logging.error("Error creating boto3 client: " + str(e))
@@ -148,7 +171,7 @@ def lambda_handler(event, context):
         for resource in top_5_resources:
             resourcedata = {
                 "Account": account_detail,
-                "Region": region,
+                "Region": f"{region} ({region_names.get(region, 'unknown region name')})",
                 "Service": resource["Keys"][0],
                 "Cost": resource["Metrics"]["UnblendedCost"]["Amount"],
             }
@@ -205,4 +228,5 @@ def lambda_handler(event, context):
         logging.error("Error initializing Prometheus Registry and Gauge: " + str(e))
         return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
     # Return the response
+
     return {"statusCode": 200, "body": json.dumps(parent_list)}

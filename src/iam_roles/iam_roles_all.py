@@ -31,6 +31,30 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 
+region_names = {
+    "us-east-1":"N. Virginia",
+    "us-east-2":"Ohio",
+    "us-west-1":"N. California",
+    "us-west-2":"Oregon",
+    "af-south-1":"Cape Town",
+    "ap-east-1":"Hong Kong",
+    "me-central":"Middle East",
+    "ap-south-1":"Mumbai",
+    "ap-northeast-2":"Seoul",
+    "ap-northeast-3":"Osaka",
+    "ap-southeast-1":"Singapore",
+    "ap-southeast-2":"Sydney",
+    "ap-northeast-1":"Tokyo",
+    "ca-central-1":"Canada",
+    "eu-central-1":"Frankfurt",
+    "eu-west-1":"Ireland",
+    "eu-west-2":"London",
+    "eu-south-1":"Milan",
+    "eu-west-3":"Paris",
+    "eu-north-1":"Stockholm",
+    "me-south-1":"Bahrain",
+    "sa-east-1":"São Paulo"
+}
 
 def lambda_handler(event, context):
     """
@@ -97,6 +121,7 @@ def lambda_handler(event, context):
     for role in list_of_iam_roles:
         role_name = role["RoleName"]
         region = role["RoleLastUsed"].get("Region", "None")
+        region = f"{region} ({region_names.get(region, 'unknown region name')})"
         iam_role_all_gauge.labels(role_name, region, account_id).set(0)
 
     push_to_gateway(os.environ["prometheus_ip"], job="IAM-roles-all", registry=registry)
