@@ -35,7 +35,6 @@ module "xc3" {
 | prometheus_layer       | The S3 key for prometheus layer used to store layer package. | `string` |     n/a    | Yes      |
 | domain_name            | The domain name for grafana dashboard.               | `string`  |    n/a     | No       |
 | hosted_zone_id         | The public Route 53 hosted zone ID.                  | `string`  |    n/a     | No       |
-| cognito_domain         | The Cognito domain. Default is grafana-domain.       | `string`  | `grafana-domain`| No      |
 | namespace              | The namespace to use for the resources created.     | `string`  |    n/a     | Yes      |
 | tags                   | A map of custom tags to apply to the resources created. | `map(string)` | n/a     | Yes      |
 

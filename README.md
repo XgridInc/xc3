@@ -82,15 +82,6 @@ Check the below video for a quick demo of XC3.
    Note : if no private/public subnets provided then XC3 will create new VPC, private and public subnets and also XC3 will destroy these resources once
    user destroys XC3 setup.
 
-10. XC3 will create an EC2 instance during deployment, the user needs to create an AWS key_pair file in order to login to EC2 instance for troubleshooting purpose.
-11. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group ID of the bastion/jump/vpn EC2 instance.
-12. The user has to **enable CostExplorer** by following the below link.
-
-    https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html
-
-    ```
-    Note: After enabling CE, it may take up to 24hours for AWS to start capturing your AWS account cost data, hence XC3 may not show the data until CE data is available in AWS account
-    ```
 
 # Deployment
 
@@ -104,20 +95,23 @@ Check the below video for a quick demo of XC3.
     cd infrastructure
     mkdir python
     cd python
-    pip install prometheus-client
+    pip3 install prometheus-client -t
+    cd ..
     zip -r python.zip ./python
     ```
 3.  `terraform.auto.tfvars` is the configuration file for the deployment. Use this files to create an `input.tfvars` file.
     Copy the mentioned configuration file and modify the parameters.
 
 4.  Initialize Terraform. It will initialize all terraform modules/plugins.
-    go to `XC3/infrastructure/` directory and run below command
-    `bash
-cd XC3/infrastructure/
-terraform init
-`
-    `bash
-Expected Output: It will create .terraform directory in XC3/infrastructure/  location
+    go to `xc3/infrastructure/` directory.
+    ```
+    cd xc3/infrastructure/
+    ``` 
+    And run the following command
+    ```
+    terraform init
+    ```
+    `Expected Output: It will create .terraform directory in xc3/infrastructure/  location
             Initializing modules...
             - infrastructure in modules/networking
             - infrastructure in modules/xc3
@@ -138,7 +132,7 @@ Expected Output: It will create .terraform directory in XC3/infrastructure/  loc
                     ------------------------------------------------------------------------
         ```
 
-6.  Run actual Apply command under `XC3/infrastructure` directory to deploy all the resources into AWS master account.
+6.  Run actual Apply command under `xc3/infrastructure` directory to deploy all the resources into AWS master account.
     This step may take `10-15` mins.
 
     ```bash
@@ -166,24 +160,36 @@ Expected Output: It will create .terraform directory in XC3/infrastructure/  loc
 7.  Please copy msg_templates in custodian directory on deployed EC2 instance
 
     ```
-    scp -i "keypair.pem" keypair.pem bastion-host-dns:/directory-to-copy-keypair
-    ssh -i "keypair.pem" user@bastion-host-DNS
-    cd directory (where keypair copied in above command)
-    ssh -i "keypair.pem" user@private-ip-ec2
-    cp -r  ./cloud_custodian_policies/msg_templates/ custodian/lib/python3.x/site-packages/c7n_mailer/msg_templates/
+    sudo scp -i "keypair.pem" keypair.pem bastion-host-dns:/directory-to-copy-keypair
+    
+    sudo scp -r -i "keypair.pem" ../cloud_custodian_policies/  user@bastion-host-DNS:~/.
 
+    ssh -i "keypair.pem" user@bastion-host-DNS
+
+    cd directory (where keypair copied in above command)
+
+    sudo scp -r -i "keypair.pem" cloud_custodian_policies/ user@private-ip-ec2:~/.
+
+    ssh -i "keypair.pem" user@private-ip-ec2
+
+    sudo chown root:root /home/ubuntu/cloud_custodian_policies/msg_templates/*.html.j2
+
+    sudo cp /home/ubuntu/cloud_custodian_policies/msg_templates/*.html.j2 /custodian/lib/python3.8/site-packages/c7n_mailer/msg-templates/
+    
     ```
 
 8.  Please run the following steps on deployed EC2 instance to trigger XC3 lambda functions.
 
     ```
+        source /custodian/bin/activate
+        cd ccloud_custodian_policies
+
      1. custodian run -s s3://${bucket_name}/iam-user --region ${aws_region} iam-user.yml
 
      2. custodian run -s s3://${bucket_name}/iam-role/ --region ${aws_region} iam-role.yml
 
      3. custodian run -s tagging-compliance --region ${aws_region} eks-tagging.yml --region all
 
-     4. custodian run -s tagging-compliance --region ${aws_region} ec2-tagging.yml --region all
 
     ```
 
