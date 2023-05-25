@@ -115,6 +115,12 @@ variable "domain_name" {
   default     = ""
 }
 
+variable "parent_domain_name" {
+  type        = string
+  description = "Parent domain name for SSL Certificates"
+  default     = ""
+}
+
 variable "hosted_zone_id" {
   type        = string
   description = "Public Hosted Zone ID in the Route 53"
