@@ -27,7 +27,7 @@ data "aws_key_pair" "key_pair" {
 
 data "aws_acm_certificate" "issued" {
   count       = var.domain_name != "" ? 1 : 0
-  domain      = var.domain_name
+  domain      = var.parent_domain_name
   most_recent = true
   types       = ["AMAZON_ISSUED"]
   statuses    = ["ISSUED"]
