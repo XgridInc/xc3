@@ -70,7 +70,7 @@ resource "aws_cognito_user_pool" "grafana_pool" {
 
 resource "aws_cognito_user_pool_domain" "main" {
   count        = var.domain_name != "" ? 1 : 0
-  domain       = var.cognito_domain
+  domain       = "${var.namespace}-domain"
   user_pool_id = aws_cognito_user_pool.grafana_pool[0].id
 }
 

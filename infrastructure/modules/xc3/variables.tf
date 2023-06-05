@@ -89,11 +89,6 @@ variable "hosted_zone_id" {
   description = "Public Hosted Zone ID in the Route 53"
 }
 
-variable "cognito_domain" {
-  type        = string
-  description = "Cognito Domain"
-  default     = "grafana-domain"
-}
 
 variable "grafana_api_gateway" {
   type        = string

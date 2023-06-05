@@ -129,6 +129,7 @@ resource "aws_instance" "this" {
     dashboard           = file("${path.module}/dashboard.yml"),
     grafana_api_gateway = var.grafana_api_gateway,
     region              = var.region
+    s3_bucket           = aws_s3_bucket.this.id
     }
   )
 
