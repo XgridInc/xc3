@@ -166,13 +166,17 @@ Check the below video for a quick demo of XC3.
 8.  Please copy msg_templates in custodian directory on deployed EC2 instance
 
     ```
-    sudo scp -r -i "keypair.pem" keypair.pem user@bastion-host-DNS:/directory-to-copy-keypair
-
+    sudo scp -i "keypair.pem" keypair.pem bastion-host-dns:/directory-to-copy-keypair
+    
     sudo scp -r -i "keypair.pem" ../cloud_custodian_policies/  user@bastion-host-DNS:~/.
 
     ssh -i "keypair.pem" user@bastion-host-DNS
 
+
     cd directory (where keypair copied in above command)
+
+    sudo scp -r -i "keypair.pem" cloud_custodian_policies/ user@private-ip-ec2:~/.
+
 
     sudo scp -r -i "keypair.pem" cloud_custodian_policies/ user@private-ip-ec2:~/.
 
@@ -181,14 +185,14 @@ Check the below video for a quick demo of XC3.
     sudo chown root:root /home/ubuntu/cloud_custodian_policies/msg_templates/*.html.j2
 
     sudo cp /home/ubuntu/cloud_custodian_policies/msg_templates/*.html.j2 /custodian/lib/python3.8/site-packages/c7n_mailer/msg-templates/
-
+    
     ```
 
 9.  Please run the following steps on deployed EC2 instance to trigger XC3 lambda functions.
 
     ```
         source /custodian/bin/activate
-        cd cloud_custodian_policies
+        cd ccloud_custodian_policies
 
      1. custodian run -s s3://${bucket_name}/iam-user --region ${aws_region} iam-user.yml
 
