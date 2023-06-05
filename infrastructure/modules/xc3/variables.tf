@@ -76,7 +76,7 @@ variable "project" {
 
 variable "domain_name" {
   type        = string
-  description = "Domain name for SSL Certificates"
+  description = "Domain name for Grafana Dashboard"
 }
 
 variable "hosted_zone_id" {

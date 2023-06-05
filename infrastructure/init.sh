@@ -40,19 +40,27 @@ else
     echo "Error: config.sh file not found"
     exit 1
 fi
+
+# shellcheck disable=SC2154
 # AWS Region from config.sh to be used in rest of script
 echo "AWS Region: $aws_region"
 # Dynamodb Table Name to be used in creating dynamo db table for maintaining lock in terraform
+# shellcheck disable=SC2154
 echo "DynamoDB Table Name: $dynamo_table_name"
 # S3 Bucket Name that will be used in creating S3 bucket for maintaining state file of terraform
+# shellcheck disable=SC2154
 echo "Bucket Name: $bucket_name"
 # Project Name that will be used Tag value for Project key to follow tagging compliance best practices
+# shellcheck disable=SC2154
 echo "Project: $project"
 # Domain Name to be used in create ACM Certificate that will be used in creating Route53 Domain
+# shellcheck disable=SC2154
 echo "Domain: $domain"
 # Email Address of Owner of Team
+# shellcheck disable=SC2154
 echo "Owner Email: $owner_email"
 # Email Address of Creator who is spinning up the infrastructure
+# shellcheck disable=SC2154
 echo "Creator Email: $creator_email"
 
 # Create S3 bucket to store terraform state file in specific AWS Region
@@ -96,57 +104,17 @@ fi
 
 
 # Create ACM Certificate that will be used in Route 53 Domain
-if aws acm request-certificate \
-    --domain-name "${domain}" \
-    --validation-method DNS \
-    --key-algorithm RSA_2048 \
-    --region "${aws_region}" \
-    --tags "[{\"Key\":\"Project\",\"Value\":\"${project}\"}, {\"Key\":\"Owner\",\"Value\":\"${owner_email}\"}, {\"Key\":\"Creator\",\"Value\":\"${creator_email}\"}]" >/dev/null 2>&1; then
-    echo "ACM certificate requested successfully"
+if [[ -z "${domain}" ]]; then
+    echo "Domain is null. Skipping ACM certificate request."
 else
-    echo "Failed to request ACM certificate"
-fi
-
-# Create the KMS key for cloudtrail and capture the key ID in a variable
-if key_id=$(aws kms create-key \
-        --description "kms key for cloudtrail" \
-        --tags "[{\"TagKey\":\"Project\",\"TagValue\":\"${project}\"}, {\"TagKey\":\"Owner\",\"TagValue\":\"${owner_email}\"}, {\"TagKey\":\"Creator\",\"TagValue\":\"${creator_email}\"}]" \
-        --policy '{
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Sid": "Enable IAM User Permissions",
-                "Effect": "Allow",
-                "Principal": {
-                  "AWS": "*"
-                },
-                "Action": "kms:*",
-                "Resource": "*"
-              },
-              {
-                "Sid": "Allow CloudTrail to encrypt logs",
-                "Effect": "Allow",
-                "Principal": {
-                  "Service": "cloudtrail.amazonaws.com"
-                },
-                "Action": [
-                  "kms:GenerateDataKey",
-                  "kms:Decrypt"
-                ],
-                "Resource": "*"
-              }
-            ]
-          }' \
-        --output text \
-        --query 'KeyMetadata.KeyId' \
-        --region "${aws_region}"); then
-   echo "KMS Key created successfully"
-else
-    echo "Failed to create KMS key"
-fi
-# Create alias on KMS key
-if aws kms create-alias --alias-name "alias/${project}-kms-key" --target-key-id "${key_id}" --region "${aws_region}" ; then
-   echo "Alias created successfully on KMS key"
-else
-    echo "Failed to create alias on kms key"
+    if aws acm request-certificate \
+        --domain-name "${domain}" \
+        --validation-method DNS \
+        --key-algorithm RSA_2048 \
+        --region "${aws_region}" \
+        --tags "[{\"Key\":\"Project\",\"Value\":\"${project}\"}, {\"Key\":\"Owner\",\"Value\":\"${owner_email}\"}, {\"Key\":\"Creator\",\"Value\":\"${creator_email}\"}]" >/dev/null 2>&1; then
+        echo "ACM certificate requested successfully"
+    else
+        echo "Failed to request ACM certificate"
+    fi
 fi
