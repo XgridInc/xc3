@@ -91,7 +91,7 @@ Check the below video for a quick demo of XC3.
     cd xc3/infrastructure
     bash init.sh
     ```
-3. Install the `prometheus client` library using following commands:
+3. Install the `prometheus-client` library using following commands:
     ```
     cd infrastructure
     mkdir python
