@@ -115,11 +115,6 @@ variable "domain_name" {
   default     = ""
 }
 
-variable "parent_domain_name" {
-  type        = string
-  description = "Parent domain name for SSL Certificates"
-  default     = ""
-}
 
 variable "hosted_zone_id" {
   type        = string
@@ -141,4 +136,9 @@ variable "slack_channel_url" {
   description = "Slack Channel URL"
   type        = string
   default     = ""
+}
+
+variable "create_kms" {
+  description = "Fetch the KMS if exist"
+  type        = bool
 }

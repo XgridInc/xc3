@@ -79,10 +79,6 @@ variable "domain_name" {
   description = "Domain name for Grafana Dashboard"
 }
 
-variable "parent_domain_name" {
-  type        = string
-  description = "Parent domain name for SSL Certificate"
-}
 
 variable "hosted_zone_id" {
   type        = string
