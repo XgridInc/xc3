@@ -22,16 +22,7 @@ The roadmap for XC3 is maintained at the org level at this board:
 - Add support for AWS billing alerts to notify users when costs exceed a certain threshold.
 
 
-- Integration of federated users into the application
-- Integration of RDS, ECS, EKS services detail for IAM Role/User/Federated User 
-- Add support for AWS billing alerts to notify users when costs exceed a certain threshold.
-
 ## Mid-term Goals (next 6-12 months)
-
-- Create a cost optimization recommendations engine based on usage and utilization data
-- Enhance the dashboard to provide more detailed insights and data visualizations
-- Implement cost tracking and reporting for Google Cloud Platform (GCP) and Microsoft Azure.
-
 
 - Create a cost optimization recommendations engine based on usage and utilization data
 - Enhance the dashboard to provide more detailed insights and data visualizations
@@ -41,11 +32,6 @@ The roadmap for XC3 is maintained at the org level at this board:
 
 - Expand the application's capabilities to include security and compliance monitoring and reporting
 - Implement machine learning algorithms to predict future cloud costs and provide proactive cost management recommendations
-
-
-- Expand the application's capabilities to include security and compliance monitoring and reporting
-- Implement machine learning algorithms to predict future cloud costs and provide proactive cost management recommendations
-
 
 
 We welcome contributions to these items and also welcome community feedback as to what kind of features/fixes and priority of these features users would like to see. 
