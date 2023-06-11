@@ -30,3 +30,8 @@ output "private_ip" {
   description = "Private IP address of ec2 instance to push prometheus metrics"
   value       = aws_instance.this.private_ip
 }
+
+output "load_balancer_dns" {
+ description = "DNS of the load balancer"
+ value       = var.domain_name != "" ? var.domain_name : aws_lb.this.dns_name
+}

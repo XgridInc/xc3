@@ -1,3 +1,22 @@
+Content-Type: multipart/mixed; boundary="//"
+MIME-Version: 1.0
+
+--//
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="cloud-config.txt"
+
+#cloud-config
+cloud-init directives
+
+--//
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="userdata.txt"
+
+#!/bin/bash
 # Copyright (c) 2023, Xgrid Inc, https://xgrid.co
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,7 +30,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#!/bin/bash
 # This script installs Docker, Cloud Custodian, Prometheus, and Grafana
 # on a Linux system. It pulls the necessary Docker images, creates a bridge network,
 # and writes configuration files for Prometheus and Grafana.
@@ -32,18 +50,16 @@ else
     exit 1
 fi
 
+
 # Install cloud custodian
-if sudo apt install python3-pip -y && \
-    sudo apt install python3-venv -y && \
-    sudo python3 -m venv custodian && \
-    source custodian/bin/activate && \
-    sudo pip install c7n c7n-mailer && \
-    deactivate
-then
-    echo "cloud custodian installed successfully"
-else
-    echo "Failed to install cloud custodian"
-fi
+sudo apt-get install python3-pip -y 
+sudo apt-get install python3-venv -y
+
+python3 -m venv custodian
+source /custodian/bin/activate
+pip install c7n
+pip install c7n-mailer
+deactivate
 
 
 #Install Prometheus
@@ -59,6 +75,7 @@ else
     echo "Failed to install Prometheus"
 fi
 
+
 # Create pushgateway container
 if sudo docker pull prom/pushgateway
 then
@@ -66,6 +83,7 @@ then
 else
     echo "Failed to pull docker image for pushgateway"
 fi
+
 
 if sudo docker run -d -p 9091:9091 --name=pushgateway --network=xc3 prom/pushgateway
 then
@@ -97,6 +115,7 @@ fi
 
 echo "Pushgateway installed and configured successfully!"
 
+
 # Restart Prometheus to apply the new config file
 if ! sudo docker restart prometheus
 then
@@ -120,34 +139,37 @@ then
   echo "Error writing datasource file!" >&2
 fi
 
-# Create content and plugins directories
-if ! sudo mkdir ~/content
+
+# Create content directory
+if ! sudo mkdir /home/ubuntu/content
 then
   echo "Error creating content directory!" >&2
 fi
 
-if ! sudo mkdir ~/plugins
-then
-  echo "Error creating plugins directory!" >&2
-fi
+sudo apt install awscli -y
+sudo aws s3 cp s3://${s3_bucket}/content/ /home/ubuntu/content --recursive
 
 echo "Pushgateway installed and configured successfully!"
 
-if ! sudo docker ps | grep -q grafana; then
-    sudo docker run -d -p 3000:3000 --name grafana --network xc3 --env-file /home/ubuntu/.env \
+
+if sudo docker run -d -p 3000:3000 --name grafana --network xc3 --env-file /home/ubuntu/.env \
         -e "GF_INSTALL_PLUGINS=marcusolsson-dynamictext-panel" \
         -e "GF_DEFAULT_HOME_DASHBOARD=LQ93m_o4z" \
         -e "GRAFANA_API_GATEWAY=${grafana_api_gateway}" \
         -e "GRAFANA_REGION=${region}" \
-        -v ~/content/:/var/lib/grafana/dashboards \
-        -v ~/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml \
-        -v ~/datasource.yml:/etc/grafana/provisioning/datasources/datasources.yml \
-        grafana/grafana-enterprise
+        -v /home/ubuntu/content/:/var/lib/grafana/dashboards \
+        -v /home/ubuntu/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml \
+        -v /home/ubuntu/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml \
+        grafana/grafana-enterprise;
+then
+    echo "Grafana container started successfully."
 else
-    echo "Grafana container is already running"
+    echo "Error: failed to start Grafana container."
 fi
 
 if [ $? -ne 0 ]; then
   echo "Error: failed to start Grafana container." >&2
   exit 1
 fi
+
+--//--

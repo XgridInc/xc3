@@ -129,6 +129,7 @@ resource "aws_instance" "this" {
     dashboard           = file("${path.module}/dashboard.yml"),
     grafana_api_gateway = var.grafana_api_gateway,
     region              = var.region
+    s3_bucket           = aws_s3_bucket.this.id
     }
   )
 
@@ -199,6 +200,7 @@ resource "null_resource" "upload_files_on_s3" {
   provisioner "local-exec" {
     command = <<EOT
       aws s3 cp python.zip s3://${aws_s3_bucket.this.id}/lambda_layers/
+      aws s3 cp ../custom_dashboard/grafana_dashboards/. s3://${aws_s3_bucket.this.id}/content/ --recursive --exclude "*.md"
    EOT
   }
 }

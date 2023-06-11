@@ -76,19 +76,15 @@ variable "project" {
 
 variable "domain_name" {
   type        = string
-  description = "Domain name for SSL Certificates"
+  description = "Domain name for Grafana Dashboard"
 }
+
 
 variable "hosted_zone_id" {
   type        = string
   description = "Public Hosted Zone ID in the Route 53"
 }
 
-variable "cognito_domain" {
-  type        = string
-  description = "Cognito Domain"
-  default     = "grafana-domain"
-}
 
 variable "grafana_api_gateway" {
   type        = string
