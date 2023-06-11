@@ -115,6 +115,7 @@ variable "domain_name" {
   default     = ""
 }
 
+
 variable "hosted_zone_id" {
   type        = string
   description = "Public Hosted Zone ID in the Route 53"
@@ -135,4 +136,9 @@ variable "slack_channel_url" {
   description = "Slack Channel URL"
   type        = string
   default     = ""
+}
+
+variable "create_kms" {
+  description = "Fetch the KMS if exist"
+  type        = bool
 }

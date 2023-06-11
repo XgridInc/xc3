@@ -75,5 +75,6 @@ module "serverless" {
   total_account_cost_cronjob = var.total_account_cost_cronjob
   cron_jobs_schedule         = var.cron_jobs_schedule
   slack_channel_url          = var.slack_channel_url
+  create_kms                 = var.create_kms
 
 }

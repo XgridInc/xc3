@@ -44,21 +44,27 @@ fi
 # shellcheck disable=SC2154
 # AWS Region from config.sh to be used in rest of script
 echo "AWS Region: $aws_region"
+# shellcheck disable=SC2154
 # Dynamodb Table Name to be used in creating dynamo db table for maintaining lock in terraform
 # shellcheck disable=SC2154
 echo "DynamoDB Table Name: $dynamo_table_name"
+# shellcheck disable=SC2154
 # S3 Bucket Name that will be used in creating S3 bucket for maintaining state file of terraform
 # shellcheck disable=SC2154
 echo "Bucket Name: $bucket_name"
+# shellcheck disable=SC2154
 # Project Name that will be used Tag value for Project key to follow tagging compliance best practices
 # shellcheck disable=SC2154
 echo "Project: $project"
+# shellcheck disable=SC2154
 # Domain Name to be used in create ACM Certificate that will be used in creating Route53 Domain
 # shellcheck disable=SC2154
 echo "Domain: $domain"
+# shellcheck disable=SC2154
 # Email Address of Owner of Team
 # shellcheck disable=SC2154
 echo "Owner Email: $owner_email"
+# shellcheck disable=SC2154
 # Email Address of Creator who is spinning up the infrastructure
 # shellcheck disable=SC2154
 echo "Creator Email: $creator_email"
@@ -96,7 +102,7 @@ fi
 
 
 # Create EC2 Key-Pair that will be used to ssh into EC2 instances spin up by terraform module
-if aws ec2 create-key-pair --key-name "${project}-key" --tag-specifications "ResourceType=key-pair,Tags=[{Key=Project,Value=${project}},{Key=Owner,Value=${owner_email}},{Key=Creator,Value=${creator_email}}]" --query 'KeyMaterial' --output text > "${project}-key.pem" --region="${aws_region}" ; then
+if aws ec2 create-key-pair --key-name "${project}-key" --tag-specifications "ResourceType=key-pair,Tags=[{Key=Project,Value=${project}},{Key=Owner,Value=${owner_email}},{Key=Creator,Value=${creator_email}}]" --query 'KeyMaterial' --output text > "${project}"-key.pem --region="${aws_region}" ; then
     echo "Key pair created successfully"
 else
     echo "Error creating key pair"
