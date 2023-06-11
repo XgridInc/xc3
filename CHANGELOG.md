@@ -10,13 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### Changed
-- Updated the startup script of XC3's EC2 instance
 - Updated the Readme file
 - Updated the Architecture Diagram in the Readme file
 
 
 ### Fixed
 - SSL Certificate Validation issue
+- Fixed the startup script of XC3's EC2 instance
+
 
 
 

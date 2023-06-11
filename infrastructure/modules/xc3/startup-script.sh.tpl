@@ -54,10 +54,9 @@ fi
 # Install cloud custodian
 sudo apt-get install python3-pip -y 
 sudo apt-get install python3-venv -y
+
 python3 -m venv custodian
 source /custodian/bin/activate
-
-
 pip install c7n
 pip install c7n-mailer
 deactivate

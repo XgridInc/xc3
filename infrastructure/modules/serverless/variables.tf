@@ -122,3 +122,8 @@ variable "slack_channel_url" {
   description = "Slack Channel URL"
   type        = string
 }
+
+variable "create_kms" {
+  description = "Fetch the KMS if exist"
+  type        = bool
+}

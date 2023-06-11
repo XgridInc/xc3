@@ -50,7 +50,6 @@ module "xc3" {
   region              = var.region
   prometheus_layer    = var.prometheus_layer
   domain_name         = var.domain_name
-  parent_domain_name  = var.parent_domain_name
   hosted_zone_id      = var.hosted_zone_id
   grafana_api_gateway = module.serverless.grafana_api_gateway
 }
@@ -76,5 +75,6 @@ module "serverless" {
   total_account_cost_cronjob = var.total_account_cost_cronjob
   cron_jobs_schedule         = var.cron_jobs_schedule
   slack_channel_url          = var.slack_channel_url
+  create_kms                 = var.create_kms
 
 }
