@@ -50,7 +50,6 @@ module "xc3" {
   region              = var.region
   prometheus_layer    = var.prometheus_layer
   domain_name         = var.domain_name
-  parent_domain_name  = var.parent_domain_name
   hosted_zone_id      = var.hosted_zone_id
   grafana_api_gateway = module.serverless.grafana_api_gateway
 }

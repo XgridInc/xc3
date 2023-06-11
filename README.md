@@ -166,7 +166,7 @@ Check the below video for a quick demo of XC3.
 8.  Please copy msg_templates in custodian directory on deployed EC2 instance
 
     ```
-    sudo scp -i "keypair.pem" keypair.pem bastion-host-dns:/directory-to-copy-keypair
+    sudo scp -r -i "keypair.pem" keypair.pem user@bastion-host-DNS:/directory-to-copy-keypair
     
     sudo scp -r -i "keypair.pem" ../cloud_custodian_policies/  user@bastion-host-DNS:~/.
 
