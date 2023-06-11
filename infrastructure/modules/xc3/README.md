@@ -4,7 +4,9 @@ The Terraform XC3 Module is used to create the required infrastructure of XC3. I
 The module also allows the user to define custom tags and namespace for the resources created.
 
 ### Usage
+
 The XC3 Module can be used by calling the module block and passing the required input variables in `main.tf`, as shown below:
+
 ```
 module "xc3" {
   source = "./modules/xc3"
@@ -24,30 +26,29 @@ module "xc3" {
 
 ### Input Variables
 
-| Variable Name          | Description                                         | Type    | Default | Required |
-| ---------------------- | --------------------------------------------------- | ------- | ------- | -------- |
-| vpc_id                 | The ID of the VPC.                                  | `string`  |    n/a     | Yes      |
-| subnet_id              | The ID of the private subnet where EC2 will be created. | `string`  |  n/a       | Yes      |
-| security_group_IDs     | The security group IDs that will be associated with EC2 instances. | `map(string)` |   n/a  | Yes      |
-| public_subnet_IDs      | The list of public subnet IDs where the bastion host server will be created. | `map(string)` | n/a  | Yes      |
-| instance_type          | The EC2 instance type.                              | `string`  |   n/a      | Yes      |
-| ses_email_address      | The email address for SES identity.                 | `string`  |     n/a    | Yes      |
-| prometheus_layer       | The S3 key for prometheus layer used to store layer package. | `string` |     n/a    | Yes      |
-| parent_domain_name     | The domain to read certificate created from script  | `string`  |   n/a      |  Yes     |
-| domain_name            | The domain name for grafana dashboard.               | `string`  |    n/a     | No       |
-| hosted_zone_id         | The public Route 53 hosted zone ID.                  | `string`  |    n/a     | No       |
-| namespace              | The namespace to use for the resources created.     | `string`  |    n/a     | Yes      |
-| tags                   | A map of custom tags to apply to the resources created. | `map(string)` | n/a     | Yes      |
+| Variable Name      | Description                                                                  | Type          | Default | Required |
+| ------------------ | ---------------------------------------------------------------------------- | ------------- | ------- | -------- |
+| vpc_id             | The ID of the VPC.                                                           | `string`      | n/a     | Yes      |
+| subnet_id          | The ID of the private subnet where EC2 will be created.                      | `string`      | n/a     | Yes      |
+| security_group_IDs | The security group IDs that will be associated with EC2 instances.           | `map(string)` | n/a     | Yes      |
+| public_subnet_IDs  | The list of public subnet IDs where the bastion host server will be created. | `map(string)` | n/a     | Yes      |
+| instance_type      | The EC2 instance type.                                                       | `string`      | n/a     | Yes      |
+| ses_email_address  | The email address for SES identity.                                          | `string`      | n/a     | Yes      |
+| prometheus_layer   | The S3 key for prometheus layer used to store layer package.                 | `string`      | n/a     | Yes      |
+| domain_name        | The domain name for grafana dashboard.                                       | `string`      | n/a     | No       |
+| hosted_zone_id     | The public Route 53 hosted zone ID.                                          | `string`      | n/a     | No       |
+| namespace          | The namespace to use for the resources created.                              | `string`      | n/a     | Yes      |
+| tags               | A map of custom tags to apply to the resources created.                      | `map(string)` | n/a     | Yes      |
 
 ### Output Variables
 
-| Variable Name          | Description                                         |
-| ---------------------- | --------------------------------------------------- |
-| s3_xc3_bucket          | The S3 bucket to be used in lambda functions.       |
-| sns_topic_arn          | The SNS topic arn to be used in lambda functions.   |
-| prometheus_layer_arn   | The lambda layer arn to be used in lambda functions.|
-| private_ip             | The private IP of EC2 instance where pushgateway is installed. |
-| load_balancer_dns      | The DNS of the loadbalancer to access dashboard if domain is null |
+| Variable Name        | Description                                                       |
+| -------------------- | ----------------------------------------------------------------- |
+| s3_xc3_bucket        | The S3 bucket to be used in lambda functions.                     |
+| sns_topic_arn        | The SNS topic arn to be used in lambda functions.                 |
+| prometheus_layer_arn | The lambda layer arn to be used in lambda functions.              |
+| private_ip           | The private IP of EC2 instance where pushgateway is installed.    |
+| load_balancer_dns    | The DNS of the loadbalancer to access dashboard if domain is null |
 
 ### Resources Created
 
@@ -70,6 +71,7 @@ module "xc3" {
 - aws_cognito_user_pool: The AWS Cognito user pool that will be used for user access management using OAuth on grafna.
 
 - aws_route53_record: A recod in any existing public hosted zone.
+
 ### Dependencies
 
 This module depends on the following provider:

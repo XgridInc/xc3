@@ -86,12 +86,13 @@ Check the below video for a quick demo of XC3.
     ```
     git clone https://github.com/XgridInc/xc3.git
     ```
-2. You have to configure the config.sh file in xc3/infrastructure and run the below command
+
+2.  You have to configure the config.sh file in xc3/infrastructure and run the below command
     ```
     cd xc3/infrastructure
     bash init.sh
     ```
-3. Install the `prometheus-client` library using following commands:
+3.  Install the `prometheus-client` library using following commands:
     ```
     cd infrastructure
     mkdir python
@@ -105,20 +106,24 @@ Check the below video for a quick demo of XC3.
 
 5.  Initialize Terraform. It will initialize all terraform modules/plugins.
     go to `xc3/infrastructure/` directory.
+
     ```
     cd xc3/infrastructure/
-    ``` 
+    ```
+
     And run the following command
+
     ```
     terraform init
     ```
+
     `Expected Output: It will create .terraform directory in xc3/infrastructure/  location
-            Initializing modules...
-            - infrastructure in modules/networking
-            - infrastructure in modules/xc3
-            * provider.aws: version = "~> 4.0."
-            Terraform has been successfully initialized!
-    `
+        Initializing modules...
+        - infrastructure in modules/networking
+        - infrastructure in modules/xc3
+        * provider.aws: version = "~> 4.0."
+        Terraform has been successfully initialized!
+`
 
 6.  Run planner command under `XC3/infrastructure` directory.
 
@@ -162,7 +167,7 @@ Check the below video for a quick demo of XC3.
 
     ```
     sudo scp -r -i "keypair.pem" keypair.pem user@bastion-host-DNS:/directory-to-copy-keypair
-    
+
     sudo scp -r -i "keypair.pem" ../cloud_custodian_policies/  user@bastion-host-DNS:~/.
 
     ssh -i "keypair.pem" user@bastion-host-DNS
@@ -176,14 +181,14 @@ Check the below video for a quick demo of XC3.
     sudo chown root:root /home/ubuntu/cloud_custodian_policies/msg_templates/*.html.j2
 
     sudo cp /home/ubuntu/cloud_custodian_policies/msg_templates/*.html.j2 /custodian/lib/python3.8/site-packages/c7n_mailer/msg-templates/
-    
+
     ```
 
 9.  Please run the following steps on deployed EC2 instance to trigger XC3 lambda functions.
 
     ```
         source /custodian/bin/activate
-        cd ccloud_custodian_policies
+        cd cloud_custodian_policies
 
      1. custodian run -s s3://${bucket_name}/iam-user --region ${aws_region} iam-user.yml
 
@@ -194,8 +199,9 @@ Check the below video for a quick demo of XC3.
 
     ```
 
-10.  Wait for few minutes before proceeding further for the application to come online.
+10. Wait for few minutes before proceeding further for the application to come online.
     Verify the readiness of the metrics system. Load the Grafana URL in a browser. Live Grafana UI ensures the system is ready to accept and visualize metrics.
+
 
     > Verify the readiness of metrics system by accessing Grafana UI: https://xc3.xxx.com/login
 
