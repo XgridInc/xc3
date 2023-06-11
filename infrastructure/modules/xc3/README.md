@@ -47,6 +47,7 @@ module "xc3" {
 | sns_topic_arn          | The SNS topic arn to be used in lambda functions.   |
 | prometheus_layer_arn   | The lambda layer arn to be used in lambda functions.|
 | private_ip             | The private IP of EC2 instance where pushgateway is installed. |
+| load_balancer_dns      | The DNS of the loadbalancer to access dashboard if domain is null |
 
 ### Resources Created
 

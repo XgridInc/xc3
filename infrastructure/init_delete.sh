@@ -42,21 +42,27 @@ fi
 echo "AWS Region: $aws_region"
 # shellcheck disable=SC2154
 # Dynamodb Table Name to be used in deleting dynamo db table
+# shellcheck disable=SC2154
 echo "DynamoDB Table Name: $dynamo_table_name"
 # shellcheck disable=SC2154
 # S3 Bucket Name that will be used in deleting S3 bucket
+# shellcheck disable=SC2154
 echo "Bucket Name: $bucket_name"
 # shellcheck disable=SC2154
 # Project Name that will be used Tag value for Project key to follow tagging compliance best practices
+# shellcheck disable=SC2154
 echo "Project: $project"
 # shellcheck disable=SC2154
 # Domain Name to create ACM Certificate that will be used in creating Route53 Domain
+# shellcheck disable=SC2154
 echo "Domain: $domain"
 # shellcheck disable=SC2154
 # Email Address of Owner of Team
+# shellcheck disable=SC2154
 echo "Owner Email: $owner_email"
 # shellcheck disable=SC2154
 # Email Address of Creator who is spinning up the infrastructure
+# shellcheck disable=SC2154
 echo "Creator Email: $creator_email"
 
 # Delete S3 bucket that was used to maintain state file of terraform
@@ -96,4 +102,3 @@ else
         fi
     fi
 fi
-
