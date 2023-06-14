@@ -68,6 +68,10 @@ echo "Owner Email: $owner_email"
 # Email Address of Creator who is spinning up the infrastructure
 # shellcheck disable=SC2154
 echo "Creator Email: $creator_email"
+# shellcheck disable=SC2154
+# Email Address of Creator who is spinning up the infrastructure
+# shellcheck disable=SC2154
+echo "Namespace: $namespace"
 
 # Create S3 bucket to store terraform state file in specific AWS Region
 if aws s3api create-bucket --bucket "${bucket_name}" --region "${aws_region}" --create-bucket-configuration LocationConstraint="${aws_region}"
@@ -102,7 +106,7 @@ fi
 
 
 # Create EC2 Key-Pair that will be used to ssh into EC2 instances spin up by terraform module
-if aws ec2 create-key-pair --key-name "${project}-key" --tag-specifications "ResourceType=key-pair,Tags=[{Key=Project,Value=${project}},{Key=Owner,Value=${owner_email}},{Key=Creator,Value=${creator_email}}]" --query 'KeyMaterial' --output text > "${project}"-key.pem --region="${aws_region}" ; then
+if aws ec2 create-key-pair --key-name "${namespace}-key" --tag-specifications "ResourceType=key-pair,Tags=[{Key=Project,Value=${project}},{Key=Owner,Value=${owner_email}},{Key=Creator,Value=${creator_email}}]" --query 'KeyMaterial' --output text > "${project}"-key.pem --region="${aws_region}" ; then
     echo "Key pair created successfully"
 else
     echo "Error creating key pair"
