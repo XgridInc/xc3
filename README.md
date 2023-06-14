@@ -96,13 +96,10 @@ Check the below video for a quick demo of XC3.
     ```
     cd infrastructure
     mkdir python
-    cd python
-    pip3 install prometheus-client -t
-    cd ..
+    pip3 install -t python/ prometheus-client
     zip -r python.zip ./python
     ```
-4.  `terraform.auto.tfvars` is the configuration file for the deployment. Use this files to create an `input.tfvars` file.
-    Copy the mentioned configuration file and modify the parameters.
+4.  `terraform.auto.tfvars` is the configuration file for the deployment, modify the parameters according your environment.
 
 5.  Initialize Terraform. It will initialize all terraform modules/plugins.
     go to `xc3/infrastructure/` directory.
@@ -127,11 +124,11 @@ Check the below video for a quick demo of XC3.
 
 6.  Run planner command under `XC3/infrastructure` directory.
 
-    ```bash
-    terraform  plan -var-file=input.tfvars
+    ```
+    terraform  plan -var-file=terraform.auto.tfvars
     ```
 
-        ```bash
+        ```
         This command will generate a preview of all the actions which terraform is going to execute.
             Expected Output: This command will be giving output something like below
                     Plan: 20 to add, 0 to change, 0 to destroy.
@@ -141,23 +138,22 @@ Check the below video for a quick demo of XC3.
 7.  Run actual Apply command under `xc3/infrastructure` directory to deploy all the resources into AWS master account.
     This step may take `10-15` mins.
 
-    ```bash
-    terraform apply -var-file=input.tfvars
+    ```
+    terraform apply -var-file=terraform.auto.tfvars
     ```
 
     The output will look like below
 
-    ````bash
-        Expected output: It will ask for approval like below
-            Do you want to perform these actions?
-            Terraform will perform the actions described above.
-            Only 'yes' will be accepted to approve.
-            Enter a value:
-        ```
+    ```
+    Expected output: It will ask for approval like below
+        Do you want to perform these actions?
+        Terraform will perform the actions described above.
+        Only 'yes' will be accepted to approve.
+        Enter a value:
+        
     Please type "yes" and enter
     It provides the next steps to perform
 
-    ```bash
     Apply complete! Resources: 20 added, 0 changed, 0 destroyed.
 
     Outputs:
@@ -166,6 +162,8 @@ Check the below video for a quick demo of XC3.
 8.  Please copy msg_templates in custodian directory on deployed EC2 instance
 
     ```
+    chmod 400 "keypair.pem"
+
     sudo scp -r -i "keypair.pem" keypair.pem user@bastion-host-DNS:/directory-to-copy-keypair
 
     sudo scp -r -i "keypair.pem" ../cloud_custodian_policies/  user@bastion-host-DNS:~/.
