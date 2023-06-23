@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2034
 # Copyright (c) 2023, Xgrid Inc, https://xgrid.co
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-project       = "example"
-creator_email = "admin@example.co"
-owner_email   = "admin@example.co"
-namespace     = "example"
+# Variables values that will be used in init script to create resources for XC3 infrastructure
+namespace="example"
+project="example"
+region="eu-west-1"
+allow_traffic="0.0.0.0/0"
+domain="" #  [Optional] - If you want to use your own domain then set this variable.
+account_id="201635854701"
+hosted_zone_id="Z053166920YP1STI0EK5X"
+owner_email="example@example.co"
+creator_email="example@example.co"
+ses_email_address="example@example.co"

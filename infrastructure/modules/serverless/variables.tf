@@ -53,7 +53,7 @@ variable "prometheus_layer" {
 }
 
 variable "subnet_id" {
-  type        = string
+  type        = list(string)
   description = "The ID of the subnet where the resources will be created"
 }
 

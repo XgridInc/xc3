@@ -110,17 +110,15 @@ resource "aws_lambda_function" "total_account_cost" {
   timeout     = var.timeout
   layers      = [var.prometheus_layer]
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-total-account-cost" }))
 
 }
 # tflint-ignore: terraform_required_providers
-resource "null_resource" "delete_zip_file" {
-  triggers = {
-    lambda_function_arn = aws_lambda_function.total_account_cost.arn
-  }
+resource "terraform_data" "delete_zip_file" {
+  triggers_replace = [aws_lambda_function.total_account_cost.arn]
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.total_account_cost.output_path}"
   }
