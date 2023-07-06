@@ -140,7 +140,8 @@ resource "aws_security_group" "serverless_sg" {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.private_subnet.cidr_block]
+    cidr_blocks = [for subnet in aws_subnet.private_subnet : subnet.cidr_block]
+
   }
 
   egress {

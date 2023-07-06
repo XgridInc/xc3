@@ -28,7 +28,7 @@ variable "allow_traffic" {
 }
 
 variable "private_subnet_cidr_block" {
-  type        = string
+  type        = map(string)
   description = "AWS VPC CIDR range for private subnet"
 }
 

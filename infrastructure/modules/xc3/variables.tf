@@ -22,8 +22,8 @@ variable "vpc_id" {
   description = "The ID of the VPC where the resources will be created"
 }
 
-variable "subnet_id" {
-  type        = string
+variable "private_subnet_id" {
+  type        = list(string)
   description = "The ID of the subnet where the resources will be created"
 }
 

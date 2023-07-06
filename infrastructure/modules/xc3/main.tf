@@ -102,6 +102,7 @@ resource "aws_iam_instance_profile" "this" {
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-EC2-Profile" }))
 }
 
+
 # Creating EC2 Instance that will be hosting Cloud Custodian
 
 resource "aws_instance" "this" {
@@ -111,7 +112,7 @@ resource "aws_instance" "this" {
   instance_type               = var.instance_type
   associate_public_ip_address = false
   key_name                    = data.aws_key_pair.key_pair.key_name
-  subnet_id                   = var.subnet_id
+  subnet_id                   = var.private_subnet_id[0]
   vpc_security_group_ids      = [var.security_group_ids.private_security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
   user_data = templatefile("${path.module}/startup-script.sh.tpl", {
@@ -180,6 +181,7 @@ resource "terraform_data" "upload_files_on_s3" {
     command = <<EOT
       aws s3 cp python.zip s3://${aws_s3_bucket.this.id}/lambda_layers/
       aws s3 cp ../custom_dashboard/grafana_dashboards/. s3://${aws_s3_bucket.this.id}/content/ --recursive --exclude "*.md"
+      aws s3 cp ../cloud_custodian_policies/ s3://${aws_s3_bucket.this.id}/cloud_custodian_policies/ --recursive --exclude "*.md" --include "*"
    EOT
   }
 }
@@ -203,6 +205,6 @@ resource "aws_lambda_layer_version" "lambda_layer_prometheus" {
 
   compatible_runtimes = ["python3.9"]
   depends_on = [
-    null_resource.upload_files_on_s3
+    terraform_data.upload_files_on_s3
   ]
 }

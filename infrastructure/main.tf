@@ -38,7 +38,7 @@ module "xc3" {
   source = "./modules/xc3"
 
   vpc_id              = module.networking.vpc_id
-  subnet_id           = module.networking.private_subnet_id
+  private_subnet_id   = module.networking.private_subnet_id
   public_subnet_ids   = module.networking.public_subnet_ids
   security_group_ids  = module.networking.security_group_ids
   ses_email_address   = var.ses_email_address
@@ -52,6 +52,7 @@ module "xc3" {
   domain_name         = var.domain_name
   hosted_zone_id      = var.hosted_zone_id
   grafana_api_gateway = module.serverless.grafana_api_gateway
+  depends_on          = [module.networking]
 }
 
 // Terraform Module for Serverless Application
