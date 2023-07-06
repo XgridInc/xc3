@@ -142,25 +142,6 @@ resource "aws_instance" "this" {
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-EC2" }))
 }
 
-# Creating Bastion Host Server
-
-resource "aws_instance" "bastion_host" {
-  #ts:skip=AC-AWS-NS-IN-M-1172 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.AI.LM.HIGH.0070 We are aware of the risk and choose to skip this rule
-  ami                         = data.aws_ami.ubuntu.id
-  instance_type               = var.instance_type
-  associate_public_ip_address = true
-  key_name                    = data.aws_key_pair.key_pair.key_name
-  subnet_id                   = var.public_subnet_ids[0]
-  vpc_security_group_ids      = [var.security_group_ids.public_security_group_id]
-  iam_instance_profile        = aws_iam_instance_profile.this.name
-  root_block_device {
-    volume_size = 30
-    encrypted   = true
-  }
-  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Bastion-Host-Server" }))
-}
-
 # Configuring SES Identity and SQS for email notifications
 resource "aws_ses_email_identity" "this" {
   email = var.ses_email_address
@@ -202,6 +183,16 @@ resource "terraform_data" "upload_files_on_s3" {
       aws s3 cp ../custom_dashboard/grafana_dashboards/. s3://${aws_s3_bucket.this.id}/content/ --recursive --exclude "*.md"
       aws s3 cp ../cloud_custodian_policies/ s3://${aws_s3_bucket.this.id}/cloud_custodian_policies/ --recursive --exclude "*.md" --include "*"
    EOT
+  }
+}
+
+# tflint-ignore: terraform_required_providers
+resource "terraform_data" "eicendpoint" {
+  triggers_replace = [
+    aws_instance.this.id
+  ]  
+provisioner "local-exec" {
+    command = "aws ec2 create-instance-connect-endpoint --subnet-id ${var.subnet_id} --security-group-id ${var.security_group_ids.private_security_group_id}"
   }
 }
 
