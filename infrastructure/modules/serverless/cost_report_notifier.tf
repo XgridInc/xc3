@@ -102,7 +102,7 @@ resource "aws_lambda_function" "cost_report_notifier" {
   layers      = [aws_lambda_layer_version.apprise_layer[0].arn]
 
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
 
@@ -110,12 +110,9 @@ resource "aws_lambda_function" "cost_report_notifier" {
 
 }
 
-resource "null_resource" "delete_cost_report_notifier_zip_file" {
-  count = var.slack_channel_url != "" ? 1 : 0
-  triggers = {
-    lambda_function_arn = aws_lambda_function.cost_report_notifier[0].arn
-  }
-
+resource "terraform_data" "delete_cost_report_notifier_zip_file" {
+  count            = var.slack_channel_url != "" ? 1 : 0
+  triggers_replace = [aws_lambda_function.cost_report_notifier[0].arn]
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.cost_report_notifier[0].output_path}"
   }
@@ -178,6 +175,6 @@ resource "aws_lambda_layer_version" "apprise_layer" {
 
   compatible_runtimes = ["python3.9"]
   depends_on = [
-    null_resource.upload_files_on_s3
+    terraform_data.upload_files_on_s3
   ]
 }

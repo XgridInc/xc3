@@ -97,7 +97,7 @@ if [[ -z "${domain}" ]]; then
     echo "Domain is null. Skipping ACM certificate deletion."
 else
     certificate_arn=$(aws acm list-certificates --region "${aws_region}" --query "CertificateSummaryList[?DomainName=='${domain}'].CertificateArn" --output text)
-    
+
     if [[ -z "${certificate_arn}" ]]; then
         echo "No ACM certificate found for the specified domain. Skipping ACM certificate deletion."
     else

@@ -20,9 +20,13 @@ public_subnet_cidr_block = {
   "eu-west-1a" = "10.0.0.0/24"
   "eu-west-1c" = "10.0.1.0/24"
 }
-domain_name                = ""
-hosted_zone_id             = "Z053166920YP1STI0EK5X"
-private_subnet_cidr_block  = "10.0.100.0/24"
+domain_name    = ""
+hosted_zone_id = "Z053166920YP1STI0EK5X"
+
+private_subnet_cidr_block = {
+  "eu-west-1a" = "10.0.100.0/24"
+}
+# private_subnet_cidr_block  = "10.0.100.0/24"
 allow_traffic              = ["0.0.0.0/0"] // Use your own network CIDR
 ses_email_address          = "admin@example.co"
 creator_email              = "admin@example.co"
