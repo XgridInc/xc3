@@ -55,6 +55,21 @@ resource "aws_security_group" "private_sg" {
   name        = "${var.namespace}_private_security_group"
   vpc_id      = aws_vpc.this.id
   description = "Security Group Rules"
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.allow_traffic
+  }
+
+  ingress {
+    description = "All Traffic"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = [aws_subnet.private_subnet.cidr_block]
+  }
   egress {
     description = "Allow all egress traffic from the Load Balancer Security Group"
     from_port   = 0

@@ -31,7 +31,7 @@ output "private_ip" {
   value       = aws_instance.this.private_ip
 }
 
-output "load_balancer_dns" {
-  description = "DNS of the load balancer"
+output "xc3_url" {
+  description = "DNS of the XC3 Dashboard"
   value       = var.domain_name != "" ? var.domain_name : aws_lb.this.dns_name
 }

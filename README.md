@@ -29,7 +29,7 @@ Check the below video for a quick demo of XC3.
 
 # XC3 Architecture Diagram
 
-![XC3-architecture](https://github.com/XgridInc/xc3/assets/105271892/47f7a162-eb39-43fd-b219-fe6cbddf78ec)
+![XC3-architecture](https://github.com/XgridInc/xc3/assets/122358742/1f9b1c1e-92ca-4b2e-af17-8465214f25e9)
 
 # To start using XC3
 
@@ -114,8 +114,8 @@ Check the below video for a quick demo of XC3.
 4. Now setup is complete. If domain is provided in the input.sh then users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
 
 5. SSH into the private instance using EIC Endpoint to check if eveything is working fine. Here replace [instance-id] needs to be replaced with ID
-         
-         ssh ubuntu@[instance-id] -i keypair.pem -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %h'
+
+    ``` ssh ubuntu@[instance-id] -i keypair.pem -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %h' ```
 
 6. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
 
