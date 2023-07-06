@@ -78,9 +78,9 @@ resource "aws_iam_role" "lambda_execution_role" {
 }
 
 resource "aws_lambda_function" "resources_cost_iam_user" {
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0485 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0483 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0484 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-list_iam_user_resources_cost"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.9"
@@ -95,7 +95,7 @@ resource "aws_lambda_function" "resources_cost_iam_user" {
   timeout     = var.timeout
   layers      = [var.prometheus_layer]
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
   depends_on = [
@@ -105,28 +105,24 @@ resource "aws_lambda_function" "resources_cost_iam_user" {
 
 }
 
-resource "null_resource" "delete_iamuser_zip_file" {
-  triggers = {
-    lambda_function_arn = aws_lambda_function.list_iam_user.arn
-  }
+resource "terraform_data" "delete_iamuser_zip_file" {
+  triggers_replace = [aws_lambda_function.list_iam_user.arn]
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.lambda_function_listusers_zip.output_path}"
   }
 }
 
-resource "null_resource" "delete_cost_zip_file" {
-  triggers = {
-    lambda_function_arn = aws_lambda_function.resources_cost_iam_user.arn
-  }
+resource "terraform_data" "delete_cost_zip_file" {
+  triggers_replace = [aws_lambda_function.resources_cost_iam_user.arn]
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.lambda_function_listcost_zip.output_path}"
   }
 }
 
 resource "aws_lambda_function" "list_iam_user" {
-  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0484 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0485 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0483 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-list_iam_users"
   role          = aws_iam_role.lambda_execution_role.arn
   runtime       = "python3.9"
@@ -144,7 +140,7 @@ resource "aws_lambda_function" "list_iam_user" {
   timeout     = var.timeout
   layers      = [var.prometheus_layer]
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-list_iam_user" }))

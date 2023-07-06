@@ -44,7 +44,7 @@ module "serverless" {
 
 - aws_iam_role: The IAM role that will be associated with the lambda functions. The role will have the necessary permissions to execute the lambda functions.
 
-- null_resource: The null resource to remove zip files created for lambda packages.
+- terraform_data: The terraform_data resource to remove zip files created for lambda packages.
 
 - aws_cloudwatch_event_rule: The cloudwatch event rule that will be attach with lambda functions. This rule will trigger the lambda functions based on a schedule or an event.
 

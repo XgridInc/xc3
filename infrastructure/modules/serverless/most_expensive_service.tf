@@ -124,7 +124,7 @@ resource "aws_lambda_function" "most_expensive_service" {
   memory_size = var.memory_size
   timeout     = var.timeout
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-most_expensive_service" }))
@@ -151,19 +151,17 @@ resource "aws_lambda_function" "cost_metrics_of_expensive_services" {
   memory_size = var.memory_size
   timeout     = var.timeout
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-cost_metrics_of_expensive_services" }))
 
 }
 
-resource "null_resource" "delete_lambda_zip_files" {
-  for_each = local.lambda_archive
-
-  triggers = {
-    lambda_function_arn = "arn:aws:lambda:${var.region}:${var.account_id}:function:${each.key}"
-  }
+resource "terraform_data" "delete_lambda_zip_files" {
+  for_each         = local.lambda_archive
+  triggers_replace = ["arn:aws:lambda:${var.region}:${var.account_id}:function:${each.key}"]
+  depends_on       = [aws_lambda_function.cost_metrics_of_expensive_services, aws_lambda_function.most_expensive_service]
 
   provisioner "local-exec" {
     command = "rm -rf ${each.value.output_path}"

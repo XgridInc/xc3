@@ -94,7 +94,7 @@ resource "aws_lambda_function" "ProjectSpendCost" {
   layers      = [var.prometheus_layer]
 
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
 
@@ -103,11 +103,8 @@ resource "aws_lambda_function" "ProjectSpendCost" {
 }
 
 
-resource "null_resource" "delete_project_spend_cost_zip_file" {
-  triggers = {
-    lambda_function_arn = aws_lambda_function.ProjectSpendCost.arn
-  }
-
+resource "terraform_data" "delete_project_spend_cost_zip_file" {
+  triggers_replace = [aws_lambda_function.ProjectSpendCost.arn]
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.project_spend_cost.output_path}"
   }
