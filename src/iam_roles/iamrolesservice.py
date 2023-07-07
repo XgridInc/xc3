@@ -66,6 +66,30 @@ def cost_of_instance(event, client, resource_id, start_date, end_date):
     return response
 
 
+region_names = {
+    "us-east-1": "N. Virginia",
+    "us-east-2": "Ohio",
+    "us-west-1": "N. California",
+    "us-west-2": "Oregon",
+    "af-south-1": "Cape Town",
+    "ap-east-1": "Hong Kong",
+    "ap-south-1": "Mumbai",
+    "ap-northeast-2": "Seoul",
+    "ap-southeast-1": "Singapore",
+    "ap-southeast-2": "Sydney",
+    "ap-northeast-1": "Tokyo",
+    "ca-central-1": "Canada",
+    "eu-central-1": "Frankfurt",
+    "eu-west-1": "Ireland",
+    "eu-west-2": "London",
+    "eu-south-1": "Milan",
+    "eu-west-3": "Paris",
+    "eu-north-1": "Stockholm",
+    "me-south-1": "Bahrain",
+    "sa-east-1": "São Paulo"
+}
+
+
 def lambda_handler(event, context):
     """
     The main Lambda function that is executed.
@@ -138,13 +162,14 @@ def lambda_handler(event, context):
                 if isinstance(detail, dict):
                     # extract the "Instance_Region" and "Instance" fields
                     instance_region = detail["Instance_Region"]
+                    instance_region_name = region_names.get(instance_region, instance_region)
                     instance = detail["Instance"]
                     ec2 = "ec2:instance/" + instance
                     response = cost_of_instance(
                         event, client, instance, start_date, end_date
                     )
 
-                    ec2_resource = boto3.resource("ec2", region_name=instance_region)
+                    ec2_resource = boto3.resource("ec2", region_name=instance_region_name)
                     state = ec2_resource.Instance(instance).state["Name"]
 
                     if state != "terminated":

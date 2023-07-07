@@ -105,7 +105,10 @@ def lambda_handler(event, context):
                     subset_list.append(subset_value)
         # Push resource list to Prometheus metric
         for resource in subset_list:
-            resource_list_guage.labels(resource, lambda_item["Region"], account_id).set(
+            region_id = lambda_item["Region"]
+            region_name = region_names.get(region_id, region_id)
+            region = f"{region_id} ({region_name})"
+            resource_list_guage.labels(resource, region, account_id).set(
                 0
             )
     push_to_gateway(
