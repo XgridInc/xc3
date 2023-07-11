@@ -95,6 +95,7 @@ Check the below video for a quick demo of XC3.
                owner_email="admin@example.co"
                creator_email="admin@example.co"
                ses_email_address="admin@example.co"
+               bucket_name="terraform-state-example"
 
             - Before running the below mentioned command:
 

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 resource "aws_lb_target_group" "this" {
+  count = var.env == "prod" ? 1 : 0
   #ts:skip=AWS.ALTG.IS.MEDIUM.0042 We are aware of the risk and choose to skip this rule
   name        = "${var.namespace}-target-group"
   port        = 80
@@ -31,13 +32,15 @@ resource "aws_lb_target_group" "this" {
 }
 
 resource "aws_lb_target_group_attachment" "this" {
-  target_group_arn = aws_lb_target_group.this.arn
+  count            = var.env == "prod" ? 1 : 0
+  target_group_arn = aws_lb_target_group.this[0].arn
   target_id        = aws_instance.this.id
   port             = 3000
 
 }
 
 resource "aws_lb" "this" {
+  count                      = var.env == "prod" ? 1 : 0
   name                       = "${var.namespace}-load-balancer"
   internal                   = false
   load_balancer_type         = "application"
@@ -53,27 +56,27 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_listener" "this" {
-  count             = var.domain_name != "" ? 1 : 0
-  load_balancer_arn = aws_lb.this.arn
+  count             = var.env == "prod" && var.domain_name != "" ? 1 : 0
+  load_balancer_arn = aws_lb.this[0].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = data.aws_acm_certificate.issued[0].arn
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = aws_lb_target_group.this[0].arn
   }
 }
 
 resource "aws_lb_listener" "http" {
   #ts:skip=AWS.ALL.IS.MEDIUM.0046
-  count             = var.domain_name == "" ? 1 : 0
-  load_balancer_arn = aws_lb.this.arn
+  count             = var.env == "prod" && var.domain_name == "" ? 1 : 0
+  load_balancer_arn = aws_lb.this[0].arn
   port              = "80"
   protocol          = "HTTP"
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = aws_lb_target_group.this[0].arn
   }
 }
 
@@ -84,8 +87,8 @@ resource "aws_route53_record" "xc3_alias" {
   zone_id = var.hosted_zone_id
 
   alias {
-    name                   = aws_lb.this.dns_name
-    zone_id                = aws_lb.this.zone_id
+    name                   = aws_lb.this[0].dns_name
+    zone_id                = aws_lb.this[0].zone_id
     evaluate_target_health = true
   }
 

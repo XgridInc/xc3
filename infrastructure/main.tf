@@ -31,6 +31,7 @@ module "networking" {
   owner_email               = var.owner_email
   domain_name               = var.domain_name
   project                   = var.project
+  env                       = var.env
 }
 // Terraform Module for Xgrid Cloud Cost Control
 
@@ -52,6 +53,7 @@ module "xc3" {
   domain_name         = var.domain_name
   hosted_zone_id      = var.hosted_zone_id
   grafana_api_gateway = module.serverless.grafana_api_gateway
+  env                 = var.env
   depends_on          = [module.networking]
 }
 

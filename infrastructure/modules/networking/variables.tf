@@ -67,3 +67,8 @@ variable "domain_name" {
   type        = string
   description = "Domain name for SSL Certificates"
 }
+
+variable "env" {
+  description = "Env variable for Dev/Prod"
+  type        = string
+}
