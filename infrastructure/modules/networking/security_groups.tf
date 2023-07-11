@@ -62,13 +62,23 @@ resource "aws_security_group" "private_sg" {
     protocol    = "tcp"
     cidr_blocks = var.allow_traffic
   }
+  dynamic "ingress" {
+    for_each = var.env != "prod" ? [1] : [0]
+    content {
+      from_port   = 3000
+      to_port     = 3000
+      description = "Allow Grafana traffic to port 3000"
+      protocol    = "TCP"
+      cidr_blocks = var.allow_traffic
+    }
+  }
 
   ingress {
     description = "All Traffic"
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = [aws_subnet.private_subnet.cidr_block]
+    cidr_blocks = [for subnet in aws_subnet.private_subnet : subnet.cidr_block]
   }
   egress {
     description = "Allow all egress traffic from the Load Balancer Security Group"

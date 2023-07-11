@@ -45,16 +45,6 @@ else echo "Python is already installed. Moving forward..."
 fi
 
 
-# Checking for the AWS credentials, if not set then exit
-if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" ]]; then
-    echo "----> AWS credentials not set. Please configure AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY."
-    exit 1
-fi
-
-echo "AWS credentials are set. Proceeding with the script..."
-
-
-
 # # ************************************** User Inputs  ******************************************#
 
 namespace=$(grep 'namespace' input.sh | awk -F'"' '{print $2}')
@@ -64,7 +54,6 @@ if [ -z "$namespace" ]; then
 else
     echo "namespace:$namespace"
 fi
-
 
 project=$(grep 'project' input.sh | awk -F'"' '{print $2}')
 if [ -z "$project" ]; then
@@ -141,8 +130,19 @@ else
 fi
 
 
+environ=$(grep 'env' input.sh | awk -F'"' '{print $2}')
+environ=$(echo "$environ"|tr -d '\n')
 
-# #--------------- Pre_Requirement --> terraform.auto.tfvars --------------------#
+if [ -z "$environ" ]; then
+    echo "----> The environment variable is empty. Exiting the script..."
+    exit 1
+else
+    echo "environment:$environ"
+fi
+
+
+
+# # #--------------- Pre_Requirement --> terraform.auto.tfvars --------------------#
 
 # Namespace
 pre_namespace=$(grep 'namespace' pre_requirement/terraform.auto.tfvars | awk -F'"' '{print $2}')
@@ -214,12 +214,16 @@ infra_namespace=$(grep 'namespace' infrastructure/terraform.auto.tfvars | awk -F
 # echo $infra_namespace
 sed -i "/namespace/ s/$infra_namespace/$namespace/" infrastructure/terraform.auto.tfvars
 
+# Environment
+infra_env=$(grep 'env' infrastructure/terraform.auto.tfvars | awk -F'"' '{print $2}')
+# echo $infra_env
+sed -i "/env/ s/$infra_env/$environ/" infrastructure/terraform.auto.tfvars
+
 
 # # # Region
 infra_region=$(grep 'region' infrastructure/terraform.auto.tfvars | awk -F'"' '{print $2}')
 # echo $infra_region
 sed -i "/region/ s/$infra_region/$region/" infrastructure/terraform.auto.tfvars
-
 
 # # # Account ID
 infr_account_id=$(grep 'account_id' infrastructure/terraform.auto.tfvars | awk -F'"' '{print $2}')
@@ -240,7 +244,6 @@ fi
 infr_hosted_zone_id=$(grep 'hosted_zone_id' infrastructure/terraform.auto.tfvars | awk -F'"' '{print $2}')
 # echo $infr_hosted_zone_id
 sed -i "/hosted_zone_id/ s/$infr_hosted_zone_id/$hosted_zone_id/" infrastructure/terraform.auto.tfvars
-
 
 
 # # SES Email Address
@@ -272,7 +275,13 @@ infra_allow_traffic=$(grep 'allow_traffic' infrastructure/terraform.auto.tfvars 
 sed -i "s~$infra_allow_traffic~$allow_traffic~" infrastructure/terraform.auto.tfvars
 
 
-# # ************************************** User Inputs  ******************************************#
+# Envrionment
+infra_environ=$(grep 'env' infrastructure/terraform.auto.tfvars | awk -F'"' '{print $2}')
+# echo $infra_namespace
+sed -i "/env/ s/$infra_environ/$environ/" infrastructure/terraform.auto.tfvars
+
+
+# # # ************************************** User Inputs  ******************************************#
 
 
 
@@ -330,10 +339,10 @@ else
 fi
 
 
-terraform plan -var-file=terraform.auto.tfvars -lock=false -out=tfplan.out
+terraform plan -var-file=terraform.auto.tfvars -out=tfplan.out
 
 sleep 5
 
-terraform apply -lock=false "tfplan.out"
+terraform apply "tfplan.out"
 
 echo "XC3 Deployment is Done"

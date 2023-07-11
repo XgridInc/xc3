@@ -51,7 +51,8 @@ resource "aws_iam_role_policy" "this" {
           "arn:aws:s3:::${aws_s3_bucket.this.id}/*",
           "arn:aws:lambda:*:*:function:*",
           "arn:aws:events:*:*:rule:*",
-          "arn:aws:events:*:*:rule/*"
+          "arn:aws:events:*:*:rule/*",
+          "arn:aws:iam::*:role/onboarding-custodian-role"
         ]
       },
       {
@@ -110,9 +111,9 @@ resource "aws_instance" "this" {
   #ts:skip=AWS.AI.LM.HIGH.0070 We are aware of the risk and choose to skip this rule
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
-  associate_public_ip_address = false
+  associate_public_ip_address = var.env == "prod" ? false : true
   key_name                    = data.aws_key_pair.key_pair.key_name
-  subnet_id                   = var.private_subnet_id[0]
+  subnet_id                   = var.public_subnet_ids[0]
   vpc_security_group_ids      = [var.security_group_ids.private_security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
   user_data = templatefile("${path.module}/startup-script.sh.tpl", {
@@ -188,11 +189,12 @@ resource "terraform_data" "upload_files_on_s3" {
 
 # tflint-ignore: terraform_required_providers
 resource "terraform_data" "eicendpoint" {
+  count = var.env == "prod" ? 1 : 0
   triggers_replace = [
     aws_instance.this.id
-  ]  
-provisioner "local-exec" {
-    command = "aws ec2 create-instance-connect-endpoint --subnet-id ${var.subnet_id} --security-group-id ${var.security_group_ids.private_security_group_id}"
+  ]
+  provisioner "local-exec" {
+    command = "aws ec2 create-instance-connect-endpoint --subnet-id ${var.private_subnet_id[0]} --security-group-id ${var.security_group_ids.private_security_group_id}"
   }
 }
 

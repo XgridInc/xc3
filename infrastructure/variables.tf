@@ -142,3 +142,9 @@ variable "create_kms" {
   description = "Fetch the KMS if exist"
   type        = bool
 }
+
+variable "env" {
+  description = "Env variable for Dev/Prod"
+  type        = string
+  default     = "dev"
+}
