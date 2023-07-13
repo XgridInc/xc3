@@ -77,6 +77,7 @@ variable "project" {
 variable "domain_name" {
   type        = string
   description = "Domain name for Grafana Dashboard"
+  default     = ""
 }
 
 
@@ -89,4 +90,9 @@ variable "hosted_zone_id" {
 variable "grafana_api_gateway" {
   type        = string
   description = "The API Gateway link "
+}
+
+variable "env" {
+  description = "Env variable for Dev/Prod"
+  type        = string
 }
