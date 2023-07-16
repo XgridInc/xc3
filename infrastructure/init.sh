@@ -69,8 +69,14 @@ echo "Owner Email: $owner_email"
 # shellcheck disable=SC2154
 echo "Creator Email: $creator_email"
 
+
+# A location constraint for "us-east-1" returns an error.
+if [[ -n "$aws_region" ]] && [[ "$aws_region" != "us-east-1" ]]; then
+    bucket_config_arg="--create-bucket-configuration LocationConstraint=$aws_region"
+fi
+
 # Create S3 bucket to store terraform state file in specific AWS Region
-if aws s3api create-bucket --bucket "${bucket_name}" --region "${aws_region}" --create-bucket-configuration LocationConstraint="${aws_region}"
+if aws s3api create-bucket --bucket "${bucket_name}" --region "${aws_region}" $bucket_config_arg
    aws s3api put-bucket-versioning --bucket "${bucket_name}" --versioning-configuration Status=Enabled --region "${aws_region}"
    aws s3api put-bucket-encryption --bucket "${bucket_name}" --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}' --region "${aws_region}"
 then
