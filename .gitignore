@@ -16,6 +16,7 @@
 **/.terraform.lock.hcl
 # Ignore all files in the .terraform-plugins directory
 */.terraform-plugins/*
+infrastructure/python/
 
 */*.pem
 */*-key.pub
