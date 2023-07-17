@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated the infra-deployment based on environment variable
 - Added the automation script
 - Updated the Architecture Diagram in the Readme file
-- Updated the Readme file
 
 
 ### Fixed
