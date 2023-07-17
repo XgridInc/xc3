@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Linked List Lambda issue fixed
-- Added checks for the packages [AWS cli, pyhton, terraform] in the init.sh bash script.
+- Added checks for the packages installation [AWS CLI, python, terraform] in the init.sh bash script.
 
 
 
