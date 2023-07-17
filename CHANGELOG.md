@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### Changed
-- Added the EIC endpoint
+- Integrated EIC endpoint and removed bastion host
 - Updated the infra-deployment based on environment variable
 - Added the automation script
 - Updated the Architecture Diagram in the Readme file
