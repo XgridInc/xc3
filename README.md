@@ -29,7 +29,7 @@ Check the below video for a quick demo of XC3.
 
 # XC3 Architecture Diagram
 
-![XC3-architecture](https://github.com/XgridInc/xc3/assets/122358742/1f9b1c1e-92ca-4b2e-af17-8465214f25e9)
+![XC3-architecture](https://user-images.githubusercontent.com/114464405/231076093-88d0fae9-4c87-4b5e-a6b3-c67ff6430646.png)
 
 # To start using XC3
 

@@ -52,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `UserGuide.md` file provides the guide on how to use XC3 Grafana Dashboards effectively
 
 ### Changed
-- Updated the startup script of XC3's EC2 instance 
+- Updated the startup script of XC3's EC2 instance
 
 
 [1.0.0]: https://github.com/XgridInc/xc3/releases/tag/v1.0.0
