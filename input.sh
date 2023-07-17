@@ -15,13 +15,17 @@
 # limitations under the License.
 
 # Variables values that will be used in init script to create resources for XC3 infrastructure
+env="dev"
 namespace="example"
 project="example"
-region="eu-west-1"
+region="ap-southeast-2"
 allow_traffic="0.0.0.0/0"
 domain="" #  [Optional] - If you want to use your own domain then set this variable.
-account_id="201635854701"
+account_id="123456789012"
 hosted_zone_id="Z053166920YP1STI0EK5X"
 owner_email="example@example.co"
 creator_email="example@example.co"
 ses_email_address="example@example.co"
+bucket_name="terraform-state-example"
+
+

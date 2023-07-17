@@ -58,7 +58,8 @@ resource "aws_iam_role_policy" "list_linked_accounts" {
           "ec2:DetachNetworkInterface",
           "ec2:AttachNetworkInterface",
           "ec2:DeleteNetworkInterface",
-          "ec2:DescribeRegions"
+          "ec2:DescribeRegions",
+          "organizations:DescribeOrganization"
         ],
         "Effect" : "Allow",
         "Resource" : "*"
