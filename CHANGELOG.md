@@ -21,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added checks for the packages installation [AWS CLI, python, terraform] in the init.sh bash script.
 
 
-
 ## [1.0.1]  - 2023-06-06
 
 
