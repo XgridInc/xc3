@@ -7,6 +7,7 @@ The module also allows the user to define custom tags and namespace for the reso
 
 The XC3 Module can be used by calling the module block and passing the required input variables in `main.tf`, as shown below:
 
+
 ```
 module "xc3" {
   source = "./modules/xc3"
@@ -52,7 +53,7 @@ module "xc3" {
 
 ### Resources Created
 
-- aws_instance: Private EC2 instances in private subnet, where cloud custodian installed 
+- aws_instance: Private EC2 instances in private subnet, where cloud custodian installed
 
 - aws_iam_role: The IAM role that will be associated with EC2 instance.
 
@@ -71,6 +72,7 @@ module "xc3" {
 - aws_cognito_user_pool: The AWS Cognito user pool that will be used for user access management using OAuth on grafna.
 
 - aws_route53_record: A recod in any existing public hosted zone.
+
 
 ### Dependencies
 
@@ -99,5 +101,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
