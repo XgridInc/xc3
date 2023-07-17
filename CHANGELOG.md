@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Integrated EIC endpoint and removed bastion host
 - Updated the infra-deployment based on environment variable
-- Added the automation script
+- Added the automation script to deploy XC3 infrastack
 - Updated the Architecture Diagram of XC3 in the Readme file
 
 
