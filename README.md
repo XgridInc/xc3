@@ -105,6 +105,7 @@ Check the below video for a quick demo of XC3.
 3. Wait for few minutes before proceeding further for the application to come online.
     Verify the readiness of the metrics system. Load the Grafana URL in a browser. Live Grafana UI ensures the system is ready to accept and visualize metrics.
 
+
     > Verify the readiness of metrics system by accessing Grafana UI: https://xc3.xxx.com/login
 
     > Verify the readiness of metrics system by accessing Grafana UI: `loadbalancer-dns`. If Hosted zone ID is not provided in `input.tfvars`.
