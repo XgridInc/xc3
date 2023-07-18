@@ -21,27 +21,25 @@ public_subnet_cidr_block = {
   "eu-west-1a" = "10.0.0.0/24"
   "eu-west-1b" = "10.0.1.0/24"
 }
+
 domain_name    = ""
 hosted_zone_id = "Z053166920YP1STI0EK5X"
 
 private_subnet_cidr_block = {
   "eu-west-1a" = "10.0.100.0/24"
 }
-# private_subnet_cidr_block  = "10.0.100.0/24"
-allow_traffic               = ["0.0.0.0/0"] // Use your own network CIDR
-ses_email_address           = "testing@testing.co"
-creator_email               = "testing@testing.co"
-owner_email                 = "testing@testing.co"
-instance_type               = "t2.micro"
-total_account_cost_lambda   = "total_account_cost"
-total_account_cost_cronjob  = "cron(0 0 1,15 * ? *)"     // flexible can be set according to need
-prometheus_layer            = "lambda_layers/python.zip" // s3 key for lambda layer
-memory_size                 = 128
-timeout                     = 300
-project                     = "testing"
-create_cloudtrail_kms       = false
-create_cloudtrail           = false
-create_cloudtrail_s3_bucket = false
+
+allow_traffic              = ["39.50.156.207/32"]
+ses_email_address          = "admin@example.co"
+creator_email              = "admin@example.co"
+owner_email                = "admin@example.co"
+instance_type              = "t2.micro"
+total_account_cost_lambda  = "total_account_cost"
+total_account_cost_cronjob = "cron(0 0 1,15 * ? *)"     // flexible can be set according to need
+prometheus_layer           = "lambda_layers/python.zip" // s3 key for lambda layer
+memory_size                = 128
+timeout                    = 300
+project                    = "example"
 security_group_ingress = {
   "pushgateway" = {
     description = "PushGateway"
