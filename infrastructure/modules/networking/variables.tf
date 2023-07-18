@@ -28,7 +28,7 @@ variable "allow_traffic" {
 }
 
 variable "private_subnet_cidr_block" {
-  type        = string
+  type        = map(string)
   description = "AWS VPC CIDR range for private subnet"
 }
 
@@ -66,4 +66,9 @@ variable "security_group_ingress" {
 variable "domain_name" {
   type        = string
   description = "Domain name for SSL Certificates"
+}
+
+variable "env" {
+  description = "Env variable for Dev/Prod"
+  type        = string
 }

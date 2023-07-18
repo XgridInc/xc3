@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace     = "example"
+
 project       = "example"
-creator_email = "admin@example.co"
-owner_email   = "admin@example.co"
+creator_email = "example@example.co"
+owner_email   = "example@example.co"
+namespace     = "example"
 region        = "eu-west-1"

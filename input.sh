@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2034
 # Copyright (c) 2023, Xgrid Inc, https://xgrid.co
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,24 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data "aws_ami" "ubuntu" {
-  owners = ["099720109477"]
+# Variables values that will be used in init script to create resources for XC3 infrastructure
+env="dev"
+namespace="example"
+project="example"
+region="ap-southeast-2"
+allow_traffic="0.0.0.0/0"
+domain="" #  [Optional] - If you want to use your own domain then set this variable.
+account_id="123456789012"
+hosted_zone_id="Z053166920YP1STI0EK5X"
+owner_email="example@example.co"
+creator_email="example@example.co"
+ses_email_address="example@example.co"
+bucket_name="terraform-state-example"
 
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220914"]
-  }
-}
 
-data "aws_key_pair" "key_pair" {
-  key_name = "${var.namespace}-key"
-}
-
-data "aws_acm_certificate" "issued" {
-  count       = var.env == "prod" && var.domain_name != "" ? 1 : 0
-  domain      = var.domain_name
-  most_recent = true
-  types       = ["AMAZON_ISSUED"]
-  statuses    = ["ISSUED"]
-  key_types   = ["RSA_2048"]
-}

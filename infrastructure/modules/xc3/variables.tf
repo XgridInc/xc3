@@ -22,8 +22,8 @@ variable "vpc_id" {
   description = "The ID of the VPC where the resources will be created"
 }
 
-variable "subnet_id" {
-  type        = string
+variable "private_subnet_id" {
+  type        = list(string)
   description = "The ID of the subnet where the resources will be created"
 }
 
@@ -77,6 +77,10 @@ variable "project" {
 variable "domain_name" {
   type        = string
   description = "Domain name for Grafana Dashboard"
+<<<<<<< HEAD
+  default     = ""
+=======
+>>>>>>> main
 }
 
 
@@ -89,4 +93,9 @@ variable "hosted_zone_id" {
 variable "grafana_api_gateway" {
   type        = string
   description = "The API Gateway link "
+}
+
+variable "env" {
+  description = "Env variable for Dev/Prod"
+  type        = string
 }

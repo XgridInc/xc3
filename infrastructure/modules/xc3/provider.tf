@@ -12,24 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data "aws_ami" "ubuntu" {
-  owners = ["099720109477"]
+terraform {
+  required_version = ">= 1.0"
 
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20220914"]
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 4.0"
+
+    }
+    archive = {
+      source  = "hashicorp/archive"
+      version = ">= 2.0.0"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 3.0.0"
+    }
   }
-}
-
-data "aws_key_pair" "key_pair" {
-  key_name = "${var.namespace}-key"
-}
-
-data "aws_acm_certificate" "issued" {
-  count       = var.env == "prod" && var.domain_name != "" ? 1 : 0
-  domain      = var.domain_name
-  most_recent = true
-  types       = ["AMAZON_ISSUED"]
-  statuses    = ["ISSUED"]
-  key_types   = ["RSA_2048"]
 }

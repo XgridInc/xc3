@@ -1,4 +1,4 @@
-output "load_balancer_dns" {
-  description = "DNS of the load balancer"
-  value       = module.xc3.load_balancer_dns
- }
+output "xc3_url" {
+  description = "DNS of the XC3 Dashboard"
+  value       = module.xc3.xc3_url
+}

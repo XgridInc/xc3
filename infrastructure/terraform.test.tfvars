@@ -20,9 +20,17 @@ public_subnet_cidr_block = {
   "eu-west-1a" = "15.0.1.0/24"
   "eu-west-1c" = "15.0.2.0/24"
 }
+<<<<<<< HEAD
+domain_name    = ""
+hosted_zone_id = ""
+private_subnet_cidr_block = {
+  "eu-west-1a" = "15.0.3.0/26"
+}
+=======
 domain_name                = ""
 hosted_zone_id             = ""
 private_subnet_cidr_block  = "15.0.3.0/26"
+>>>>>>> main
 allow_traffic              = ["39.50.156.207/32"]
 ses_email_address          = "admin@example.co"
 creator_email              = "admin@example.co"

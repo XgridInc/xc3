@@ -64,6 +64,12 @@ echo "Owner Email: $owner_email"
 # Email Address of Creator who is spinning up the infrastructure
 # shellcheck disable=SC2154
 echo "Creator Email: $creator_email"
+# shellcheck disable=SC2154
+# Namespace who is spinning up the infrastructure
+# shellcheck disable=SC2154
+echo "Namespace: $namespace"
+
+
 
 # Delete S3 bucket that was used to maintain state file of terraform
 if aws s3 rb s3://"${bucket_name}" --force; then
@@ -80,7 +86,7 @@ else
 fi
 
 # Delete EC2 key-pair that was used to ssh into EC2 instances
-if aws ec2 delete-key-pair --key-name "${project}-key" --region "${aws_region}"; then
+if aws ec2 delete-key-pair --key-name "${namespace}-key" --region "${aws_region}"; then
     rm "${project}-key.pem"
     echo "Key pair deleted successfully"
 else
@@ -91,7 +97,6 @@ if [[ -z "${domain}" ]]; then
     echo "Domain is null. Skipping ACM certificate deletion."
 else
     certificate_arn=$(aws acm list-certificates --region "${aws_region}" --query "CertificateSummaryList[?DomainName=='${domain}'].CertificateArn" --output text)
-    
     if [[ -z "${certificate_arn}" ]]; then
         echo "No ACM certificate found for the specified domain. Skipping ACM certificate deletion."
     else

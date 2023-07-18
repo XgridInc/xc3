@@ -7,6 +7,7 @@ The module also allows the user to define custom tags and namespace for the reso
 
 The XC3 Module can be used by calling the module block and passing the required input variables in `main.tf`, as shown below:
 
+
 ```
 module "xc3" {
   source = "./modules/xc3"
@@ -31,7 +32,7 @@ module "xc3" {
 | vpc_id             | The ID of the VPC.                                                           | `string`      | n/a     | Yes      |
 | subnet_id          | The ID of the private subnet where EC2 will be created.                      | `string`      | n/a     | Yes      |
 | security_group_IDs | The security group IDs that will be associated with EC2 instances.           | `map(string)` | n/a     | Yes      |
-| public_subnet_IDs  | The list of public subnet IDs where the bastion host server will be created. | `map(string)` | n/a     | Yes      |
+| public_subnet_IDs  | The list of public subnet IDs where the load balancer will be created.       | `map(string)` | n/a     | Yes      |
 | instance_type      | The EC2 instance type.                                                       | `string`      | n/a     | Yes      |
 | ses_email_address  | The email address for SES identity.                                          | `string`      | n/a     | Yes      |
 | prometheus_layer   | The S3 key for prometheus layer used to store layer package.                 | `string`      | n/a     | Yes      |
@@ -48,11 +49,11 @@ module "xc3" {
 | sns_topic_arn        | The SNS topic arn to be used in lambda functions.                 |
 | prometheus_layer_arn | The lambda layer arn to be used in lambda functions.              |
 | private_ip           | The private IP of EC2 instance where pushgateway is installed.    |
-| load_balancer_dns    | The DNS of the loadbalancer to access dashboard if domain is null |
+| xc3_url              | The DNS of the loadbalancer to access dashboard if domain is null |
 
 ### Resources Created
 
-- aws_instances: Two EC2 instances one in private subnet where cloud custodian installed and other in public subnet that server as bastion host to ssh into private instance.
+- aws_instance: Private EC2 instances in private subnet, where cloud custodian installed
 
 - aws_iam_role: The IAM role that will be associated with EC2 instance.
 
@@ -71,6 +72,7 @@ module "xc3" {
 - aws_cognito_user_pool: The AWS Cognito user pool that will be used for user access management using OAuth on grafna.
 
 - aws_route53_record: A recod in any existing public hosted zone.
+
 
 ### Dependencies
 
@@ -99,3 +101,5 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+

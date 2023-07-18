@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.1.0]  - 2023-07-17
+
+
+### Changed
+- Integrated EIC endpoint and removed bastion host
+- Updated the infra-deployment based on environment variable
+- Added the automation script to deploy XC3 infrastack
+- Updated the Architecture Diagram of XC3 in the Readme file
+
+
+### Fixed
+- Fixed Linked List Lambda to run from a member account as well
+- Added checks for the packages installation [AWS CLI, python, terraform] in the init.sh bash script.
+
+
 ## [1.0.1]  - 2023-06-06
 
 
@@ -37,8 +52,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `UserGuide.md` file provides the guide on how to use XC3 Grafana Dashboards effectively
 
 ### Changed
-- Updated the startup script of XC3's EC2 instance 
-
+- Updated the startup script of XC3's EC2 instance
 
 [1.0.0]: https://github.com/XgridInc/xc3/releases/tag/v1.0.0
 [1.0.1]: https://github.com/XgridInc/xc3/releases/tag/v1.0.1
+[1.1.0]: https://github.com/XgridInc/xc3/releases/tag/v1.1.0
+

@@ -8,7 +8,8 @@ Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="cloud-config.txt"
 
 #cloud-config
-cloud-init directives
+cloud_final_modules:
+- [scripts-user, always]
 
 --//
 Content-Type: text/x-shellscript; charset="us-ascii"
@@ -36,7 +37,8 @@ Content-Disposition: attachment; filename="userdata.txt"
 # The script also creates content and plugins directories for Grafana
 # and sets up an environment file.
 
-#Install docker
+
+# Install docker
 # Check if Docker is installed
 sudo apt-get remove docker docker-engine docker.io containerd runc
 sudo apt-get update -y
@@ -52,7 +54,7 @@ fi
 
 
 # Install cloud custodian
-sudo apt-get install python3-pip -y 
+sudo apt-get install python3-pip -y
 sudo apt-get install python3-venv -y
 
 python3 -m venv custodian
@@ -147,14 +149,26 @@ then
 fi
 
 sudo apt install awscli -y
+
 sudo aws s3 cp s3://${s3_bucket}/content/ /home/ubuntu/content --recursive
+
+# Coping cloud_custodian_policies folder from S3 bucket
+sudo aws s3 cp s3://${s3_bucket}/cloud_custodian_policies/ /home/ubuntu/cloud_custodian_policies/ --recursive --exclude "*.md" --include "*"
+
+# Changing the ownership of files
+sudo chown root:root /home/ubuntu/cloud_custodian_policies/msg_templates/*.html.j2
+
+# Getting the python version from the Host machine
+python_version="python$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")"
+
+# Copying files to the cloud_custodian directory
+sudo cp /home/ubuntu/cloud_custodian_policies/msg_templates/*.html.j2 "/custodian/lib/$python_version/site-packages/c7n_mailer/msg-templates/"
 
 echo "Pushgateway installed and configured successfully!"
 
-
-if sudo docker run -d -p 3000:3000 --name grafana --network xc3 --env-file /home/ubuntu/.env \
-        -e "GF_INSTALL_PLUGINS=marcusolsson-dynamictext-panel" \
-        -e "GF_DEFAULT_HOME_DASHBOARD=LQ93m_o4z" \
+# pragma: allowlist secret
+if sudo docker run -d -p 3000:3000 --name grafana --network xc3 --env-file /home/ubuntu/.env -e "GF_INSTALL_PLUGINS=marcusolsson-dynamictext-panel" \
+        -e "GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/home-dashboard.json" \
         -e "GRAFANA_API_GATEWAY=${grafana_api_gateway}" \
         -e "GRAFANA_REGION=${region}" \
         -v /home/ubuntu/content/:/var/lib/grafana/dashboards \
@@ -165,11 +179,25 @@ then
     echo "Grafana container started successfully."
 else
     echo "Error: failed to start Grafana container."
+    echo "Error: failed to start Grafana container."
 fi
 
 if [ $? -ne 0 ]; then
   echo "Error: failed to start Grafana container." >&2
   exit 1
 fi
+
+
+# Triggering XC3 lambda functions.
+
+source /custodian/bin/activate
+
+cd /home/ubuntu/cloud_custodian_policies
+
+custodian run -s s3://${s3_bucket}/iam-user --region ${region} iam-user.yml
+
+custodian run -s s3://${s3_bucket}/iam-role/ --region ${region} iam-role.yml
+
+custodian run -s tagging-compliance --region ${region} eks-tagging.yml
 
 --//--

@@ -68,15 +68,23 @@ echo "Owner Email: $owner_email"
 # Email Address of Creator who is spinning up the infrastructure
 # shellcheck disable=SC2154
 echo "Creator Email: $creator_email"
+# shellcheck disable=SC2154
+# Email Address of Creator who is spinning up the infrastructure
+# shellcheck disable=SC2154
+echo "Namespace: $namespace"
 
 # Create S3 bucket to store terraform state file in specific AWS Region
-if aws s3api create-bucket --bucket "${bucket_name}" --region "${aws_region}" --create-bucket-configuration LocationConstraint="${aws_region}"
-   aws s3api put-bucket-versioning --bucket "${bucket_name}" --versioning-configuration Status=Enabled --region "${aws_region}"
-   aws s3api put-bucket-encryption --bucket "${bucket_name}" --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}' --region "${aws_region}"
-then
-    echo "S3 bucket ${bucket_name} created successfully"
+if aws s3api head-bucket --bucket "${bucket_name}" --region "${aws_region}" >/dev/null 2>&1; then
+    echo "S3 bucket ${bucket_name} already exists"
 else
-    echo "Failed to create S3 bucket ${bucket_name}"
+    if aws s3api create-bucket --bucket "${bucket_name}" --region "${aws_region}" --create-bucket-configuration LocationConstraint="${aws_region}" && \
+       aws s3api put-bucket-versioning --bucket "${bucket_name}" --versioning-configuration Status=Enabled --region "${aws_region}" && \
+       aws s3api put-bucket-encryption --bucket "${bucket_name}" --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}' --region "${aws_region}"
+    then
+        echo "S3 bucket ${bucket_name} created successfully"
+    else
+        echo "Failed to create S3 bucket ${bucket_name}"
+    fi
 fi
 
 
@@ -88,24 +96,32 @@ else
 fi
 
 # Create Dynamodb Table to maintain lock on terraform states
-if aws dynamodb create-table \
-    --table-name "${dynamo_table_name}" \
-    --attribute-definitions AttributeName=LockID,AttributeType=S \
-    --key-schema AttributeName=LockID,KeyType=HASH \
-    --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
-    --tags Key=backup,Value=short \
-    --region "${aws_region}"; then
-    echo "DynamoDB table created successfully"
+if aws dynamodb describe-table --table-name "${dynamo_table_name}" --region "${aws_region}" >/dev/null 2>&1; then
+    echo "DynamoDB table ${dynamo_table_name} already exists"
 else
-    echo "Error creating DynamoDB table"
+    if aws dynamodb create-table \
+        --table-name "${dynamo_table_name}" \
+        --attribute-definitions AttributeName=LockID,AttributeType=S \
+        --key-schema AttributeName=LockID,KeyType=HASH \
+        --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1 \
+        --tags Key=backup,Value=short \
+        --region "${aws_region}"; then
+        echo "DynamoDB table created successfully"
+    else
+        echo "Error creating DynamoDB table"
+    fi
 fi
 
 
 # Create EC2 Key-Pair that will be used to ssh into EC2 instances spin up by terraform module
-if aws ec2 create-key-pair --key-name "${project}-key" --tag-specifications "ResourceType=key-pair,Tags=[{Key=Project,Value=${project}},{Key=Owner,Value=${owner_email}},{Key=Creator,Value=${creator_email}}]" --query 'KeyMaterial' --output text > "${project}"-key.pem --region="${aws_region}" ; then
-    echo "Key pair created successfully"
+if aws ec2 describe-key-pairs --key-names "${namespace}-key" --region "${aws_region}" >/dev/null 2>&1; then
+    echo "Key pair ${namespace}-key already exists"
 else
-    echo "Error creating key pair"
+    if aws ec2 create-key-pair --key-name "${namespace}-key" --tag-specifications "ResourceType=key-pair,Tags=[{Key=Project,Value=${project}},{Key=Owner,Value=${owner_email}},{Key=Creator,Value=${creator_email}}]" --query 'KeyMaterial' --output text > "${project}"-key.pem --region="${aws_region}" ; then
+        echo "Key pair created successfully"
+    else
+        echo "Error creating key pair"
+    fi
 fi
 
 
