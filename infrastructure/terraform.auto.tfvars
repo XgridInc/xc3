@@ -15,7 +15,7 @@
 namespace      = "example"
 env            = "dev"
 region         = "ap-southeast-2"
-account_id     = "123456789012"
+account_id     = "123456789"
 vpc_cidr_block = "10.0.0.0/16"
 public_subnet_cidr_block = {
   "ap-southeast-2a" = "10.0.0.0/24"
