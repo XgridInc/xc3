@@ -179,6 +179,7 @@ then
     echo "Grafana container started successfully."
 else
     echo "Error: failed to start Grafana container."
+    echo "Error: failed to start Grafana container."
 fi
 
 if [ $? -ne 0 ]; then
