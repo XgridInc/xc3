@@ -24,6 +24,7 @@ import json
 
 try:
     ec2_client = boto3.client("ec2")
+    lambda_client = boto3.client("lambda")
 except Exception as e:
     logging.error("Error creating boto3 client for ec2: " + str(e))
 try:
@@ -84,7 +85,16 @@ def lambda_handler(event, context):
             registry=registry,
         )
 
+        
         response = cost_of_project(ce_client, start_date, end_date)
+        payload_str = json.dumps(response)
+        
+        #Invoke Lambda function for further project breakdown
+        project_breakdown_response = lambda_client.invoke(
+            FunctionName="sp-project_cost_breakdown",
+            InvocationType="Event",
+            Payload=payload_str,
+        )
         project_dict = {}
 
         for group in response["ResultsByTime"][0]["Groups"]:
