@@ -192,7 +192,7 @@
           "hide": 0,
           "includeAll": false,
           "multi": true,
-          "name": "region",
+          "name": "Region",
           "options": [],
           "query": {
             "query": "label_values(region)",
