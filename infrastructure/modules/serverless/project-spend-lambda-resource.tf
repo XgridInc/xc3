@@ -77,11 +77,12 @@ resource "aws_lambda_function" "ProjectSpendCost" {
   #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
-  function_name = "${var.namespace}-project-spend-cost"
-  role          = aws_iam_role.ProjectSpendCost.arn
-  runtime       = "python3.9"
-  handler       = "project_spend_cost.lambda_handler"
-  filename      = data.archive_file.project_spend_cost.output_path
+  function_name    = "${var.namespace}-project-spend-cost"
+  role             = aws_iam_role.ProjectSpendCost.arn
+  runtime          = "python3.9"
+  handler          = "project_spend_cost.lambda_handler"
+  filename         = data.archive_file.project_spend_cost.output_path
+  source_code_hash = data.archive_file.project_spend_cost.output_base64sha256
   environment {
     variables = {
       prometheus_ip        = "${var.prometheus_ip}:9091"
