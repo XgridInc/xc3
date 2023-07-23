@@ -24,6 +24,7 @@ import json
 
 try:
     ec2_client = boto3.client("ec2")
+    lambda_client = boto3.client("lambda")
 except Exception as e:
     logging.error("Error creating boto3 client for ec2: " + str(e))
 try:
@@ -68,6 +69,35 @@ def cost_of_project(ce_client, start_date, end_date):
         return None
 
 
+# TODO Not sure if we need to pass along payload_str
+def breakdown_of_project(project_spend_breakdown, payload_str):
+    print("START Project breakdown")
+    print("function name: " + project_spend_breakdown)
+    try:
+        project_breakdown_response = lambda_client.invoke(
+            FunctionName=project_spend_breakdown,
+            InvocationType="Event",
+            Payload=payload_str,
+        )
+        # Extract the status code from the response
+        status_code = project_breakdown_response["StatusCode"]
+        if status_code != 202:
+            # Handle unexpected status code
+            logging.error(
+                f"Unexpected status code {status_code} returned from "
+                f"project_spend_breakdown_lambda"
+            )
+        print(project_breakdown_response)
+        print("END Project breakdown response: ")
+        return project_breakdown_response
+    except Exception as e:
+        logging.error("Error in invoking lambda function: " + str(e))
+        return {
+            "statusCode": 500,
+            "body": "Error invoking project_spend_breakdown_lambda",
+        }
+
+
 def lambda_handler(event, context):
     """
     The main function that is executed when the AWS Lambda function is triggered.
@@ -75,6 +105,7 @@ def lambda_handler(event, context):
     Returns:
         str: A message indicating the success or failure of the function execution.
     """
+    project_spend_breakdown = os.environ["lambda_function_name"]
     try:
         registry = CollectorRegistry()
         g = Gauge(
@@ -85,6 +116,10 @@ def lambda_handler(event, context):
         )
 
         response = cost_of_project(ce_client, start_date, end_date)
+        payload_str = json.dumps(response)
+        # Test invocation. Do we need this payload?
+        # TODO Implement properly and move into for loop?
+        breakdown_of_project(project_spend_breakdown, payload_str)
         project_dict = {}
 
         for group in response["ResultsByTime"][0]["Groups"]:
