@@ -41,7 +41,7 @@ def get_cost_and_usage_data(client, start, end, region, account_id):
         client: A boto3.client object for the AWS Cost Explorer API.
         account_id: A string representing the AWS account ID to retrieve
         cost data for.
-        region: A string representing the AWS Regionto retrieve cost data for.
+        region: A string representing the AWS Region to retrieve cost data for.
         start_date: A string representing the start date of the time period to
         retrieve cost data for in YYYY-MM-DD format.
         end_date: A string representing the end date of the time period to
