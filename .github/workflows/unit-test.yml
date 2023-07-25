@@ -1,38 +1,37 @@
 name: Python tests
-
-on:
+'on':
   push:
     branches:
-      - main
+      - feature/unit-testing-v2-wajahat
   pull_request:
     branches:
-      - main
-
+      - feature/unit-testing-v2-wajahat
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-#    - name: Install dependencies
-#      run: |
-#        python -m pip install --upgrade pip
-#        pip install -r requirements.txt
-
-#    - name: Load environment variables
-#      uses: decathlon/gh-actions-load-env-file@v1
-#      with:
-#        path: .env
-#
-#    - name: Run tests
-#      run: pytest tests/**/*.py
-#      env:
-#        ENV_VAR_1: ${{ env.BUCKET_NAME }}
-#        ENV_VAR_2: ${{ env.OBJECT_KEY }}
+      - name: Run tests
+        run: |
+          pwd
+          ls -lsh
+          cd ./tests/unit_test
+          # pytest *.py      
+          # env:
+      #   ENV_VAR_1: ${{ env.BUCKET_NAME }}
+      #   ENV_VAR_2: ${{ env.OBJECT_KEY }}
+      
+      # - name: Load environment variables
+      #   uses: decathlon/gh-actions-load-env-file@v1
+      #   with:
+      #     path: .env
