@@ -18,6 +18,10 @@
 */.terraform-plugins/*
 infrastructure/python/
 
+.vscode
+tests/.pytest_cache
+tests/__pycache__
+
 */*.pem
 */*-key.pub
 */*-key
