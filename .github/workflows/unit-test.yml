@@ -25,6 +25,7 @@ jobs:
         run: |
           pwd
           cd tests/unit_test/
+          pwd
           # pytest *.py      
           # env:
       #   ENV_VAR_1: ${{ env.BUCKET_NAME }}
