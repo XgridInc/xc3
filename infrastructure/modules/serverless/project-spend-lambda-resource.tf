@@ -111,10 +111,10 @@ resource "aws_lambda_function" "ProjectSpendCost" {
   source_code_hash = data.archive_file.project_spend_cost.output_base64sha256
   environment {
     variables = {
-      prometheus_ip        = "${var.prometheus_ip}:9091"
-      bucket_name          = var.s3_xc3_bucket.bucket
-      project_spend_prefix = var.s3_prefixes.project_spend_prefix
-      lambda_function_name = aws_lambda_function.project_spend_breakdown.arn
+      prometheus_ip                  = "${var.prometheus_ip}:9091"
+      bucket_name                    = var.s3_xc3_bucket.bucket
+      project_spend_prefix           = var.s3_prefixes.project_spend_prefix
+      lambda_function_breakdown_name = aws_lambda_function.project_spend_breakdown.arn
     }
   }
   memory_size = var.memory_size

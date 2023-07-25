@@ -22,6 +22,7 @@ import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 import json
 
+project_breakdown_lambda = os.environ["lambda_function_breakdown_name"]
 try:
     ec2_client = boto3.client("ec2")
     lambda_client = boto3.client("lambda")
@@ -42,7 +43,7 @@ end_date = str(datetime.datetime.now().date())
 start_date = str(datetime.datetime.now().date() - timedelta(days=cost_by_days))
 
 
-def cost_of_project(ce_client, start_date, end_date):
+def get_cost_per_project(ce_client, start_date, end_date):
     """
     Calculates the cost of a project for a given time period.
 
@@ -69,27 +70,30 @@ def cost_of_project(ce_client, start_date, end_date):
         return None
 
 
-# TODO Not sure if we need to pass along payload_str
-def breakdown_of_project(project_spend_breakdown, payload_str):
-    print("START Project breakdown")
-    print("function name: " + project_spend_breakdown)
+def invoke_project_breakdown(project_name):
+    payload = {
+        project_name,
+        start_date,
+        end_date,
+    }
     try:
-        project_breakdown_response = lambda_client.invoke(
-            FunctionName=project_spend_breakdown,
+        response = lambda_client.invoke(
+            FunctionName=project_breakdown_lambda,
             InvocationType="Event",
-            Payload=payload_str,
+            Payload=payload,
         )
+
         # Extract the status code from the response
-        status_code = project_breakdown_response["StatusCode"]
+        status_code = response["StatusCode"]
         if status_code != 202:
             # Handle unexpected status code
             logging.error(
                 f"Unexpected status code {status_code} returned from "
                 f"project_spend_breakdown_lambda"
             )
-        print(project_breakdown_response)
-        print("END Project breakdown response: ")
-        return project_breakdown_response
+
+        print(f"Invoked project breakdown for {project_name}")
+        return response
     except Exception as e:
         logging.error("Error in invoking lambda function: " + str(e))
         return {
@@ -105,7 +109,6 @@ def lambda_handler(event, context):
     Returns:
         str: A message indicating the success or failure of the function execution.
     """
-    project_spend_breakdown = os.environ["lambda_function_name"]
     try:
         registry = CollectorRegistry()
         g = Gauge(
@@ -115,13 +118,8 @@ def lambda_handler(event, context):
             registry=registry,
         )
 
-        response = cost_of_project(ce_client, start_date, end_date)
-        payload_str = json.dumps(response)
-        # Test invocation. Do we need this payload?
-        # TODO Implement properly and move into for loop?
-        breakdown_of_project(project_spend_breakdown, payload_str)
+        response = get_cost_per_project(ce_client, start_date, end_date)
         project_dict = {}
-
         for group in response["ResultsByTime"][0]["Groups"]:
             tag_key = group["Keys"][0]
             cost = group["Metrics"]["UnblendedCost"]["Amount"]
@@ -133,6 +131,11 @@ def lambda_handler(event, context):
             print(tag_value)
             g.labels(tag_value, cost).set(cost)
             project_dict[tag_value] = cost
+
+        print("Projects: ")
+        for project_name in project_dict.keys():
+            print(f" - {project_name}")
+            invoke_project_breakdown(project_name)
 
         # Convert the dictionary to JSON
         json_data = json.dumps(project_dict)
