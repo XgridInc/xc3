@@ -24,8 +24,7 @@ jobs:
       - name: Run tests
         run: |
           pwd
-          ls -lsh
-          cd ./tests/unit_test
+          cd tests/unit_test/
           # pytest *.py      
           # env:
       #   ENV_VAR_1: ${{ env.BUCKET_NAME }}
