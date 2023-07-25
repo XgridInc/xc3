@@ -22,9 +22,9 @@ import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 import json
 
+project_breakdown_lambda = os.environ["lambda_function_breakdown_name"]
 try:
     ec2_client = boto3.client("ec2")
-    lambda_client = boto3.client("lambda")
 except Exception as e:
     logging.error("Error creating boto3 client for ec2: " + str(e))
 try:
@@ -35,6 +35,10 @@ try:
     ce_client = boto3.client("ce")
 except Exception as e:
     logging.error("Error creating boto3 client for ce: " + str(e))
+try:
+    lambda_client = boto3.client("lambda")
+except Exception as e:
+    logging.error("Error creating boto3 client for lambda: " + str(e))
 
 
 cost_by_days = 30
@@ -42,7 +46,7 @@ end_date = str(datetime.datetime.now().date())
 start_date = str(datetime.datetime.now().date() - timedelta(days=cost_by_days))
 
 
-def cost_of_project(ce_client, start_date, end_date):
+def get_cost_per_project(ce_client, start_date, end_date):
     """
     Calculates the cost of a project for a given time period.
 
@@ -69,6 +73,44 @@ def cost_of_project(ce_client, start_date, end_date):
         return None
 
 
+def invoke_project_breakdown(project_name):
+    
+    payload = {
+    "project_name": project_name,
+    "start_date": start_date,
+    "end_date": end_date,
+    }
+    payload_data = json.dumps(payload).encode('utf-8')
+    try:
+        response = lambda_client.invoke(
+            FunctionName=project_breakdown_lambda,
+            InvocationType="Event",
+            Payload=payload_data,
+        )
+        print("Original Response:", response)
+        payload_bytes = response['Payload'].read()
+        response_message = payload_bytes.decode('utf-8')
+        print("Child Lambda Response:",response_message)
+
+        # Extract the status code from the response
+        status_code = response["StatusCode"]
+        if status_code != 202:
+            # Handle unexpected status code
+            logging.error(
+                f"Unexpected status code {status_code} returned from "
+                f"project_spend_breakdown_lambda"
+            )
+
+        #print(f"Invoked project breakdown for {project_name}")
+        return response
+    except Exception as e:
+        logging.error("Error in invoking lambda function: " + str(e))
+        return {
+            "statusCode": 500,
+            "body": "Error invoking project_spend_breakdown_lambda",
+        }
+
+
 def lambda_handler(event, context):
     """
     The main function that is executed when the AWS Lambda function is triggered.
@@ -85,29 +127,26 @@ def lambda_handler(event, context):
             registry=registry,
         )
 
-        
-        response = cost_of_project(ce_client, start_date, end_date)
-        payload_str = json.dumps(response)
-        
-        #Invoke Lambda function for further project breakdown
-        project_breakdown_response = lambda_client.invoke(
-            FunctionName="sp-project_cost_breakdown",
-            InvocationType="Event",
-            Payload=payload_str,
-        )
+        response = get_cost_per_project(ce_client, start_date, end_date)
+        print("Response:",response)
         project_dict = {}
+        for time_period in response["ResultsByTime"]:
+            if "Groups" in time_period:
+                for group in time_period["Groups"]:
+                    tag_key = group["Keys"][0]
+                    cost = group["Metrics"]["UnblendedCost"]["Amount"]
+                    print(f"{tag_key}: {cost}")
+                    tag_value = tag_key.split("$")[1]
+                    if tag_value == "":
+                        tag_value = "Others"
+                    
+                    g.labels(tag_value, cost).set(cost)
+                    project_dict[tag_value] = cost
 
-        for group in response["ResultsByTime"][0]["Groups"]:
-            tag_key = group["Keys"][0]
-            cost = group["Metrics"]["UnblendedCost"]["Amount"]
-
-            print(f"{tag_key}: {cost}")
-            tag_value = tag_key.split("$")[1]
-            if tag_value == "":
-                tag_value = "Others"
-            print(tag_value)
-            g.labels(tag_value, cost).set(cost)
-            project_dict[tag_value] = cost
+        print("Projects: ",project_dict)
+        for project_name in project_dict.keys():
+            print(f" - {project_name}")
+            invoke_project_breakdown(project_name)
 
         # Convert the dictionary to JSON
         json_data = json.dumps(project_dict)
