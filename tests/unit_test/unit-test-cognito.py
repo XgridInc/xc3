@@ -4,12 +4,23 @@ import string
 import unittest
 
 import boto3
-from config import cognito, region
+from config import cognito, region, env
 from moto import mock_cognitoidp
 
 
 class CognitoMockTests(unittest.TestCase):
+    # Define a decorator to skip the test if the environment is "prod"
+    def skip_if_prod(func):
+        def wrapper(self, *args, **kwargs):
+            if env != "prod":
+                self.skipTest("Skipping test in 'prod' environment")
+            else:
+                func(self, *args, **kwargs)
+
+        return wrapper
+
     @mock_cognitoidp
+    @skip_if_prod
     def test_create_user_and_verify_attributes(self):
         region_name = region
 

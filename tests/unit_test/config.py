@@ -6,9 +6,7 @@ import subprocess
 os.chdir("../../infrastructure/")
 subprocess.run(["terraform", "init"])
 subprocess.run(["terraform", "validate"])
-subprocess.run(
-    ["terraform", "plan", "-var-file=terraform.testsaad.tfvars", "-out=tfplan"]
-)
+subprocess.run(["terraform", "plan", "-var-file=terraform.auto.tfvars", "-out=tfplan"])
 
 # Run `terraform show -json tfplan` command to get the plan output in JSON format
 terraform_show_output = subprocess.run(
@@ -24,15 +22,24 @@ total_account_cost = "total_account_cost"
 project_spend_cost = "project_spend_cost"
 resource_list = "resource_list"
 
+
+# Json File
+# with open("tfplan.json", "w") as file:
+#     file.write(f"{terraform_plan_json}")
+
+
+# Env
+env = terraform_plan_json["variables"]["env"]["value"]
+os.environ["ENV"] = env
+os.system("export ENV")
+
+
 combined_list = []
 for item in terraform_plan_json["planned_values"]["root_module"]["child_modules"]:
     combined_list.extend(item["resources"])
 
-region = None
-for data_item in combined_list:
-    if data_item["type"] == "aws_cloudtrail" and data_item["name"] == "this":
-        region = data_item["values"]["kms_key_id"].split(":")[3]
-        break
+# Region
+region = terraform_plan_json["variables"]["region"]["value"]
 
 kms_id = None
 for data_item in combined_list:
@@ -50,11 +57,13 @@ for data_item in combined_list:
         s3_bucket = data_item["values"]["bucket"]
         break
 
+
 s3_bucket_tags = None
 for data_item in combined_list:
     if data_item["type"] == "aws_s3_bucket" and data_item["name"] == "this":
         s3_bucket_tags = data_item["values"]["tags"]
         break
+
 
 vpc_cidr = None
 for data_item in combined_list:
@@ -198,8 +207,8 @@ for data_item in combined_list:
 ec2_ami = None
 ec2_ami_count = 0
 for data_item in combined_list:
-    if data_item["type"] == "aws_instance" and data_item["name"] == "this":
-        ec2_ami = data_item["values"]["ami"]
+    if data_item["type"] == "aws_ami" and data_item["name"] == "this":
+        ec2_ami = data_item["values"]["filter"]["values"][0]
         ec2_ami_count += 1
         break
 
