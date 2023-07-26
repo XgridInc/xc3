@@ -4,7 +4,7 @@ import subprocess
 
 # Run `terraform plan -out=tfplan` command to generate the plan file
 os.chdir("../../infrastructure/")
-subprocess.run(["terraform", "init"])
+subprocess.run(["terraform", "init", "-reconfigure"])
 subprocess.run(["terraform", "validate"])
 subprocess.run(["terraform", "plan", "-var-file=terraform.auto.tfvars", "-out=tfplan"])
 
