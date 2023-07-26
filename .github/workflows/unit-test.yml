@@ -1,21 +1,45 @@
-name: Python tests
-'on':
+# This is a basic workflow to help you get started with Actions
+name: Connect to an AWS role from a GitHub repository
+
+# Controls when the action will run. Invokes the workflow on push events but only for the main branch
+on:
   push:
-    branches:
-      - feature/unit-testing-v2-wajahat
+    branches: [feature/unit-testing-v2-wajahat]
   pull_request:
-    branches:
-      - feature/unit-testing-v2-wajahat
+    branches: [feature/unit-testing-v2-wajahat]
+
+env:
+  AWS_REGION: "eu-west-1" # Change to reflect your Region
+
+# Permission can be added at job level or workflow level
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+
 jobs:
-  test:
+  AssumeRoleAndCallIdentity:
     runs-on: ubuntu-latest
     steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1.7.0
+        with:
+          role-to-assume: arn:aws:iam::201635854701:oidc-provider/token.actions.githubusercontent.com # Change to reflect your IAM role’s ARN
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{ env.AWS_REGION }}
+      
+      # Hello from AWS: WhoAmI
+      - name: Sts GetCallerIdentity
+        run: |
+          aws sts get-caller-identity
+      
       - name: Checkout code
         uses: actions/checkout@v2
+      
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -25,12 +49,4 @@ jobs:
         run: |
           pwd
           cd tests/unit_test/
-          pytest *.py      
-          # env:
-      #   ENV_VAR_1: ${{ env.BUCKET_NAME }}
-      #   ENV_VAR_2: ${{ env.OBJECT_KEY }}
-      
-      # - name: Load environment variables
-      #   uses: decathlon/gh-actions-load-env-file@v1
-      #   with:
-      #     path: .env
+          pytest *.py
