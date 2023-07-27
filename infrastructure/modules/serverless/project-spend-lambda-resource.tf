@@ -12,25 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#Added for project_cost_breakdown.py
 locals {
-  lambda_archive_spend = {
-    project_spend_cost = {
-      source_file = "../src/budget_details/project_spend_cost.py"
-      output_path = "${path.module}/project_spend_cost.zip"
-    }
-    project_cost_breakdown = {
-      source_file = "../src/budget_details/project_cost_breakdown.py"
-      output_path = "${path.module}/project_cost_breakdown.zip"
-    }
+  archive_project_spend_cost = {
+    source_file = "../src/budget_details/project_spend_cost.py"
+    output_path = "${path.module}/project_spend_cost.zip"
+  }
+  archive_project_spend_breakdown = {
+    source_file = "../src/budget_details/project_spend_breakdown.py"
+    output_path = "${path.module}/project_spend_breakdown.zip"
   }
 }
 
 data "archive_file" "project_spend_cost" {
-  for_each    = local.lambda_archive_spend
   type        = "zip"
-  source_file = each.value.source_file
-  output_path = each.value.output_path
+  source_file = local.archive_project_spend_cost.source_file
+  output_path = local.archive_project_spend_cost.output_path
+}
+
+data "archive_file" "project_spend_breakdown" {
+  type        = "zip"
+  source_file = local.archive_project_spend_breakdown.source_file
+  output_path = local.archive_project_spend_breakdown.output_path
 }
 
 # Creating Inline policy
@@ -45,6 +47,7 @@ resource "aws_iam_role_policy" "ProjectSpendCost" {
         Action = [
           "aws-portal:ViewBilling",
           "ce:GetCostAndUsage",
+          "ce:GetCostAndUsageWithResources",
           "ec2:DescribeInstances",
           "ec2:CreateNetworkInterface",
           "ec2:DescribeNetworkInterfaces",
@@ -101,17 +104,18 @@ resource "aws_lambda_function" "ProjectSpendCost" {
   #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
-  function_name = "${var.namespace}-project-spend-cost"
-  role          = aws_iam_role.ProjectSpendCost.arn
-  runtime       = "python3.9"
-  handler       = "project_spend_cost.lambda_handler"
-  filename      = values(data.archive_file.project_spend_cost)[1].output_path
+  function_name    = "${var.namespace}-project-spend-cost"
+  role             = aws_iam_role.ProjectSpendCost.arn
+  runtime          = "python3.9"
+  handler          = "project_spend_cost.lambda_handler"
+  filename         = data.archive_file.project_spend_cost.output_path
+  source_code_hash = data.archive_file.project_spend_cost.output_base64sha256
   environment {
     variables = {
-      prometheus_ip        = "${var.prometheus_ip}:9091"
-      bucket_name          = var.s3_xc3_bucket.bucket
-      project_spend_prefix = var.s3_prefixes.project_spend_prefix
-      lambda_function_name = aws_lambda_function.project_cost_breakdown.arn
+      prometheus_ip                  = "${var.prometheus_ip}:9091"
+      bucket_name                    = var.s3_xc3_bucket.bucket
+      project_spend_prefix           = var.s3_prefixes.project_spend_prefix
+      lambda_function_breakdown_name = aws_lambda_function.project_spend_breakdown.arn
     }
   }
   memory_size = var.memory_size
@@ -124,28 +128,29 @@ resource "aws_lambda_function" "ProjectSpendCost" {
   }
 
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-project_cost_function" }))
-
 }
 
-resource "aws_lambda_function" "project_cost_breakdown" {
+resource "aws_lambda_function" "project_spend_breakdown" {
   #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
-  function_name = "${var.namespace}-project_cost_breakdown"
-  role          = aws_iam_role.ProjectSpendCost.arn
-  runtime       = "python3.9"
-  handler       = "project_cost_breakdown.lambda_handler"
-  filename      = values(data.archive_file.project_spend_cost)[0].output_path
-  
+  function_name    = "${var.namespace}-project_spend_breakdown"
+  role             = aws_iam_role.ProjectSpendCost.arn
+  runtime          = "python3.9"
+  handler          = "project_spend_breakdown.lambda_handler"
+  filename         = data.archive_file.project_spend_breakdown.output_path
+  source_code_hash = data.archive_file.project_spend_breakdown.output_base64sha256
+
   layers      = [var.prometheus_layer]
   memory_size = var.memory_size
   timeout     = var.timeout
+
   vpc_config {
     subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
-  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-project_cost_breakdown" }))
 
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-project_spend_breakdown" }))
 }
 
 
@@ -153,14 +158,14 @@ resource "aws_lambda_function" "project_cost_breakdown" {
 resource "terraform_data" "delete_project_spend_cost_zip_file" {
   triggers_replace = [aws_lambda_function.ProjectSpendCost.arn]
   provisioner "local-exec" {
-    command = "rm -r ${values(data.archive_file.project_spend_cost)[1].output_path}"
+    command = "rm -r ${data.archive_file.project_spend_cost.output_path}"
   }
 }
 
-resource "terraform_data" "delete_project_cost_breakdown_zip_file" {
-  triggers_replace = [aws_lambda_function.project_cost_breakdown.arn]
+resource "terraform_data" "delete_project_spend_breakdown_zip_file" {
+  triggers_replace = [aws_lambda_function.ProjectSpendCost.arn]
   provisioner "local-exec" {
-    command = "rm -r ${values(data.archive_file.project_spend_cost)[0].output_path}"
+    command = "rm -r ${data.archive_file.project_spend_breakdown.output_path}"
   }
 }
 
