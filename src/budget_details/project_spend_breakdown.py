@@ -5,10 +5,8 @@ import boto3
 # from datetime import date, timedelta
 
 # import botocore
-#Start-of-code: Jasmine
 import os
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
-#End-of-code: Jasmine
 
 try:
     ce_client = boto3.client("ce")
@@ -54,9 +52,7 @@ def get_cost_for_project(project_name, start_date, end_date):
     except Exception as e:
         print(f"Error getting cost of project: {e}")
         return None
-    
-#Start-Of-Code: Jasmine
-#Function to create Prometheus metrics
+
 def create_prometheus_metrics(project_name, response):
     if response:
         cost_gauge = Gauge("project_cost", "Cost of the project resources", ["project_name", "resource_id", "service"])
@@ -78,7 +74,6 @@ def push_metrics_to_prometheus():
         print("Metrics pushed to Prometheus")
     except Exception as e:
         print(f"Failed to push metrics to Prometheus: {e}")
-#End-Of-Code: Jasmine
 
 def lambda_handler(event, context):
     print(event)
@@ -91,8 +86,6 @@ def lambda_handler(event, context):
     print("Result from get_cost_and_usage_with_resource")
     print(response)
 
-    #Start-Of-Code: Jasmine
-    #Function call
     create_prometheus_metrics(project_name, response)
     push_metrics_to_prometheus()
     #End-Of-Code: Jasmine
