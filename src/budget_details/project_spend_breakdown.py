@@ -29,8 +29,7 @@ def get_cost_for_project(project_name, start_date, end_date):
     try:
         response = ce_client.get_cost_and_usage_with_resources(
             TimePeriod={"Start": start_date, "End": end_date},
-            Granularity="MONTHLY",
-            # Granularity="DAILY",
+            Granularity="DAILY",  # 'DAILY'|'MONTHLY'|'HOURLY'
             Metrics=["UnblendedCost"],
             Filter={
                 "Tags": {
@@ -41,17 +40,36 @@ def get_cost_for_project(project_name, start_date, end_date):
                 },
             },
             GroupBy=[
-                {"Type": "DIMENSION", "Key": "RESOURCE_ID"},
-                {"Type": "DIMENSION", "Key": "SERVICE"},
+                {"Type": "DIMENSION", "Key": "SERVICE"},  # Group by SERVICE 
+                {"Type": "DIMENSION", "Key": "RESOURCE_ID"},  # Group by RESOURCE_ID 
             ],
         )
 
-        print("Result from get_cost_and_usage_with_resource")
-        print(response)
-        return response
+        # Process the response to extract service and resource costs
+        cost_data = {}
+        for group in response["ResultsByTime"]:
+            for item in group["Groups"]:
+                service = item["Keys"][0]  # first get service
+                resource_id = item["Keys"][1]  # then get ResourceID from Keys list
+                cost = Decimal(item["Metrics"]["UnblendedCost"]["Amount"])  # Decimal cost values
+                key = f"{service}::{resource_id}"  # combine service with resource_id
+                cost_data[key] = str(cost)
+            
+        return {
+            "statusCode": 202,
+            "body": cost_data
+        }
+
     except Exception as e:
         print(f"Error getting cost of project: {e}")
-        return None
+        return {
+            "statusCode": 500,
+            "body": "Error getting cost of project"
+        }
+
+def lambda_handler(event, context):
+    
+    
 
 def create_prometheus_metrics(project_name, response):
     if response:
@@ -85,9 +103,7 @@ def lambda_handler(event, context):
     response = get_cost_for_project(project_name, start_date, end_date)
     print("Result from get_cost_and_usage_with_resource")
     print(response)
-
     create_prometheus_metrics(project_name, response)
     push_metrics_to_prometheus()
-    #End-Of-Code: Jasmine
 
-    return "Hello from project spend breakdown"
+    return response

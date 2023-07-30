@@ -47,6 +47,7 @@ resource "aws_iam_role_policy" "ProjectSpendCost" {
         Action = [
           "aws-portal:ViewBilling",
           "ce:GetCostAndUsage",
+          "ce:GetCostAndUsageWithResources",
           "ec2:DescribeInstances",
           "ec2:CreateNetworkInterface",
           "ec2:DescribeNetworkInterfaces",

@@ -1,5 +1,4 @@
 # Copyright (c) 2023, Xgrid Inc, https://xgrid.co
-
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -7,6 +6,7 @@
 #        http://www.apache.org/licenses/LICENSE-2.0
 
 # Unless required by applicable law or agreed to in writing, software
+
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -36,9 +36,13 @@ try:
     ce_client = boto3.client("ce")
 except Exception as e:
     logging.error("Error creating boto3 client for ce: " + str(e))
+try:
+    lambda_client = boto3.client("lambda")
+except Exception as e:
+    logging.error("Error creating boto3 client for lambda: " + str(e))
 
 
-cost_by_days = 30
+cost_by_days = 10
 end_date = str(datetime.datetime.now().date())
 start_date = str(datetime.datetime.now().date() - timedelta(days=cost_by_days))
 
@@ -68,6 +72,44 @@ def get_cost_per_project(ce_client, start_date, end_date):
     except Exception as e:
         print(f"Error getting cost of project: {e}")
         return None
+
+def invoke_project_breakdown(project_name):
+    
+    payload = {
+    "project_name": project_name,
+    "start_date": start_date,
+    "end_date": end_date,
+    }
+    print("project: ",project_name)
+    payload_data = json.dumps(payload).encode('utf-8')
+    try:
+        response = lambda_client.invoke(
+            FunctionName=project_breakdown_lambda,
+            InvocationType="RequestResponse",
+            Payload=payload_data,
+        )
+        
+        payload_bytes = response['Payload'].read()
+        response_message = payload_bytes.decode('utf-8')
+        print("Child Lambda Response:",response_message)
+
+        # Extract the status code from the response
+        status_code = response["StatusCode"]
+        if status_code != 200:
+            # Handle unexpected status code
+            logging.error(
+                f"Unexpected status code {status_code} returned from "
+                f"project_spend_breakdown_lambda"
+            )
+
+        #print(f"Invoked project breakdown for {project_name}")
+        return response
+    except Exception as e:
+        logging.error("Error in invoking lambda function: " + str(e))
+        return {
+            "statusCode": 500,
+            "body": "Error invoking project_spend_breakdown_lambda",
+        }
 
 
 def invoke_project_breakdown(project_name):
@@ -109,6 +151,7 @@ def lambda_handler(event, context):
     Returns:
         str: A message indicating the success or failure of the function execution.
     """
+    
     try:
         registry = CollectorRegistry()
         g = Gauge(
@@ -119,18 +162,25 @@ def lambda_handler(event, context):
         )
 
         response = get_cost_per_project(ce_client, start_date, end_date)
-        project_dict = {}
-        for group in response["ResultsByTime"][0]["Groups"]:
-            tag_key = group["Keys"][0]
-            cost = group["Metrics"]["UnblendedCost"]["Amount"]
 
-            print(f"{tag_key}: {cost}")
-            tag_value = tag_key.split("$")[1]
-            if tag_value == "":
-                tag_value = "Others"
-            print(tag_value)
-            g.labels(tag_value, cost).set(cost)
-            project_dict[tag_value] = cost
+        project_dict = {}
+        for time_period in response["ResultsByTime"]:
+            if "Groups" in time_period:
+                for group in time_period["Groups"]:
+                    tag_key = group["Keys"][0]
+                    cost = group["Metrics"]["UnblendedCost"]["Amount"]
+                    print(f"{tag_key}: {cost}")
+                    tag_value = tag_key.split("$")[1]
+                    if tag_value == "":
+                        tag_value = "Others"
+                    
+                    g.labels(tag_value, cost).set(cost)
+                    project_dict[tag_value] = cost
+
+        
+        for project_name in project_dict.keys():
+            invoke_project_breakdown(project_name)
+
 
         print("Projects: ")
         for project_name in project_dict.keys():
@@ -151,6 +201,7 @@ def lambda_handler(event, context):
             os.environ["prometheus_ip"], job="Project-Spend-Cost", registry=registry
         )
         return {"statusCode": 200, "body": json_data}
+        
     except botocore.exceptions.ClientError as e:
         logging.error(f"Failed to upload file to S3: {e}")
         return {"statusCode": 500, "body": "Failed to upload file to S3."}
