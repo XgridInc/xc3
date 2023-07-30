@@ -1,21 +1,17 @@
-#
 # import json
 import logging
-
-# import os
+import boto3
 # import time
 # from datetime import date, timedelta
-import boto3
 
 # import botocore
-# from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
-
+import os
+from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
 try:
     ce_client = boto3.client("ce")
 except Exception as e:
     logging.error("Error creating boto3 client for ce: " + str(e))
-
 
 def get_cost_for_project(project_name, start_date, end_date):
     """
@@ -57,6 +53,27 @@ def get_cost_for_project(project_name, start_date, end_date):
         print(f"Error getting cost of project: {e}")
         return None
 
+def create_prometheus_metrics(project_name, response):
+    if response:
+        cost_gauge = Gauge("project_cost", "Cost of the project resources", ["project_name", "resource_id", "service"])
+
+        for metric in response["ResultsByTime"]:
+            for group in metric["Groups"]:
+                resource_id, service = group["Keys"]
+                cost = float(group["Metrics"]["UnblendedCost"]["Amount"])
+                #setting the value for Prometheus gauge metrics named cost_gauge
+                cost_gauge.labels(project_name=project_name, resource_id=resource_id, service=service).set(cost)
+
+        print("Prometheus metrics created successfully")
+
+# Function for pushing metrics to Prometheus
+def push_metrics_to_prometheus():
+    try:
+        push_gateway = os.environ["prometheus_ip"]
+        push_to_gateway(push_gateway, job="Project-Spend-Breakdown", registry=CollectorRegistry())
+        print("Metrics pushed to Prometheus")
+    except Exception as e:
+        print(f"Failed to push metrics to Prometheus: {e}")
 
 def lambda_handler(event, context):
     print(event)
@@ -68,5 +85,9 @@ def lambda_handler(event, context):
     response = get_cost_for_project(project_name, start_date, end_date)
     print("Result from get_cost_and_usage_with_resource")
     print(response)
+
+    create_prometheus_metrics(project_name, response)
+    push_metrics_to_prometheus()
+    #End-Of-Code: Jasmine
 
     return "Hello from project spend breakdown"
