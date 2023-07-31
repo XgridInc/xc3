@@ -27,7 +27,7 @@ def get_cost_for_project(project_name, start_date, end_date):
     try:
         response = ce_client.get_cost_and_usage_with_resources(
             TimePeriod={"Start": start_date, "End": end_date},
-            Granularity="DAILY",  # 'DAILY'|'MONTHLY'|'HOURLY'
+            Granularity="MONTHLY",  # 'DAILY'|'MONTHLY'|'HOURLY'
             Metrics=["UnblendedCost"],
             Filter={
                 "Tags": {
