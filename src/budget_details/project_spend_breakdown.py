@@ -1,11 +1,7 @@
-# import json
 import logging
 import boto3
+import json
 
-# import time
-# from datetime import date, timedelta
-
-# import botocore
 import os
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
@@ -48,54 +44,25 @@ def get_cost_for_project(project_name, start_date, end_date):
         )
 
         # Process the response to extract service and resource costs
-        cost_data = {}
+        cost_data = []
         for group in response["ResultsByTime"]:
             for item in group["Groups"]:
                 service = item["Keys"][0]  # first get service
                 resource_id = item["Keys"][1]  # then get ResourceID from Keys list
-                cost = float(
-                    item["Metrics"]["UnblendedCost"]["Amount"]
-                )  # Decimal cost values
-                key = f"{service}::{resource_id}"  # combine service with resource_id
-                cost_data[key] = str(cost)
+                cost = float(item["Metrics"]["UnblendedCost"]["Amount"])
 
-        return {"statusCode": 202, "body": cost_data}
+                resourcedata = {
+                    "service": service,
+                    "resource-id": resource_id,
+                    "cost": cost,
+                }
+                cost_data.append(resourcedata)
+
+        return cost_data
 
     except Exception as e:
         print(f"Error getting cost of project: {e}")
         return {"statusCode": 500, "body": "Error getting cost of project"}
-
-
-def create_prometheus_metrics(project_name, response):
-    if response:
-        cost_gauge = Gauge(
-            "project_cost",
-            "Cost of the project resources",
-            ["project_name", "resource_id", "service"],
-        )
-
-        for metric in response["ResultsByTime"]:
-            for group in metric["Groups"]:
-                resource_id, service = group["Keys"]
-                cost = float(group["Metrics"]["UnblendedCost"]["Amount"])
-                # setting the value for Prometheus gauge metrics named cost_gauge
-                cost_gauge.labels(
-                    project_name=project_name, resource_id=resource_id, service=service
-                ).set(cost)
-
-        print("Prometheus metrics created successfully")
-
-
-# Function for pushing metrics to Prometheus
-def push_metrics_to_prometheus():
-    try:
-        push_gateway = os.environ["prometheus_ip"]
-        push_to_gateway(
-            push_gateway, job="Project-Spend-Breakdown", registry=CollectorRegistry()
-        )
-        print("Metrics pushed to Prometheus")
-    except Exception as e:
-        print(f"Failed to push metrics to Prometheus: {e}")
 
 
 def lambda_handler(event, context):
@@ -105,10 +72,31 @@ def lambda_handler(event, context):
     start_date = event["start_date"]
     end_date = event["end_date"]
 
-    response = get_cost_for_project(project_name, start_date, end_date)
+    cost_data = get_cost_for_project(project_name, start_date, end_date)
     print("Result from get_cost_and_usage_with_resource")
-    print(response)
-    create_prometheus_metrics(project_name, response)
-    push_metrics_to_prometheus()
+    print(cost_data)
 
-    return response
+    try:
+        registry = CollectorRegistry()
+        cost_gauge = Gauge(
+            "Project_Cost_Breakdown",
+            "Cost of the project resources",
+            labelnames=["project_name", "service", "resource_id"],
+            registry=registry,
+        )
+
+        for line in cost_data:
+            cost_gauge.labels(project_name, line["service"], line["resource-id"]).set(
+                line["cost"]
+            )
+
+            prometheus_ip = os.environ["prometheus_ip"]
+            push_to_gateway(
+                prometheus_ip, job="Project-Spend-Breakdown", registry=registry
+            )
+
+        print("Metrics pushed to Prometheus")
+        return {"statusCode": 200, "body": json.dumps(cost_data)}
+    except Exception as e:
+        print(f"Failed to push metrics to Prometheus: {e}")
+        return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
