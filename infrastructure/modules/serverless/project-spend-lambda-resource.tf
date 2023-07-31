@@ -140,7 +140,12 @@ resource "aws_lambda_function" "project_spend_breakdown" {
   handler          = "project_spend_breakdown.lambda_handler"
   filename         = data.archive_file.project_spend_breakdown.output_path
   source_code_hash = data.archive_file.project_spend_breakdown.output_base64sha256
-
+  environment {
+    variables = {
+      prometheus_ip        = "${var.prometheus_ip}:9091"
+      project_spend_prefix = var.s3_prefixes.project_spend_prefix
+    }
+  }
   layers      = [var.prometheus_layer]
   memory_size = var.memory_size
   timeout     = var.timeout
