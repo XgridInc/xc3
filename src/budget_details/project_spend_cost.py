@@ -139,9 +139,6 @@ def lambda_handler(event, context):
                     g.labels(tag_value, cost).set(cost)
                     project_dict[tag_value] = cost
 
-        for project_name in project_dict.keys():
-            invoke_project_breakdown(project_name)
-
         print("Projects: ")
         for project_name in project_dict.keys():
             print(f" - {project_name}")
