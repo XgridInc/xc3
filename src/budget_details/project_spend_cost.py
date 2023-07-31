@@ -73,56 +73,18 @@ def get_cost_per_project(ce_client, start_date, end_date):
         print(f"Error getting cost of project: {e}")
         return None
 
-def invoke_project_breakdown(project_name):
-    
-    payload = {
-    "project_name": project_name,
-    "start_date": start_date,
-    "end_date": end_date,
-    }
-    print("project: ",project_name)
-    payload_data = json.dumps(payload).encode('utf-8')
-    try:
-        response = lambda_client.invoke(
-            FunctionName=project_breakdown_lambda,
-            InvocationType="RequestResponse",
-            Payload=payload_data,
-        )
-        
-        payload_bytes = response['Payload'].read()
-        response_message = payload_bytes.decode('utf-8')
-        print("Child Lambda Response:",response_message)
-
-        # Extract the status code from the response
-        status_code = response["StatusCode"]
-        if status_code != 200:
-            # Handle unexpected status code
-            logging.error(
-                f"Unexpected status code {status_code} returned from "
-                f"project_spend_breakdown_lambda"
-            )
-
-        #print(f"Invoked project breakdown for {project_name}")
-        return response
-    except Exception as e:
-        logging.error("Error in invoking lambda function: " + str(e))
-        return {
-            "statusCode": 500,
-            "body": "Error invoking project_spend_breakdown_lambda",
-        }
-
 
 def invoke_project_breakdown(project_name):
     payload = {
-        project_name,
-        start_date,
-        end_date,
+        "project_name": project_name,
+        "start_date": start_date,
+        "end_date": end_date,
     }
     try:
         response = lambda_client.invoke(
             FunctionName=project_breakdown_lambda,
             InvocationType="Event",
-            Payload=payload,
+            Payload=json.dumps(payload),
         )
 
         # Extract the status code from the response
@@ -151,7 +113,7 @@ def lambda_handler(event, context):
     Returns:
         str: A message indicating the success or failure of the function execution.
     """
-    
+
     try:
         registry = CollectorRegistry()
         g = Gauge(
@@ -173,14 +135,12 @@ def lambda_handler(event, context):
                     tag_value = tag_key.split("$")[1]
                     if tag_value == "":
                         tag_value = "Others"
-                    
+
                     g.labels(tag_value, cost).set(cost)
                     project_dict[tag_value] = cost
 
-        
         for project_name in project_dict.keys():
             invoke_project_breakdown(project_name)
-
 
         print("Projects: ")
         for project_name in project_dict.keys():
@@ -201,7 +161,7 @@ def lambda_handler(event, context):
             os.environ["prometheus_ip"], job="Project-Spend-Cost", registry=registry
         )
         return {"statusCode": 200, "body": json_data}
-        
+
     except botocore.exceptions.ClientError as e:
         logging.error(f"Failed to upload file to S3: {e}")
         return {"statusCode": 500, "body": "Failed to upload file to S3."}
