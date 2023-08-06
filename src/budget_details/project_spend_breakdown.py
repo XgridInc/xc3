@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 import boto3
 
 import os
@@ -50,7 +51,12 @@ def get_cost_for_project(project_name, start_date, end_date):
                 resource_id = item["Keys"][1]  # then get ResourceID from Keys list
                 cost = float(item["Metrics"]["UnblendedCost"]["Amount"])
 
+                start_date_str = item["TimePeriod"]["Start"]
+                start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+                month_name = start_date.strftime("%B")
+
                 resourcedata = {
+                    "month": month_name,
                     "service": service,
                     "resource-id": resource_id,
                     "cost": cost,
@@ -80,19 +86,17 @@ def lambda_handler(event, context):
         cost_gauge = Gauge(
             "Project_Cost_Breakdown",
             "Cost of the project resources",
-            labelnames=["project_name", "service", "resource_id"],
+            labelnames=["month", "project_name", "service", "resource_id"],
             registry=registry,
         )
 
         for line in cost_data:
-            cost_gauge.labels(project_name, line["service"], line["resource-id"]).set(
-                line["cost"]
-            )
+            cost_gauge.labels(
+                line["month"], project_name, line["service"], line["resource-id"]
+            ).set(line["cost"])
 
-            prometheus_ip = os.environ["prometheus_ip"]
-            push_to_gateway(
-                prometheus_ip, job="Project-Spend-Breakdown", registry=registry
-            )
+        prometheus_ip = os.environ["prometheus_ip"]
+        push_to_gateway(prometheus_ip, job="Project-Spend-Breakdown", registry=registry)
 
         print("Metrics pushed to Prometheus")
         return {
