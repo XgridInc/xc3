@@ -1,6 +1,5 @@
 import logging
 import boto3
-import json
 
 import os
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
@@ -96,7 +95,17 @@ def lambda_handler(event, context):
             )
 
         print("Metrics pushed to Prometheus")
-        return {"statusCode": 200, "body": json.dumps(cost_data)}
+        return {
+            "statusCode": 200,
+            "body": "Invocation of project_spend_breakdown for project "
+            + {project_name}
+            + " successful",
+        }
+
     except Exception as e:
-        print(f"Failed to push metrics to Prometheus: {e}")
-        return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
+        logging.error("Error in invoking lambda function: " + str(e))
+        return {
+            "statusCode": 500,
+            "body": "Error invoking project_spend_breakdown for project "
+            + {project_name},
+        }
