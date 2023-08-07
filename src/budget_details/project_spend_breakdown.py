@@ -51,8 +51,9 @@ def get_cost_for_project(project_name, start_date, end_date):
                 resource_id = item["Keys"][1]  # then get ResourceID from Keys list
                 cost = float(item["Metrics"]["UnblendedCost"]["Amount"])
 
-                start_date_str = item["TimePeriod"]["Start"]
-                start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
+                start_date_str = group["TimePeriod"]["Start"]
+                start_date_str = start_date_str.replace("00:00:00", "12:02:02")
+                start_date = datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%SZ")
                 month_name = start_date.strftime("%B")
 
                 resourcedata = {
@@ -78,8 +79,6 @@ def lambda_handler(event, context):
     end_date = event["end_date"]
 
     cost_data = get_cost_for_project(project_name, start_date, end_date)
-    print("Result from get_cost_and_usage_with_resource")
-    print(cost_data)
 
     try:
         registry = CollectorRegistry()
@@ -91,6 +90,7 @@ def lambda_handler(event, context):
         )
 
         for line in cost_data:
+            # print(line)
             cost_gauge.labels(
                 line["month"], project_name, line["service"], line["resource-id"]
             ).set(line["cost"])
@@ -102,7 +102,7 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "body": "Invocation of project_spend_breakdown for project "
-            + {project_name}
+            + project_name
             + " successful",
         }
 
@@ -111,5 +111,5 @@ def lambda_handler(event, context):
         return {
             "statusCode": 500,
             "body": "Error invoking project_spend_breakdown for project "
-            + {project_name},
+            + project_name,
         }

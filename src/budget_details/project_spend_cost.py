@@ -25,7 +25,6 @@ import json
 project_breakdown_lambda = os.environ["lambda_function_breakdown_name"]
 try:
     ec2_client = boto3.client("ec2")
-    lambda_client = boto3.client("lambda")
 except Exception as e:
     logging.error("Error creating boto3 client for ec2: " + str(e))
 try:
@@ -96,7 +95,7 @@ def invoke_project_breakdown(project_name):
                 f"project_spend_breakdown_lambda"
             )
 
-        print(f"Invoked project breakdown for {project_name}")
+        print(f"Invoked project breakdown for {payload}")
         return response
     except Exception as e:
         logging.error("Error in invoking lambda function: " + str(e))
