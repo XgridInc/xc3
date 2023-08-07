@@ -40,10 +40,14 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client for lambda: " + str(e))
 
-
-cost_by_days = 10
+cost_by_days = 30
 end_date = str(datetime.datetime.now().date())
 start_date = str(datetime.datetime.now().date() - timedelta(days=cost_by_days))
+
+breakdown_days = 14
+breakdown_start_date = str(
+    datetime.datetime.now().date() - timedelta(days=breakdown_days)
+)
 
 
 def get_cost_per_project(ce_client, start_date, end_date):
@@ -76,15 +80,19 @@ def get_cost_per_project(ce_client, start_date, end_date):
 def invoke_project_breakdown(project_name):
     payload = {
         "project_name": project_name,
-        "start_date": start_date,
+        "start_date": breakdown_start_date,
         "end_date": end_date,
     }
+    print(f"Invoke project breakdown for {str(payload)}")
     try:
         response = lambda_client.invoke(
             FunctionName=project_breakdown_lambda,
             InvocationType="Event",
             Payload=json.dumps(payload),
         )
+
+        # payload = json.loads(response['Payload'].read())
+        # print(payload)
 
         # Extract the status code from the response
         status_code = response["StatusCode"]

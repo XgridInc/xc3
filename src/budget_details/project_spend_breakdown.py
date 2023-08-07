@@ -95,8 +95,9 @@ def lambda_handler(event, context):
                 line["month"], project_name, line["service"], line["resource-id"]
             ).set(line["cost"])
 
+        jobname = "Project-Spend-Breakdown-" + project_name
         prometheus_ip = os.environ["prometheus_ip"]
-        push_to_gateway(prometheus_ip, job="Project-Spend-Breakdown", registry=registry)
+        push_to_gateway(prometheus_ip, job=jobname, registry=registry)
 
         print("Metrics pushed to Prometheus")
         return {
