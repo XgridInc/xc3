@@ -63,6 +63,10 @@ def get_cost_for_project(project_name, start_date, end_date):
                     "cost": cost,
                 }
                 cost_data.append(resourcedata)
+        # Filter out blank projects
+        cost_data_filtered = [
+            data for data in cost_data if data["project_name"] != ""
+        ]
 
         return cost_data
 
