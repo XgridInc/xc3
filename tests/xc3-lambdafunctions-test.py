@@ -15,10 +15,13 @@
 
 import boto3
 import json
+import datetime
+from datetime import timedelta
 from config import (
     iamrolestografananame,
     IamRolesServicename,
     functionprojectspendcost,
+    functionprojectspendbreakdown,
     functiontotalaccountcost,
     functioninstancechange,
     functionresourcelist,
@@ -37,6 +40,7 @@ function_names = [
     iamrolestografananame,
     IamRolesServicename,
     functionprojectspendcost,
+    functionprojectspendbreakdown,
     functiontotalaccountcost,
     functioninstancechange,
     functionresourcelist,
@@ -174,6 +178,33 @@ def test_project_spend_lambda():
 
     function_name = functionprojectspendcost_arn
     input_payload = {"key": "value"}
+
+    try:
+        response = lambda_client.invoke(
+            FunctionName=function_name, Payload=json.dumps(input_payload)
+        )
+
+        # Extract the response payload from the response object
+        response_payload = json.loads(response["Payload"].read().decode("utf-8"))
+
+        # Perform assertion on the response payload
+        assert response_payload["statusCode"] == 200
+
+    except Exception as e:
+        assert (
+            False
+        ), f"Lambda function {function_name} returned an unexpected response: {e}"
+
+
+def test_project_spend_breakdown():
+    function_name = functionprojectspendcost_arn
+    start_date = str(datetime.datetime.now().date() - timedelta(days=7))
+    end_date = str(datetime.datetime.now().date())
+    input_payload = {
+        "project_name": "test",
+        "start_date": start_date,
+        "end_date": end_date,
+    }
 
     try:
         response = lambda_client.invoke(

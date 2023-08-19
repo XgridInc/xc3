@@ -417,6 +417,20 @@ for data_item in state_file_json["resources"]:
         functionprojectspendcost = data_item["instances"][0]["attributes"][
             "function_name"
         ]
+
+# Getting project spend breakdown
+
+functionprojectspendbreakdown = None
+
+for data_item in state_file_json["resources"]:
+    if (
+        data_item["type"] == "aws_lambda_function"
+        and data_item["name"] == "project_spend_breakdown"
+    ):
+        functionprojectspendbreakdown = data_item["instances"][0]["attributes"][
+            "function_name"
+        ]
+
 # Getting function total account cost
 
 functiontotalaccountcost = None
