@@ -158,6 +158,16 @@ resource "aws_lambda_function" "ProjectSpendCost" {
 }
 
 
+resource "terraform_data" "delete_project_lambda_zip_files" {
+  for_each         = local.project_lambda_archive
+  triggers_replace = ["arn:aws:lambda:${var.region}:${var.account_id}:function:${each.key}"]
+  depends_on       = [aws_lambda_function.ProjectCostBreakdown, aws_lambda_function.ProjectSpendCost]
+
+  provisioner "local-exec" {
+    command = "rm -rf ${each.value.output_path}"
+  }
+}
+
 
 # Define the EventBridge rule
 resource "aws_cloudwatch_event_rule" "project_spend_cost" {
