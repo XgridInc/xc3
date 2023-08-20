@@ -100,6 +100,33 @@ resource "aws_iam_role" "ProjectSpendCost" {
   tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-Project-Spend-Cost-Role" }))
 }
 
+resource "aws_lambda_function" "ProjectCostBreakdown" {
+  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
+  function_name = "${var.namespace}-project-cost-breakdown"
+  role          = aws_iam_role.ProjectSpendCost.arn
+  runtime       = "python3.9"
+  handler       = "project_cost_breakdown.lambda_handler"
+  filename      = values(data.archive_file.project_cost_lambda_src)[0].output_path
+  environment {
+    variables = {
+      prometheus_ip                 = "${var.prometheus_ip}:9091"
+      bucket_name                   = var.s3_xc3_bucket.bucket
+      project_cost_breakdown_prefix = var.s3_prefixes.project_cost_breakdown_prefix
+    }
+  }
+  layers      = [var.prometheus_layer]
+  memory_size = var.memory_size
+  timeout     = var.timeout
+  vpc_config {
+    subnet_ids         = [var.subnet_id[0]]
+    security_group_ids = [var.security_group_id]
+  }
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-project_cost_breakdown" }))
+
+}
+
 resource "aws_lambda_function" "ProjectSpendCost" {
   #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
   #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
@@ -114,6 +141,7 @@ resource "aws_lambda_function" "ProjectSpendCost" {
       prometheus_ip        = "${var.prometheus_ip}:9091"
       bucket_name          = var.s3_xc3_bucket.bucket
       project_spend_prefix = var.s3_prefixes.project_spend_prefix
+      lambda_function_name = aws_lambda_function.ProjectCostBreakdown.arn
     }
   }
   memory_size = var.memory_size
