@@ -12,11 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data "archive_file" "project_spend_cost" {
-  type        = "zip"
-  source_file = "../src/budget_details/project_spend_cost.py"
-  output_path = "${path.module}/project_spend_cost.zip"
+#Creating archive files
+locals {
+  project_lambda_archive = {
+    project_spend_cost = {
+      source_file = "../src/budget_details/project_spend_cost.py"
+      output_path = "${path.module}/project_spend_cost.zip"
+    }
+    project_cost_breakdown = {
+      source_file = "../src/budget_details/project_cost_breakdown.py"
+      output_path = "${path.module}/project_cost_breakdown.zip"
+    }
+  }
 }
+
+data "archive_file" "project_cost_lambda_src" {
+  for_each    = local.project_lambda_archive
+  type        = "zip"
+  source_file = each.value.source_file
+  output_path = each.value.output_path
+}
+
+
 
 
 # Creating Inline policy
@@ -81,7 +98,7 @@ resource "aws_lambda_function" "ProjectSpendCost" {
   role          = aws_iam_role.ProjectSpendCost.arn
   runtime       = "python3.9"
   handler       = "project_spend_cost.lambda_handler"
-  filename      = data.archive_file.project_spend_cost.output_path
+  filename      = values(data.archive_file.project_cost_lambda_src)[1].output_path
   environment {
     variables = {
       prometheus_ip        = "${var.prometheus_ip}:9091"
@@ -103,12 +120,6 @@ resource "aws_lambda_function" "ProjectSpendCost" {
 }
 
 
-resource "terraform_data" "delete_project_spend_cost_zip_file" {
-  triggers_replace = [aws_lambda_function.ProjectSpendCost.arn]
-  provisioner "local-exec" {
-    command = "rm -r ${data.archive_file.project_spend_cost.output_path}"
-  }
-}
 
 # Define the EventBridge rule
 resource "aws_cloudwatch_event_rule" "project_spend_cost" {
