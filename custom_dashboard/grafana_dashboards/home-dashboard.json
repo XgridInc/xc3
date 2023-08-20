@@ -260,6 +260,13 @@
               "mode": "off"
             }
           },
+          "links": [
+            {
+              "targetBlank": false,
+              "title": "Project to Service",
+              "url": "/d/associated-service-12/associated-services?orgId=1&var-ProjectName=${__data.fields.project_spend_project}"
+            }
+          ],
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
