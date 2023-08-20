@@ -112,9 +112,10 @@ variable "s3_prefixes" {
   description = "S3 Prefixes for Cost Reports"
   type        = map(string)
   default = {
-    project_spend_prefix     = "cost-metrics/project_cost.json"
-    monthly_cost_prefix      = "cost-metrics/total_account_cost.json"
-    expensive_service_prefix = "cost-metrics/expensive-services"
+    project_spend_prefix          = "cost-metrics/project_cost.json"
+    monthly_cost_prefix           = "cost-metrics/total_account_cost.json"
+    expensive_service_prefix      = "cost-metrics/expensive-services"
+    project_cost_breakdown_prefix = "cost-metrics/project-cost-breakdown"
   }
 }
 
