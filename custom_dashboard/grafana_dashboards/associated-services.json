@@ -89,7 +89,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "project_spend_services",
+        "xField": "project_spend_service",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -102,7 +102,7 @@
           "expr": "topk(5, sort_desc(${ProjectName}_Services_Cost))",
           "format": "table",
           "instant": false,
-          "legendFormat": "{{project_spend_services}}",
+          "legendFormat": "{{project_spend_service}}",
           "range": true,
           "refId": "A"
         }

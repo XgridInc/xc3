@@ -443,7 +443,7 @@
         "datasource": {
           "type": "prometheus"
         },
-        "definition": "label_values(account_id)",
+        "definition": "query_result(Total_Account_Cost)",
         "hide": 0,
         "includeAll": false,
         "label": "",
@@ -451,11 +451,11 @@
         "name": "Account",
         "options": [],
         "query": {
-          "query": "label_values(account_id)",
-          "refId": "StandardVariableQuery"
+          "query": "query_result(Total_Account_Cost)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "regex": "",
+        "regex": "/account_id=\"(?<text>[^\"]+)/g",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
@@ -463,24 +463,25 @@
       {
         "current": {
           "selected": true,
-          "text": "eu-west-1",
-          "value": "eu-west-1"
+          "text": "ap-southeast-2",
+          "value": "ap-southeast-2"
         },
         "datasource": {
-          "type": "prometheus"
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
         },
-        "definition": "label_values(region)",
+        "definition": "query_result(Expensive_Services_Detail)",
         "hide": 0,
         "includeAll": true,
         "multi": false,
         "name": "region",
         "options": [],
         "query": {
-          "query": "label_values(region)",
-          "refId": "StandardVariableQuery"
+          "query": "query_result(Expensive_Services_Detail)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "regex": "",
+        "regex": "/region=\"(?<text>[^\"]+)/g",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
@@ -498,18 +499,18 @@
         "datasource": {
           "type": "prometheus"
         },
-        "definition": "label_values(project_spend_project)",
+        "definition": "query_result(Project_Spend_Cost)",
         "hide": 0,
         "includeAll": true,
         "multi": true,
         "name": "Project",
         "options": [],
         "query": {
-          "query": "label_values(project_spend_project)",
-          "refId": "StandardVariableQuery"
+          "query": "query_result(Project_Spend_Cost)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "regex": "",
+        "regex": "/project_spend_project=\"(?<text>[^\"]+)/g",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
@@ -518,26 +519,29 @@
         "current": {
           "selected": true,
           "text": [
-            "March",
-            "April"
+            "April",
+            "July"
           ],
           "value": [
-            "March",
-            "April"
+            "April",
+            "July"
           ]
         },
-        "definition": "label_values(month)",
+        "datasource": {
+          "type": "prometheus"
+        },
+        "definition": "query_result(Total_Account_Cost)",
         "hide": 0,
         "includeAll": false,
         "multi": true,
         "name": "Month",
         "options": [],
         "query": {
-          "query": "label_values(month)",
-          "refId": "StandardVariableQuery"
+          "query": "query_result(Total_Account_Cost)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
-        "regex": "",
+        "regex": "/month=\"(?<text>[^\"]+)/g",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
