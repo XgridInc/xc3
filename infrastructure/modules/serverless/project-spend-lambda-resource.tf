@@ -58,6 +58,16 @@ resource "aws_iam_role_policy" "ProjectSpendCost" {
         Resource = "*"
       },
       {
+        "Sid" : "LambdaInvokePermission",
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction"
+        ],
+        "Resource" : [
+          "arn:aws:lambda:*:*:function:*"
+        ]
+      },
+      {
         "Effect" : "Allow",
         "Action" : [
           "s3:PutObject"
