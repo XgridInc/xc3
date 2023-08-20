@@ -19,7 +19,14 @@ import time
 from datetime import date, timedelta
 
 import boto3
+import botocore
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
+
+
+try:
+    s3 = boto3.client("s3")
+except Exception as e:
+    logging.error("Error creating boto3 client for s3: " + str(e))
 
 
 def get_cost_and_usage_data(client, start, end, project_name=""):
@@ -148,6 +155,22 @@ def lambda_handler(event, context):
                 registry=registry,
             )
 
+        # convert data to JSON
+        json_data = json.dumps(data_list)
+        # upload JSON file to S3 bucket
+        bucket_name = os.environ["bucket_name"]
+        key_name = f'{os.environ["project_cost_breakdown_prefix"]}/{project_name}.json'
+        try:
+            s3.put_object(Bucket=bucket_name, Key=key_name, Body=json_data)
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "NoSuchBucket":
+                raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
+            elif e.response["Error"]["Code"] == "AccessDenied":
+                raise ValueError(
+                    f"Access denied to S3 bucket: {os.environ['bucket_name']}"
+                )
+            else:
+                raise ValueError(f"Failed to upload data to S3 bucket: {str(e)}")
     except Exception as e:
         logging.error("Error initializing Prometheus Registry and Gauge: " + str(e))
         return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
