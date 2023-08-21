@@ -145,7 +145,7 @@ case 2: user not able to change/update/modify default dashboards in Grafana UI
 
 <br clear="all">
 
-## Contributing
+## Contributor Guide
 
 XC3 is a community-driven project; we welcome your contribution! For code contributions, please read our [contribution guide](./CONTRIBUTING.md).
 
