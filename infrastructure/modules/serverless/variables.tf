@@ -127,3 +127,40 @@ variable "create_kms" {
   description = "Fetch the KMS if exist"
   type        = bool
 }
+
+# Define a variable for the budget amount
+variable "budget_amount" {
+  type    = number
+  default = 20 # Enter the budget amount here
+}
+
+# Define input variables for the EventBridge resources
+# variable "lambda_arn" {
+#   description = "ARN of the Lambda function to be triggered by the EventBridge rule"
+#   type        = string
+# }
+
+variable "ses_email_address" {
+  type        = string
+  description = "The email address for SES identity"
+}
+
+variable "sns_topic_arn2" {
+  type        = string
+  description = "SNS Topic for invoking lambda"
+}
+
+variable "bucket_name" {
+  type        = string
+  description = "S3 Bucket Name"
+}
+
+variable "services_budget_amount" {
+  type    = number
+  default = 20 # Enter the budget amount here
+}
+
+variable "iam_budget_amount" {
+  type    = number
+  default = 20 # Enter the budget amount here
+}

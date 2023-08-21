@@ -79,5 +79,12 @@ module "serverless" {
   cron_jobs_schedule         = var.cron_jobs_schedule
   slack_channel_url          = var.slack_channel_url
   create_kms                 = var.create_kms
+  budget_amount              = var.budget_amount
+  # lambda_arn                 = module.serverless.lambda_function_arn
+  ses_email_address      = var.ses_email_address
+  sns_topic_arn2         = module.serverless.sns_topic_arn2
+  bucket_name            = var.bucket_name
+  services_budget_amount = var.services_budget_amount
+  iam_budget_amount      = var.iam_budget_amount
 
 }

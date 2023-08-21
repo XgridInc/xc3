@@ -21,11 +21,10 @@ project="example"
 region="ap-southeast-2"
 allow_traffic="0.0.0.0/0"
 domain="" #  [Optional] - If you want to use your own domain then set this variable.
-account_id="123456789012"
+account_id="012345678912"
 hosted_zone_id="Z053166920YP1STI0EK5X"
 owner_email="example@example.co"
 creator_email="example@example.co"
 ses_email_address="example@example.co"
-bucket_name="terraform-state-example"
-
-
+bucket_name="example"
+slack_url="YOUR-SLACK-WEBHOOK-URL"

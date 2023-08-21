@@ -300,12 +300,12 @@ sed -i "/env/ s/$infra_environ/$environ/" infrastructure/terraform.auto.tfvars
 # Bucket
 backend_bucket=$(grep 'bucket' infrastructure/backend.tf | awk -F'"' '{print $2}')
 
-sed -i "/bucket/ s/$backend_bucket/$bucket_name/" infrastructure/backend.tf 
+sed -i "/bucket/ s/$backend_bucket/$bucket_name/" infrastructure/backend.tf
 
-Region
+# Region
 backend_region=$(grep 'region' infrastructure/backend.tf | awk -F'"' '{print $2}')
 
-sed -i "/region/ s/$backend_region/$region/" infrastructure/backend.tf 
+sed -i "/region/ s/$backend_region/$region/" infrastructure/backend.tf
 
 #************************************** User Inputs  ******************************************#
 

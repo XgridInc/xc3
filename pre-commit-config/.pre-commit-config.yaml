@@ -61,3 +61,8 @@ repos:
         name: Detect secrets
         entry: detect-secrets-hook
         exclude: package.lock.json
+  
+  - repo: https://github.com/terraform-linters/tflint
+    rev: v0.47.0  # Use the desired revision or version
+    hooks:
+      - id: tflint
