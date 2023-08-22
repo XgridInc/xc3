@@ -119,9 +119,7 @@ This manual covers the setup, configuration, documentation, and utilization of t
 ## <a name="_toc143023217"></a><a name="_toc143538388"></a>1.4 <a name="_toc143028440"></a>Intended Audience
 This User Manual is designed for technical team members, our instructor, and developers who are engaged with the XC3 project. The manual assumes a foundational understanding of cloud technologies, AWS services, Git Version Control, and infrastructure deployment using Terraform. It serves as a valuable resource for those seeking insights into the design, implementation, and integration of budget-based alerts for cost monitoring and reporting in XC3. 
 ## <a name="_toc143538389"></a>1.5 Architecture of Implementation
-![A screenshot of a computer
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.002.png)
+![A screenshot of a computer Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.002.png)
 
 *Figure 1: Our Architecture*
 
@@ -129,9 +127,7 @@ As seen above, our architecture involves our 3 primary lambdas that work indepen
 
 This is its place in the overall architecture of XC3 as seen below:
 
-![A screenshot of a computer
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.003.png)
+![A screenshot of a computer Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.003.png)
 
 *Figure 2: Our Architecture within XC3*
 
@@ -169,15 +165,11 @@ This section provides a step-by-step walkthrough of the setup and initiation pro
    1. Under ‘Your Apps’, select ‘Create New App’
    1. Click ‘From Scratch’. Enter App Name and pick the workspace you want your slack notifications in. 
 
-![A screenshot of a computer
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.004.png)
+![A screenshot of a computer Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.004.png)
 
 1. Finally, click ‘Create’.
 1. After its created, click on the app. One the left side, under **Features** you will see ‘Incoming Webhooks’. Click it.
-1. Activate Incoming Webhooks using the slider on the heading. Scroll down to find your unique webhook URL.![A screenshot of a channel
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.005.png)
+1. Activate Incoming Webhooks using the slider on the heading. Scroll down to find your unique webhook URL.![A screenshot of a channel Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.005.png)
 1. Go to the directory xc3/ and configure the input.sh file
 
 env="dev"
@@ -301,21 +293,15 @@ To get Total Account Cot Notifications, the variables “budget”, “email add
 
 The above code is my implementation. Making a new Lambda in AWS with this code will work if provide with the correct policies. The correct policies are:
 
-![A screenshot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.006.png)
+![A screenshot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.006.png)
 
 *Figure 3 In-Line Policy 1*
 
-![A screenshot of a computer code
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.007.png)
+![A screenshot of a computer code Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.007.png)
 
 *Figure 4 In-Line Policy 2*
 
-![A screenshot of a computer
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.008.png)
+![A screenshot of a computer Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.008.png)
 
 *Figure 5 In-Line Policy 3*
 
@@ -325,9 +311,7 @@ For the email service to work, the sender email will receive a verification emai
 
 Below, there is a code snippet that shows a part of how Total Account Cost notification works:
 
-![A computer screen shot of a program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.009.png)
+![A computer screen shot of a program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.009.png)
 
 *Figure 6 Code snippet for Total Account Cost*
 
@@ -340,13 +324,11 @@ Just like the Total Cost Notification, this Resource Cost Notifications Lambda c
 
 To use test this Lambda, the variables “budget”, “email address”, and “slack webhook url” need to be provided. “email address” variable needs to be provided along with a variable of folder location. That location must also have the correct file. An example of the format of json file is provided below:
 
-![](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.010.png)
+![Screenshot](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.010.png)
 
 Again, within XC3, no separate installation is necessary. In order to use this manually simply paste the code in Lambda section of Amazon Web Services. Before running, add the policies listed above as well as the following one:
 
-![A screenshot of a computer code
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.011.png)
+![A screenshot of a computer code Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.011.png)
 
 *Figure 7 In-Line Policy 4*
 
@@ -357,15 +339,11 @@ Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8
 
 Below are some code snippet showing how it works:
 
-![A computer screen with many lines of text
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.012.png)
+![A computer screen with many lines of text Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.012.png)
 
 *Figure 8 Code Snippet for Loading and Parsing through Data for Resource Notification*
 
-![A screenshot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.013.png)
+![A screenshot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.013.png)
 
 *Figure 9 Calculating Resource Cost and generating Payload message*
 
@@ -375,7 +353,7 @@ When the total modified XC3 of my team is used, no separate installation is nece
 
 To use test this Lambda, the variables “budget”, “email address”, and “slack webhook url” need to be provided. “email address” variable needs to be provided along with a variable of folder location. That location must also have the correct file. An example of the format of json file is provided below:
 
-![](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.014.png)
+![Screenshot](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.014.png)
 
 Just like for Resource Cost Notification Lambda, the IAM User Notification also uses the data generated by XC3 default lambdas to get the metrics. It then checks the cost, pushes it to Cloudwatch, and sends Email and Slack messages if the budget is crossed.
 
@@ -383,7 +361,7 @@ Adding the 4 policies listed above from Figure 1, 2, 3, and 5 will make this lam
 
 A code snippet of how this works is provided below:
 
-![](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.015.png)
+![Screenshot](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.015.png)
 
 *Figure 10: IAM Cost Notification*
 
@@ -394,9 +372,7 @@ The cronjob allows users to schedule the events that can be repeated in a specif
 
 CloudWatch Events Rule for Cron Job:
 
-![A computer screen shot of text
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.016.png)
+![A computer screen shot of text Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.016.png)
 
 *Figure 11: Event Rule for Cron Job*
 
@@ -404,9 +380,7 @@ The AWS CloudWatch Events rule, named "LambdaCronJobRule," is configured to trig
 
 CloudWatch Events Rule Target (Lambda Function):
 
-![A screen shot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.017.png)
+![A screen shot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.017.png)
 
 *Figure 12: Event Rule Target*
 
@@ -423,9 +397,7 @@ The defined CloudWatch Events rule is associated with the Lambda function throug
 
 Lambda Function Permission for CloudWatch Events:
 
-![A screen shot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.018.png)
+![A screen shot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.018.png)
 
 *Figure 13: Cloudwatch Events Rule Permission*
 
@@ -437,17 +409,13 @@ Through the Terraform setup, users can efficiently manage IAM user costs, contro
 ## <a name="_toc143538404"></a>3.5 <a name="_toc143090086"></a>Cloudwatch Integration
 For Total Account Cost and IAM User, the cost metrics has been pushed to Cloud Watch for monitoring purpose. The Total Account Cost fetches data from the cost explorer while the IAM User fetches from the S3 bucket. Users can define their S3 bucket by providing arn for the cost metrics in the Resource variable. 
 
-![A computer screen shot of a program code
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.019.png)
+![A computer screen shot of a program code Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.019.png)
 
 *Figure 14 : Cloudwatch Policy*
 
 The Cloudwatch put metric policy has also been defined for both of the lambda functions in the terraform file which users can run without any modifications. The policy allows users to put the metrics into the cloudwatch for the costs and monitoring,
 
-![A screen shot of a computer code
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.020.png)
+![A screen shot of a computer code Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.020.png)
 
 *Figure 15: Cloudwatch put metric policy*
 
@@ -468,9 +436,7 @@ Global variables play a pivotal role in maintaining consistency and modularity t
 **Approach and Implementation:** To implement global variables effectively, the existing code was carefully examined, then a structured approach was created, and then integrated. The implementation was gradual as the efficiency of the process needed to be measured.
 
 1. Defining global values
-   1. Go to ‘terraform.auto.tfvars’ file under xc3/infrastructure. Add a variable name and give it your desired value. All the variables defined in terraform.auto.tfvars are global variables. For example (budget\_amount = 25)![A screen shot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.021.png)
+   1. Go to ‘terraform.auto.tfvars’ file under xc3/infrastructure. Add a variable name and give it your desired value. All the variables defined in terraform.auto.tfvars are global variables. For example (budget\_amount = 25)![A screen shot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.021.png)
    1. Now, go to variables.tf file under xc3/infrastructure and define the variable. For example: 
 
 \# Define a variable for the budget amount
@@ -490,9 +456,7 @@ budget\_amount = var.budget\_amount
 
 var.budget\_amount takes data from terraform.auto.tfvars. Defining the values in main.tf under modules “serverless” ensures that the variable name budget\_amount can be used in any terraform file under the “serverless” folder under “modules” directory.
 
-![A screenshot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.022.png)
+![A screenshot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.022.png)
 
 1. Using the global variables in terraform
 
@@ -788,9 +752,7 @@ A18: You can modify this code to trigger other Lambda functions by adjusting the
 ## <a name="_toc143023246"></a><a name="_toc143538418"></a>6.1 Sample Screenshots
 
 ### <a name="_toc143023247"></a><a name="_toc143538419"></a>Example of Email
-![A screenshot of a computer
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.023.png)
+![A screenshot of a computer Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.023.png)
 
 *Figure 11 Example of the Email Sent via Lambda*
 ###
@@ -805,15 +767,11 @@ Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8
 
 ### <a name="_toc143023248"></a><a name="_toc143538420"></a>Example of Slack Message
 
-![A screenshot of a computer
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.024.png)
+![A screenshot of a computer Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.024.png)
 
 *Figure 12 Example 1 of Slack Message Sent via Lambda*
 
-![A screenshot of a computer
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.025.png)
+![A screenshot of a computer Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.025.png)
 
 *Figure 18 Example 2 of Slack Message sent via Lambda*
 ## <a name="_toc143023249"></a><a name="_toc143538421"></a>6.2 Code Snippets
@@ -823,7 +781,7 @@ In this section, I am going to add some code snippets and discus them accordingl
 
 The following code is the most simplified code for sending message via email. This contains a very simplified message. I chose this example as it’s the least complex message that I am sending. It gets triggered if a threshold message is generated which only happens if a budget is crossed. A code snippet is provided below:
 
-|<p>**if** threshold\_message:</p><p>`        `# Compose the email content</p><p>`        `email\_subject = "AWS Account Cost Threshold Alert"</p><p>`        `email\_body = f"The AWS account cost has crossed the {threshold\_message}."</p><p></p><p>`        `# Send the email using Amazon SES</p><p>`        `ses\_client = boto3.client('ses')</p><p>`        `ses\_client.send\_email(</p><p>`            `Source='zahinakram65@gmail.com',</p><p>`            `Destination={</p><p>`                `'ToAddresses': ['zahinakram65@gmail.com'],</p><p>`            `},</p><p>`            `Message={</p><p>`                `'Subject': {</p><p>`                    `'Data': email\_subject,</p><p>`                `},</p><p>`                `'Body': {</p><p>`                    `'Text': {</p><p>`                        `'Data': email\_body,</p><p>`                    `},</p><p>`                `}</p><p>`            `}</p><p>`        `)</p><p></p>|
+|<p>**if** threshold\_message:</p><p>`        `# Compose the email content</p><p>`        `email\_subject = "AWS Account Cost Threshold Alert"</p><p>`        `email\_body = f"The AWS account cost has crossed the {threshold\_message}."</p><p></p><p>`        `# Send the email using Amazon SES</p><p>`        `ses\_client = boto3.client('ses')</p><p>`        `ses\_client.send\_email(</p><p>`            `Source='example@gmail.com',</p><p>`            `Destination={</p><p>`                `'ToAddresses': ['example@gmail.com'],</p><p>`            `},</p><p>`            `Message={</p><p>`                `'Subject': {</p><p>`                    `'Data': email\_subject,</p><p>`                `},</p><p>`                `'Body': {</p><p>`                    `'Text': {</p><p>`                        `'Data': email\_body,</p><p>`                    `},</p><p>`                `}</p><p>`            `}</p><p>`        `)</p><p></p>|
 | - |
 ###
 ###
@@ -831,7 +789,7 @@ The following code is the most simplified code for sending message via email. Th
 
 The following is the code for a very simple slack message. It uses the webhook url generated (guideline for generating it is provided). The code is only triggered if a threshold message is generated which happens only if a budget is crossed
 
-|<p># Send the message to Slack via webhook</p><p>`        `webhook\_url = 'https://hooks.slack.com/services/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'</p><p>`        `slack\_message = {</p><p>`            `'text': f"The AWS account cost has crossed the {threshold\_message}."</p><p>`        `}</p><p>`        `req = urllib.request.Request(webhook\_url, data=json.dumps(slack\_message).encode('utf-8'), headers={'Content-Type': 'application/json'})</p><p>`        `response = urllib.request.urlopen(req)</p><p>`        `response.read()</p><p></p>|
+|<p># Send the message to Slack via webhook</p><p>`        `webhook\_url = 'YOUR SLACK WEBHOOK URL'</p><p>`        `slack\_message = {</p><p>`            `'text': f"The AWS account cost has crossed the {threshold\_message}."</p><p>`        `}</p><p>`        `req = urllib.request.Request(webhook\_url, data=json.dumps(slack\_message).encode('utf-8'), headers={'Content-Type': 'application/json'})</p><p>`        `response = urllib.request.urlopen(req)</p><p>`        `response.read()</p><p></p>|
 | - |
 
 
@@ -848,43 +806,31 @@ The following is the code for sending data to Cloudwatch. This is the most simpl
 
 
 ## <a name="_toc143538425"></a>Before/After files Integration
-![A screenshot of a computer
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.026.png)
+![A screenshot of a computer Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.026.png)
 
 *Figure 13: Received .py and .tf files for total\_account\_alert function (before)*
 
-![A screenshot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.027.png)
+![A screenshot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.027.png)
 
 *Figure 20: Put the .py files under appropriate folder in src directory and renamed them (after)*
 
-![A screenshot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.028.png)
+![A screenshot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.028.png)
 
 *Figure 21:Put the .tf files under xc3/infrastructure/modules/serverless and renamed them (after)*
 
 ## <a name="_toc143028458"></a><a name="_toc143538426"></a>Before/After terraform file
-![A screen shot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.029.png)![A screen shot of a computer program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.030.png)
+![A screen shot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.029.png)![A screen shot of a computer program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.030.png)
 
 *Figure 22: Total Account Alert .tf file (Before) vs (After)*
 
 The before file has provider “aws”, which becomes redundant because that is only needed in one .tf file. Also, the resource name for aws\_iam\_role is changed.
 
 ## <a name="_toc143028459"></a><a name="_toc143538427"></a>Before/After python file
-![](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.031.png)![](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.032.png)![](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.033.png)![A computer screen shot of a program
+![Screenshot](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.031.png)![Screenshot](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.032.png)![Screenshot](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.033.png)![A computer screen shot of a program
 
 Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.034.png)
 
-![A computer screen shot of a program
-
-Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.035.png)
+![A computer screen shot of a program Description automatically generated](pics/Aspose.Words.6de57d3a-3f54-442d-98e8-8252935ab3e1.035.png)
 
 *Figure 23: Total Account Alert python file (Before) vs (After)*
 
