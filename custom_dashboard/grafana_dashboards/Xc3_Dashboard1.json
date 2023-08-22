@@ -67,8 +67,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -184,8 +183,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus"
           },
           "editorMode": "code",
           "expr": "topk(5, sum(Project_Spend_Cost{job=\"Project-Spend-Cost\"}) by (project_spend_project))",
@@ -215,8 +213,7 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -280,8 +277,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus"
           },
           "editorMode": "code",
           "expr": " sum(Project_Spend_Cost{job=\"Project-Spend-Cost\"}) by (project_spend_project)",
@@ -321,8 +317,7 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -400,8 +395,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus"
           },
           "editorMode": "code",
           "exemplar": false,
@@ -427,8 +421,7 @@
       {
         "current": {},
         "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "type": "prometheus"
         },
         "definition": "label_values(account_id)",
         "hide": 0,
@@ -450,8 +443,7 @@
       {
         "current": {},
         "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "type": "prometheus"
         },
         "definition": "label_values(region)",
         "hide": 0,
@@ -472,8 +464,7 @@
       {
         "current": {},
         "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "type": "prometheus"
         },
         "definition": "label_values(project_spend_project)",
         "hide": 0,
@@ -494,8 +485,7 @@
       {
         "current": {},
         "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "type": "prometheus"
         },
         "definition": "label_values(month)",
         "hide": 0,

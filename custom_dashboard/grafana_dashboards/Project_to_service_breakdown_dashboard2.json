@@ -61,8 +61,7 @@
   "panels": [
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -149,8 +148,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus"
           },
           "editorMode": "code",
           "expr": "topk(5, sum by (service)(Project_Cost_Breakdown{project_name=\"$project\"}))",
@@ -181,8 +179,7 @@
     },
     {
       "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -237,8 +234,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus"
           },
           "editorMode": "code",
           "expr": "sort_desc(sum by (service)(Project_Cost_Breakdown{project_name=\"$project\"}))",
@@ -273,8 +269,7 @@
       {
         "current": {},
         "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "type": "prometheus"
         },
         "definition": "label_values(project_name)",
         "hide": 0,

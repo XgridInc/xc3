@@ -56,7 +56,6 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -137,8 +136,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "type": "prometheus"
           },
           "editorMode": "code",
           "expr": "sum by (month)(Project_Cost_Breakdown{service=\"$service\", project_name=\"$project\"})",
@@ -162,8 +160,7 @@
       {
         "current": {},
         "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "type": "prometheus"
         },
         "definition": "label_values(project_spend_project)",
         "hide": 0,
@@ -185,8 +182,7 @@
       {
         "current": {},
         "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+          "type": "prometheus"
         },
         "definition": "label_values(service)",
         "hide": 0,
