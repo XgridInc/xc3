@@ -1,14 +1,5 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_PROMETHEUS",
-      "label": "Prometheus",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "prometheus",
-      "pluginName": "Prometheus"
-    }
-  ],
+  "__inputs": [],
   "__elements": {},
   "__requires": [
     {
@@ -232,7 +223,7 @@
           "links": [
             {
               "targetBlank": true,
-              "title": "test open break",
+              "title": "Open breakdown",
               "url": "/d/dd739f1a-345b-41d5-81b5-0bcdceac8025/project-to-service-breakdown?orgId=1&from=now&to=now&var-project=${__data.fields.project_spend_project}"
             }
           ],
@@ -537,7 +528,7 @@
     "type": "timepicker"
   },
   "timezone": "browser",
-  "title": "Xc3 project  Dashboard",
+  "title": "Project  Dashboard",
   "uid": "LQ93m_o4project",
   "version": 6,
   "weekStart": ""
