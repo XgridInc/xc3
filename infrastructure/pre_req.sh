@@ -77,7 +77,12 @@ echo "Namespace: $namespace"
 if aws s3api head-bucket --bucket "${bucket_name}" --region "${aws_region}" >/dev/null 2>&1; then
     echo "S3 bucket ${bucket_name} already exists"
 else
-    if aws s3api create-bucket --bucket "${bucket_name}" --region "${aws_region}" --create-bucket-configuration LocationConstraint="${aws_region}" && \
+    # A location constraint for "us-east-1" returns an error. For "us-east-1", we omit --create-bucket-configuration
+    if [[ -n "$aws_region" ]] && [[ "$aws_region" != "us-east-1" ]]; then
+        bucket_config_arg="--create-bucket-configuration LocationConstraint=$aws_region"
+    fi
+
+    if aws s3api create-bucket --bucket "${bucket_name}" --region "${aws_region}" $bucket_config_arg && \
        aws s3api put-bucket-versioning --bucket "${bucket_name}" --versioning-configuration Status=Enabled --region "${aws_region}" && \
        aws s3api put-bucket-encryption --bucket "${bucket_name}" --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}' --region "${aws_region}"
     then
