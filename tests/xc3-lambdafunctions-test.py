@@ -33,6 +33,7 @@ from config import (
     functionmostexpensiveservice_arn,
     functionresourcelistfunction_arn,
     functionprojectspendcost_arn,
+    functionprojectspendbreakdown_arn,
 )
 
 
@@ -197,7 +198,7 @@ def test_project_spend_lambda():
 
 
 def test_project_spend_breakdown():
-    function_name = functionprojectspendcost_arn
+    function_name = functionprojectspendbreakdown_arn
     start_date = str(datetime.datetime.now().date() - timedelta(days=7))
     end_date = str(datetime.datetime.now().date())
     input_payload = {

@@ -583,6 +583,17 @@ for data_item in state_file_json["resources"]:
         functionprojectspendcost_arn = data_item["instances"][0]["attributes"]["arn"]
 
 
+# Getting function project spend breakdown arn
+
+functionprojectspendbreakdown_arn = None
+
+for data_item in state_file_json["resources"]:
+    if (
+        data_item["type"] == "aws_lambda_function"
+        and data_item["name"] == "project_spend_breakdown"
+    ):
+        functionprojectspendcost_arn = data_item["instances"][0]["attributes"]["arn"]
+
 # Getting rest api ID
 
 restapiID = None
