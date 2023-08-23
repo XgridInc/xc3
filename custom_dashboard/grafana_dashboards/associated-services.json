@@ -124,7 +124,7 @@
             "cellOptions": {
               "type": "color-text"
             },
-            "filterable": false,
+            "filterable": true,
             "inspect": false
           },
           "mappings": [],
