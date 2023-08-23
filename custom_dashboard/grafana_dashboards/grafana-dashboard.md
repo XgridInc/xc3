@@ -14,7 +14,7 @@ The home dashboard consists of the following panels:
 
 The associated service dashboard consists of the following panels:
 - Top 5 most expensive services of the selected project.
-
+- Table showing all services of the selected project.
 
 ## **IAM Role Dashboard**
 
