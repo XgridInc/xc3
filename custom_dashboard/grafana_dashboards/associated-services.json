@@ -203,7 +203,10 @@
               "project_spend_cost": true
             },
             "indexByName": {},
-            "renameByName": {}
+            "renameByName": {
+              "Value": "Cost ($)",
+              "project_spend_service": "Services"
+            }
           }
         }
       ],
