@@ -27,9 +27,13 @@ Check the below video for a quick demo of XC3.
 
 - Provides cost optimization recommendation workflow without exposing your private information
 
-# XC3 Architecture Diagram
+# XC3 Dev Architecture Diagram
 
-![XC3-architecture](https://github.com/XgridInc/xc3/assets/122358742/1f9b1c1e-92ca-4b2e-af17-8465214f25e9)
+![XC3 Dev Architecture](https://github.com/XgridInc/xc3/assets/138758061/8bd4a8f3-ee54-44ee-a152-865d7ce6bb2b)
+
+# XC3 Prod Architecture Diagram
+ 
+![XC3-Prod-architecture](https://github.com/XgridInc/xc3/assets/122358742/1f9b1c1e-92ca-4b2e-af17-8465214f25e9)
 
 # To start using XC3
 
