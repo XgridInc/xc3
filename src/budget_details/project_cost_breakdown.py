@@ -43,8 +43,8 @@ def get_cost_and_usage_data(client, start, end, project_name=""):
         cost data of that project
 
     Returns:
-        dict: The cost of the services, grouped by service dimension
-        and filtered by project tag.
+        dict: The cost of the services, the usage volume and its unit of measurement
+         grouped by service dimension and usage quantity and filtered by project tag.
     Raises:
         ValueError: If there is a problem with the input data format,
         or if the calculation fails.
@@ -54,8 +54,11 @@ def get_cost_and_usage_data(client, start, end, project_name=""):
             response = client.get_cost_and_usage(
                 TimePeriod={"Start": start, "End": end},
                 Granularity="MONTHLY",
-                Metrics=["UnblendedCost"],
-                GroupBy=[{"Type": "DIMENSION", "Key": "SERVICE"}],
+                Metrics=["UnblendedCost", "UsageQuantity"],
+                GroupBy=[
+                    {"Type": "DIMENSION", "Key": "SERVICE"},
+                    {"Type": "DIMENSION", "Key": "USAGE_TYPE"},
+                ],
                 Filter={
                     "Tags": {
                         "Key": "Project",
@@ -132,21 +135,35 @@ def lambda_handler(event, context):
         gauge = Gauge(
             f"{project_name}_Services_Cost",
             "AWS Services Cost Detail",
-            labelnames=["project_spend_service", "project_spend_cost"],
+            labelnames=[
+                "project_spend_services",
+                "project_spend_cost",
+                "Usage_type",
+                "Usage_Quantity",
+                "Unit",
+            ],
             registry=registry,
         )
-        for i in range(len(parent_list)):
-            service = parent_list[i]["Service"]
+        # loop through api response to get cost and usage metrics
+        for pos, value in enumerate(cost_data):
+            data_list = value.get("Keys", [])
+            metrics = value.get("Metrics", {})
+            service, usage_type = data_list[0], data_list[1]
+            usage_quantity = metrics.get("UsageQuantity", {}).get("Amount", "N/A")
+            unit = metrics.get("UsageQuantity", {}).get("Unit", "N/A")
+            cost = metrics.get("UnblendedCost", {}).get("Amount", "N/A")
+            gauge.labels(service, cost, usage_type, usage_quantity, unit).set(cost)
 
-            cost = parent_list[i]["Cost"]
             data_dict = {
                 "Service": service,
                 "Cost": cost,
+                "usage_type": usage_type,
+                "usage_quantity": usage_quantity,
+                "unit": unit,
             }
 
             # add the dictionary to the list
             data_list.append(data_dict)
-            gauge.labels(service, cost).set(cost)
 
             # Push the metric to the Prometheus Gateway
             push_to_gateway(
