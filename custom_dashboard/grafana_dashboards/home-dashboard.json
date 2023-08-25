@@ -264,7 +264,7 @@
             {
               "targetBlank": false,
               "title": "Project to Service",
-              "url": "/d/associated-service-12/associated-services?orgId=1&var-project=${__data.fields.project_spend_project}"
+              "url": "/d/associated-service-12/associated-services?orgId=1&var-Project=${__data.fields.project_spend_project}"
             }
           ],
           "mappings": [],

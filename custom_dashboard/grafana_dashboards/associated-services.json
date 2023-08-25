@@ -54,7 +54,7 @@
           "links": [
             {
               "title": "Service breakdown",
-              "url": "/d/ccc24ad5-7752acf/service-breakdown?orgId=1&var-Service=${__data.fields.project_spend_services&var-project=${ProjectName}"
+              "url": "/d/ccc24ad5-7752acf/service-breakdown?orgId=1&var-Service=${__data.fields.project_spend_services&var-project=${Project}"
             }
           ],
           "mappings": [],
@@ -105,7 +105,7 @@
             "type": "prometheus"
           },
           "editorMode": "builder",
-          "expr": "topk(5, sum by(project_spend_services)(${ProjectName}_Services_Cost))",
+          "expr": "topk(5, sum by(project_spend_services)(${Project}_Services_Cost))",
           "format": "table",
           "instant": false,
           "legendFormat": "{{project_spend_service}}",
@@ -113,7 +113,7 @@
           "refId": "A"
         }
       ],
-      "title": "Associated Services of ${ProjectName}",
+      "title": "Associated Services of ${Project}",
       "type": "barchart"
     },
     {
@@ -177,7 +177,7 @@
             "type": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(project_spend_services) (${ProjectName}_Services_Cost)",
+          "expr": "sum by(project_spend_services) (${Project}_Services_Cost)",
           "format": "table",
           "instant": false,
           "legendFormat": "__auto",
@@ -236,7 +236,7 @@
         "hide": 0,
         "includeAll": false,
         "multi": false,
-        "name": "ProjectName",
+        "name": "Project",
         "options": [],
         "query": {
           "query": "query_result(Project_Spend_Cost)",
