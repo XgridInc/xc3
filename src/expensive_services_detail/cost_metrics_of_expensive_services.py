@@ -20,6 +20,7 @@ from datetime import date, timedelta
 
 import boto3
 import botocore
+from pkg_resources import resource_filename
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
 # Initialize and Connect to the AWS EC2 Service
@@ -31,6 +32,18 @@ try:
     s3 = boto3.client("s3")
 except Exception as e:
     logging.error("Error creating boto3 client for s3: " + str(e))
+
+
+# get geolocation name instead of region
+def get_region_name(region_code):
+    default_region = "EU (Ireland)"
+    endpoint_file = resource_filename("botocore", "data/endpoints.json")
+    try:
+        with open(endpoint_file, "r") as f:
+            data = json.load(f)
+        return data["partitions"][0]["regions"][region_code]["description"]
+    except IOError:
+        return default_region
 
 
 def get_cost_and_usage_data(client, start, end, region, account_id):
@@ -85,7 +98,6 @@ def get_cost_and_usage_data(client, start, end, region, account_id):
 
 
 def lambda_handler(event, context):
-
     """
     List 5 top most expensive services in provided aws region.
     Args:
@@ -171,7 +183,7 @@ def lambda_handler(event, context):
         )
         for i in range(len(parent_list)):
             service = parent_list[i]["Service"]
-            region = parent_list[i]["Region"]
+            region = get_region_name(parent_list[i]["Region"])
             cost = parent_list[i]["Cost"]
             account_id = parent_list[i]["Account"]
             data_dict = {"Service": service, "Region": region, "Cost": cost}
