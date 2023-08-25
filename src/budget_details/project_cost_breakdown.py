@@ -82,8 +82,8 @@ def lambda_handler(event, context):
     Args:
         project_name: name of the project.
     Returns:
-        It pushes the services name and cost of the project
-        to Prometheus using push gateway.
+        It pushes the services name and cost of the project and its associated
+        resources to Prometheus using push gateway.
     Raises:
         KeyError: Raise error if data not pushed to prometheus.
     """

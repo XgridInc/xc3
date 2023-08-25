@@ -463,12 +463,11 @@
       {
         "current": {
           "selected": true,
-          "text": "ap-southeast-2",
-          "value": "ap-southeast-2"
+          "text": "eu-west-1",
+          "value": "eu-west-1"
         },
         "datasource": {
-          "type": "prometheus",
-          "uid": "PBFA97CFB590B2093"
+          "type": "prometheus"
         },
         "definition": "query_result(Expensive_Services_Detail)",
         "hide": 0,
@@ -519,12 +518,12 @@
         "current": {
           "selected": true,
           "text": [
-            "April",
-            "July"
+            "March",
+            "April"
           ],
           "value": [
-            "April",
-            "July"
+            "March",
+            "April"
           ]
         },
         "datasource": {

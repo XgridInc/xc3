@@ -16,6 +16,11 @@ The associated service dashboard consists of the following panels:
 - Top 5 most expensive services of the selected project.
 - Table showing all services of the selected project.
 
+## **Service Breakdown Dashboard**
+
+The service breakdown dashboard consists of the following panels:
+- Cost of the services, the usage volume and its unit of measurement of the selected project.
+
 ## **IAM Role Dashboard**
 
 The IAM Role Dashboard consists of the following panels:

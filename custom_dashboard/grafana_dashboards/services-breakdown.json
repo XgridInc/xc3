@@ -142,13 +142,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
-          "text": [
-            "rajud4xc3"
-          ],
-          "value": [
-            "rajud4xc3"
-          ]
+          "selected": false
         },
         "datasource": {
           "type": "prometheus"
@@ -171,9 +165,7 @@
       },
       {
         "current": {
-          "selected": false,
-          "text": "EC2 - Other",
-          "value": "EC2 - Other"
+          "selected": false
         },
         "datasource": {
           "type": "prometheus"
@@ -203,7 +195,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "service breakdown",
+  "title": "Service Breakdown",
   "uid": "ccc24ad5-7752acf",
   "version": 1.4,
   "weekStart": ""
