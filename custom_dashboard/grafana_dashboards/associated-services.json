@@ -54,7 +54,7 @@
           "links": [
             {
               "title": "Service breakdown",
-              "url": "/d/ccc24ad5-7752acf/service-breakdown?orgId=1&var-Service=${__data.fields.project_spend_services}"
+              "url": "/d/ccc24ad5-7752acf/service-breakdown?orgId=1&var-Service=${__data.fields.project_spend_services&var-project=${ProjectName}"
             }
           ],
           "mappings": [],
