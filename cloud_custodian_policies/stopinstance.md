@@ -34,7 +34,7 @@ Overall, these resources work together to automatically stop EC2 instances and p
 
 ![custodianarchistopinstance drawio](https://user-images.githubusercontent.com/122358742/222974375-816e78d5-5466-4eff-a895-82a863cf5168.png)
 
-## 3. Explaination
+## 3. Explanation
 
 ![Wholearchitecturestartinstancestop drawio(1)](https://user-images.githubusercontent.com/122358742/222975243-5d5bf4fc-d68d-46f3-8235-b9fa52bf4c49.png)
 

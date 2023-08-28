@@ -42,6 +42,6 @@ variable "iam_permission_policies" {
   type        = map(string)
   default = {
     access_management = "./policies/iam_permission_set.json"
-    infra_poliy       = "./policies/infra_permission_set.json"
+    infra_policy      = "./policies/infra_permission_set.json"
   }
 }

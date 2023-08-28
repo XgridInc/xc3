@@ -45,7 +45,7 @@ def lambda_handler(event, context):
     # Call the describe_organization API
     response = org_client.describe_organization()
 
-    # Initliazing list for account details
+    # Initializing list for account details
     linked_accounts = []
     account_details = []
 
@@ -58,7 +58,8 @@ def lambda_handler(event, context):
             response_iterator = paginator.paginate()
         except Exception as e:
             raise ValueError(
-                f"An error occurred in calling api: {e}.\nPlease check the network connectivity and try again."
+                f"An error occurred in calling api: {e}.\n"
+                + "Please check the network connectivity and try again."
             )
 
         linked_accounts = [
@@ -67,7 +68,7 @@ def lambda_handler(event, context):
 
     # Check if the management account has not linked accounts
     if len(linked_accounts) == 0:
-        # Single Management/Memeber Account
+        # Single Management/Member Account
 
         account = {"Id": current_account_id, "Name": ""}
 

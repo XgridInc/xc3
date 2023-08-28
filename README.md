@@ -58,9 +58,9 @@ Check the below video for a quick demo of XC3.
 3. VPC needs to be present in the master account where you want to set up XC3
 
 
-4. To store terraform state and maintaing lock, S3 bucket and dynamodb should be available in master account.
+4. To store terraform state and to maintain lock, S3 bucket and dynamodb should be available in master account.
 
-5. ACM certificate should be available. It will be associated with loadbalanacer and domain.
+5. ACM certificate should be available. It will be associated with loadbalancer and domain.
 
 6. The user has to **enable CostExplorer** by following the below link.
 
@@ -114,7 +114,7 @@ Check the below video for a quick demo of XC3.
 
 4. Now setup is complete. If domain is provided in the input.sh then users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
 
-5. SSH into the private instance using EIC Endpoint to check if eveything is working fine. Here replace [instance-id] needs to be replaced with ID
+5. SSH into the private instance using EIC Endpoint to check if everything is working fine. Here replace [instance-id] needs to be replaced with ID
 
     ``` ssh ubuntu@[instance-id] -i keypair.pem -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %h' ```
 
@@ -145,7 +145,7 @@ case 2: user not able to change/update/modify default dashboards in Grafana UI
 
 <br clear="all">
 
-## Contibutor
+## Contributor Guide
 
 XC3 is a community-driven project; we welcome your contribution! For code contributions, please read our [contribution guide](./CONTRIBUTING.md).
 
