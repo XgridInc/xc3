@@ -10,12 +10,18 @@ The script starts by initializing the runtime_region variable with the value of 
 
 - **Project Spend Cost**
 
-The script for project_spend_cost defines a lambda_handler function that takes two arguments: event, and context. It uses the context variable to get the AWS account ID. Then, it defines two variables start and end to represent the start and end date for the 14 days.
+The script for project_spend_cost defines a lambda_handler function that takes two arguments: event, and context. It uses the context variable to get the AWS account ID. Then, it defines two variables start and end to represent the start and end date for the 30 days.
 
-Then, it uses the Cost Explorer API to get the cost and usage data for the specified time period, filtering by the GroupBy dimension. The dimension uses the TAG filter with Project as its key to get the costs of Projects.
+Then, it uses the Cost Explorer API to get the cost and usage data for the specified time period, filtering by the GroupBy dimension. The dimension uses the TAG filter with Project as its key to get the costs of Projects. Then, it invokes the project cost breakdown lambda function asynchronously passing the project name as payload.
+
+- **Project Cost Breakdown**
+
+The script for project_cost_breakdown defines a lambda_handler function that takes two arguments: event, and context. It uses the event variable to get the Project name and, context variable to get the AWS account ID. Then, it defines two variables start and end to represent the start and end date for the 30 days.
+
+Then, it uses the Cost Explorer API to get the cost and usage data for the specified time period, filtered by the Filter dimension. The dimension uses the TAG filter with Project as its key and Project name as its value to get the costs of specified Project. It uses GroupBy SERVICE dimension to group the response based on service.
 
 - **Total Account Cost**
-  
+
 The script for total_account_cost defines a lambda_handler function that takes two arguments: event, and context. It uses the context variable to get the AWS account ID. Then, it defines two variables start and end to represent the start and end date for the 14 days.
 
 Then, it uses the Cost Explorer API to get the cost and usage data for the specified time period, filtering by the Filter dimension. The dimension uses the LINKED_ACCOUNT filter with account id as input to get the costs of accounts.
