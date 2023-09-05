@@ -22,7 +22,7 @@ resource "aws_lb_target_group" "this" {
   target_type = "instance"
 
   health_check {
-    path                = "/"
+    path                = "/login" #fix health check issues,because we're redirecting traffic to /login.
     timeout             = 120
     healthy_threshold   = 3
     unhealthy_threshold = 3

@@ -54,7 +54,8 @@ module "xc3" {
   hosted_zone_id      = var.hosted_zone_id
   grafana_api_gateway = module.serverless.grafana_api_gateway
   env                 = var.env
-  depends_on          = [module.networking]
+  # removed network module dependency - fixed - in case if you face any issues regarding network timeout
+  # _ in instance level, write -> depends_on = [module.networking] 
 }
 
 // Terraform Module for Serverless Application

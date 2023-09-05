@@ -113,7 +113,7 @@ resource "aws_instance" "this" {
   instance_type               = var.instance_type
   associate_public_ip_address = var.env == "prod" ? false : true
   key_name                    = data.aws_key_pair.key_pair.key_name
-  subnet_id                   = var.public_subnet_ids[0]
+  subnet_id                   = var.env == "prod" ? var.private_subnet_id[0] : var.public_subnet_ids[0] #check environment and then move instance to publi or private subnet.
   vpc_security_group_ids      = [var.security_group_ids.private_security_group_id]
   iam_instance_profile        = aws_iam_instance_profile.this.name
   user_data = templatefile("${path.module}/startup-script.sh.tpl", {
