@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace      = "example"
-env            = "dev"
-region         = "ap-southeast-2"
-account_id     = "123456789012"
+namespace      = "kashan"
+env            = "prod"
+region         = "eu-west-1"
+account_id     = "201635854701" //201635854701
 vpc_cidr_block = "10.0.0.0/16"
 public_subnet_cidr_block = {
-  "ap-southeast-2a" = "10.0.0.0/24"
-  "ap-southeast-2b" = "10.0.1.0/24"
+  "eu-west-1a" = "10.0.0.0/24"
+  "eu-west-1b" = "10.0.1.0/24"
 }
-domain_name    = ""
+domain_name    = "testing.xgrid.co"
 hosted_zone_id = "Z053166920YP1STI0EK5X"
 
 private_subnet_cidr_block = {
-  "ap-southeast-2a" = "10.0.100.0/24"
+  "eu-west-1a" = "10.0.100.0/24"
 }
 # private_subnet_cidr_block  = "10.0.100.0/24"
 allow_traffic              = ["0.0.0.0/0"] // Use your own network CIDR
@@ -38,7 +38,7 @@ total_account_cost_cronjob = "cron(0 0 1,15 * ? *)"     // flexible can be set a
 prometheus_layer           = "lambda_layers/python.zip" // s3 key for lambda layer
 memory_size                = 128
 timeout                    = 300
-project                    = "example"
+project                    = "xgrid"
 create_kms                 = false
 security_group_ingress = {
   "pushgateway" = {
