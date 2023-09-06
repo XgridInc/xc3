@@ -210,3 +210,72 @@ resource "aws_lambda_layer_version" "lambda_layer_prometheus" {
     terraform_data.upload_files_on_s3
   ]
 }
+
+
+###########################     ########################## 
+# tflint-ignore: terraform_required_providers
+resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {  #comment for user -> change name(cpu_alarm) to -> this
+  alarm_name          = "CPUUsageAlarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods = "2"
+  metric_name        = "CPUUtilization"
+  namespace          = "AWS/EC2"
+  period             = "300"
+  statistic          = "Average"
+  threshold          = "80"
+  alarm_description = "This metric checks for high CPU usage"
+  alarm_actions     = [aws_sns_topic.this.arn]
+  dimensions = {
+    InstanceId = aws_instance.this.id
+  }
+}
+
+
+
+################### This is the creation of an WAFv2 (Web ACL) and a example rate limit rule
+# tflint-ignore: terraform_required_providers
+resource "aws_wafv2_web_acl" "my_web_acl" {
+  name  = "my-web-acl"
+  scope = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "RateLimit"
+    priority = 1
+
+    action {
+      block {}
+    }
+
+    statement {
+
+      rate_based_statement {
+        aggregate_key_type = "IP"
+        limit              = 500
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "RateLimit"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = false
+    metric_name                = "my-web-acl"
+    sampled_requests_enabled   = false
+  }
+}
+# tflint-ignore: terraform_required_providers
+########### This is the association code
+
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  count             = var.env == "prod" && var.domain_name == "" ? 1 : 0
+  resource_arn = aws_lb.this[0].arn
+  web_acl_arn  = aws_wafv2_web_acl.my_web_acl.arn
+}
