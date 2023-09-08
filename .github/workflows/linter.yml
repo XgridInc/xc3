@@ -46,6 +46,7 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_MARKDOWN: false
+          FILTER_REGEX_EXCLUDE: .*tests/.*
           GITHUB_TOKEN: ${{ secrets.SECRET_GITHUB_TOKEN }}
         with:
           ignore-files: |
