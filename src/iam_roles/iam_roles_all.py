@@ -31,30 +31,30 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 
-region_names = {
-    "us-east-1":"N. Virginia",
-    "us-east-2":"Ohio",
-    "us-west-1":"N. California",
-    "us-west-2":"Oregon",
-    "af-south-1":"Cape Town",
-    "ap-east-1":"Hong Kong",
-    "me-central":"Middle East",
-    "ap-south-1":"Mumbai",
-    "ap-northeast-2":"Seoul",
-    "ap-northeast-3":"Osaka",
-    "ap-southeast-1":"Singapore",
-    "ap-southeast-2":"Sydney",
-    "ap-northeast-1":"Tokyo",
-    "ca-central-1":"Canada",
-    "eu-central-1":"Frankfurt",
-    "eu-west-1":"Ireland",
-    "eu-west-2":"London",
-    "eu-south-1":"Milan",
-    "eu-west-3":"Paris",
-    "eu-north-1":"Stockholm",
-    "me-south-1":"Bahrain",
-    "sa-east-1":"São Paulo"
-}
+try:
+    ssm_client = boto3.client("ssm")
+except Exception as e:
+    logging.error("Error creating boto3 client for ssm:" + str(e))
+    
+def get_region_names():
+    """
+    Retrieves the region names dictionary from AWS Systems Manager Parameter Store.
+
+    Returns:
+    - dict: The region names dictionary.
+    """
+    region_path = os.environ["region_names_path"]
+    
+    try:
+        response = ssm_client.get_parameter(Name=region_path)
+        region_names = json.loads(response["Parameter"]["Value"])
+        return region_names
+    except Exception as e:
+        logging.error("Error retrieving region names from Parameter Store: " + str(e))
+        raise
+
+# Get the region names dictionary
+region_names = get_region_names()
 
 def lambda_handler(event, context):
     """

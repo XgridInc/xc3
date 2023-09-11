@@ -60,7 +60,7 @@ def test_private_ec2_instance_creation():
         ), f"EC2 instance {instance_name} is not created successfully"
 
 
-def test_bashion_ec2_instance_creation():
+def test_bastion_ec2_instance_creation():
     """
     Test if the EC2 instance is created successfully.
 
@@ -90,7 +90,7 @@ def test_bashion_ec2_instance_creation():
         ), f"EC2 instance {instance_name} is not created successfully"
 
 
-def test_bashion_ec2_instance_security_group():
+def test_bastion_ec2_instance_security_group():
     """
     Test if the EC2 instance has the correct security group assigned.
 

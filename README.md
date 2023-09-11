@@ -29,7 +29,7 @@ Check the below video for a quick demo of XC3.
 
 # XC3 Architecture Diagram
 
-![XC3-architecture](https://user-images.githubusercontent.com/114464405/231076093-88d0fae9-4c87-4b5e-a6b3-c67ff6430646.png)
+![XC3-architecture](https://github.com/XgridInc/xc3/assets/122358742/1f9b1c1e-92ca-4b2e-af17-8465214f25e9)
 
 # To start using XC3
 
@@ -56,22 +56,13 @@ Check the below video for a quick demo of XC3.
    Refer the IAM Permission Set created in `pre_requirement` folder to setup XC3.
 
 3. VPC needs to be present in the master account where you want to set up XC3
-4. A Public and a Private subnet should be available.
 
-   Use below AWS documentation to create subnets if necessary.
 
-   https://docs.aws.amazon.com/AmazonECS/latest/developerguide/create-public-private-vpc.html
+4. To store terraform state and to maintain lock, S3 bucket and dynamodb should be available in master account.
 
-   Note : if no private/public subnets provided then XC3 will create new VPC, private and public subnets and also XC3 will destroy these resources once
-   user destroys XC3 setup.
+5. ACM certificate should be available. It will be associated with loadbalancer and domain.
 
-5. To store terraform state and maintaing lock, S3 bucket and dynamodb should be available in master account.
-
-6. ACM certificate should be available. It will be associated with loadbalanacer and domain.
-
-7. XC3 will create an EC2 instance during deployment, the user needs to create an AWS key_pair file in order to login to EC2 instance for troubleshooting purpose.
-8. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group ID of the bastion/jump/vpn EC2 instance.
-9. The user has to **enable CostExplorer** by following the below link.
+6. The user has to **enable CostExplorer** by following the below link.
 
    https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html
 
@@ -79,137 +70,55 @@ Check the below video for a quick demo of XC3.
    Note: After enabling CE, it may take up to 24hours for AWS to start capturing your AWS account cost data, hence XC3 may not show the data until CE data is available in AWS account
    ```
 
-   Note : if no private/public subnets provided then XC3 will create new VPC, private and public subnets and also XC3 will destroy these resources once
-   user destroys XC3 setup.
-
-10. XC3 will create an EC2 instance during deployment, the user needs to create an AWS key_pair file in order to login to EC2 instance for troubleshooting purpose.
-11. If the ssh access is restricted only through bastion/jump server/vpn, user should have the security group ID of the bastion/jump/vpn EC2 instance.
-12. The user has to **enable CostExplorer** by following the below link.
-
-    https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/ce-enable.html
-
-    ```
-    Note: After enabling CE, it may take up to 24hours for AWS to start capturing your AWS account cost data, hence XC3 may not show the data until CE data is available in AWS account
-    ```
-
 # Deployment
 
 1.  Clone the GitHub repository in your local computer to setup XC3 infrastructure.
 
-    ```bash
+    ```
     git clone https://github.com/XgridInc/xc3.git
     ```
-2. Install the `prometheus client` library using following commands:
-    ```bash
-    cd infrastructure
-    mkdir python
-    cd python
-    pip install prometheus-client
-    zip -r python.zip ./python
+
+2. Go to the directory xc3/ and configure the input.sh file and run the below command
     ```
-3.  `terraform.auto.tfvars` is the configuration file for the deployment. Use this files to create an `input.tfvars` file.
-    Copy the mentioned configuration file and modify the parameters.
+    cd xc3/
 
-4.  Initialize Terraform. It will initialize all terraform modules/plugins.
-    go to `XC3/infrastructure/` directory and run below command
-    `bash
-cd XC3/infrastructure/
-terraform init
-`
-    `bash
-Expected Output: It will create .terraform directory in XC3/infrastructure/  location
-            Initializing modules...
-            - infrastructure in modules/networking
-            - infrastructure in modules/xc3
-            * provider.aws: version = "~> 4.0."
-            Terraform has been successfully initialized!
-    `
+        Note :
+            - Configure the input.sh file in directory xc3/
 
-5.  Run planner command under `XC3/infrastructure` directory.
+               namespace="example"
+               project="example"
+               region="eu-west-1"
+               allow_traffic="0.0.0.0/0"
+               domain="" #  [Optional] - If you want to use your own domain then set this variable.
+               account_id="123456789012"
+               hosted_zone_id="Z053166920YP1STI0EK5X"
+               owner_email="admin@example.co"
+               creator_email="admin@example.co"
+               ses_email_address="admin@example.co"
+               bucket_name="terraform-state-example"
 
-    ```bash
-    terraform  plan -var-file=input.tfvars
+            - Before running the below mentioned command:
+
+    bash init.sh
     ```
 
-        ```bash
-        This command will generate a preview of all the actions which terraform is going to execute.
-            Expected Output: This command will be giving output something like below
-                    Plan: 20 to add, 0 to change, 0 to destroy.
-                    ------------------------------------------------------------------------
-        ```
-
-6.  Run actual Apply command under `XC3/infrastructure` directory to deploy all the resources into AWS master account.
-    This step may take `10-15` mins.
-
-    ```bash
-    terraform apply -var-file=input.tfvars
-    ```
-
-    The output will look like below
-
-    ````bash
-        Expected output: It will ask for approval like below
-            Do you want to perform these actions?
-            Terraform will perform the actions described above.
-            Only 'yes' will be accepted to approve.
-            Enter a value:
-        ```
-    Please type "yes" and enter
-    It provides the next steps to perform
-
-    ```bash
-    Apply complete! Resources: 20 added, 0 changed, 0 destroyed.
-
-    Outputs:
-    ````
-
-7.  Please copy msg_templates in custodian directory on deployed EC2 instance
-
-    ```
-    scp -i "keypair.pem" keypair.pem bastion-host-dns:/directory-to-copy-keypair
-    ssh -i "keypair.pem" user@bastion-host-DNS
-    cd directory (where keypair copied in above command)
-    ssh -i "keypair.pem" user@private-ip-ec2
-    cp -r  ./cloud_custodian_policies/msg_templates/ custodian/lib/python3.x/site-packages/c7n_mailer/msg_templates/
-
-    ```
-
-8.  Please run the following steps on deployed EC2 instance to trigger XC3 lambda functions.
-
-    ```
-     1. custodian run -s s3://${bucket_name}/iam-user --region ${aws_region} iam-user.yml
-
-     2. custodian run -s s3://${bucket_name}/iam-role/ --region ${aws_region} iam-role.yml
-
-     3. custodian run -s tagging-compliance --region ${aws_region} eks-tagging.yml --region all
-
-     4. custodian run -s tagging-compliance --region ${aws_region} ec2-tagging.yml --region all
-
-    ```
-
-9.  Wait for few minutes before proceeding further for the application to come online.
+3. Wait for few minutes before proceeding further for the application to come online.
     Verify the readiness of the metrics system. Load the Grafana URL in a browser. Live Grafana UI ensures the system is ready to accept and visualize metrics.
+
 
     > Verify the readiness of metrics system by accessing Grafana UI: https://xc3.xxx.com/login
 
     > Verify the readiness of metrics system by accessing Grafana UI: `loadbalancer-dns`. If Hosted zone ID is not provided in `input.tfvars`.
 
-10. Now User needs to upload grafana dashbords on S3 bucket created for metadata storage in above step.
-    ```bash
-    cd custom_dashboard
-    aws s3 cp grafana_dashboards s3://${aws_s3_bucket}/content/ --recursive --exclude "*.md"
-    ```
-11. SSH into EC2 instance via Bastion host server and copy grafana dashboards from S3 bucket to local path using following commands:
-    ```bash
-    scp -i "xc3-key" xc3-key bastion-host-public-dns:/home/ubuntu/
-    sudo ssh -i "xc3-key" ubuntu@public-ip of bastion host server
-    cd /home/ubuntu
-    sudo ssh -i "xc3-key" ubuntu@private-ip of prometheus server
-    aws s3 cp s3://${s3_bucket}/content/ ~/content --recursive
-    ```
-12. Now setup is complete.Users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
 
-13. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
+
+4. Now setup is complete. If domain is provided in the input.sh then users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
+
+5. SSH into the private instance using EIC Endpoint to check if everything is working fine. Here replace [instance-id] needs to be replaced with ID
+
+    ``` ssh ubuntu@[instance-id] -i keypair.pem -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %h' ```
+
+6. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
 
         Note :
             1. If data is not available in Grafana UI then follow the troubleshooting guide at the last section of this page.
@@ -236,7 +145,7 @@ case 2: user not able to change/update/modify default dashboards in Grafana UI
 
 <br clear="all">
 
-## Contibutor
+## Contributor Guide
 
 XC3 is a community-driven project; we welcome your contribution! For code contributions, please read our [contribution guide](./CONTRIBUTING.md).
 

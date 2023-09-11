@@ -58,7 +58,8 @@ resource "aws_iam_role_policy" "list_linked_accounts" {
           "ec2:DetachNetworkInterface",
           "ec2:AttachNetworkInterface",
           "ec2:DeleteNetworkInterface",
-          "ec2:DescribeRegions"
+          "ec2:DescribeRegions",
+          "organizations:DescribeOrganization"
         ],
         "Effect" : "Allow",
         "Resource" : "*"
@@ -92,17 +93,15 @@ resource "aws_lambda_function" "list_linked_accounts" {
   memory_size = var.memory_size
   timeout     = var.timeout
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-list_linked_accounts" }))
 
 }
 
-resource "null_resource" "list_linked_accounts" {
-  triggers = {
-    lambda_function_arn = aws_lambda_function.list_linked_accounts.arn
-  }
+resource "terraform_data" "list_linked_accounts" {
+  triggers_replace = [aws_lambda_function.list_linked_accounts.arn]
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.list_linked_accounts.output_path}"
   }

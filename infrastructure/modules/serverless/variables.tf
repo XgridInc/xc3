@@ -53,7 +53,7 @@ variable "prometheus_layer" {
 }
 
 variable "subnet_id" {
-  type        = string
+  type        = list(string)
   description = "The ID of the subnet where the resources will be created"
 }
 
@@ -112,13 +112,29 @@ variable "s3_prefixes" {
   description = "S3 Prefixes for Cost Reports"
   type        = map(string)
   default = {
-    project_spend_prefix     = "cost-metrics/project_cost.json"
-    monthly_cost_prefix      = "cost-metrics/total_account_cost.json"
-    expensive_service_prefix = "cost-metrics/expensive-services"
+    project_spend_prefix          = "cost-metrics/project_cost.json"
+    monthly_cost_prefix           = "cost-metrics/total_account_cost.json"
+    expensive_service_prefix      = "cost-metrics/expensive-services"
+    project_cost_breakdown_prefix = "cost-metrics/project-cost-breakdown"
   }
 }
 
 variable "slack_channel_url" {
   description = "Slack Channel URL"
   type        = string
+}
+
+variable "create_cloudtrail_kms" {
+  description = "Fetch the KMS if exist"
+  type        = bool
+}
+
+variable "create_cloudtrail_s3_bucket" {
+  description = "Fetch the S3 if exist"
+  type        = bool
+}
+
+variable "create_cloudtrail" {
+  description = "Fetch the Cloudtrail if exist"
+  type        = bool
 }

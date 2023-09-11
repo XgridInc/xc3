@@ -30,3 +30,8 @@ output "private_ip" {
   description = "Private IP address of ec2 instance to push prometheus metrics"
   value       = aws_instance.this.private_ip
 }
+
+output "xc3_url" {
+  description = "DNS of the XC3 Dashboard"
+  value       = var.env != "prod" ? aws_instance.this.public_ip : var.domain_name != "" ? var.domain_name : aws_lb.this[0].dns_name
+}

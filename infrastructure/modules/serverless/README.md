@@ -1,6 +1,6 @@
 # Terraform Serverless Module
 
-The Terraform serverless Module is used to create the required lambda functions of XC3. It includes the creation of lambda functions, IAM role that will be associated with lambda functions, cloud watch events, lambda permissions, cloud wathc event policy, S3 bucket notification and SNS topic subscription.
+The Terraform serverless Module is used to create the required lambda functions of XC3. It includes the creation of lambda functions, IAM role that will be associated with lambda functions, cloud watch events, lambda permissions, cloud watch event policy, S3 bucket notification and SNS topic subscription.
 The module also allows the user to define custom tags and namespace for the resources created.
 
 ### Usage
@@ -44,7 +44,7 @@ module "serverless" {
 
 - aws_iam_role: The IAM role that will be associated with the lambda functions. The role will have the necessary permissions to execute the lambda functions.
 
-- null_resource: The null resource to remove zip files created for lambda packages.
+- terraform_data: The terraform_data resource to remove zip files created for lambda packages.
 
 - aws_cloudwatch_event_rule: The cloudwatch event rule that will be attach with lambda functions. This rule will trigger the lambda functions based on a schedule or an event.
 
@@ -62,7 +62,7 @@ This module depends on the following provider:
 
 ### Limitations
 
-The module does not include encryption on evironment variables in lambda functions as well as tracing.
+The module does not include encryption on environment variables in lambda functions as well as tracing.
 
 ### License
 

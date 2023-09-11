@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-data "aws_kms_key" "this" {
-  key_id = "alias/${var.namespace}-kms-key"
+# tflint-ignore: terraform_unused_declarations
+data "aws_kms_alias" "check_existing_kms" {
+  name = "alias/${var.namespace}-kms-key"
+
 }

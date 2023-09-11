@@ -33,7 +33,7 @@ variable "public_subnet_cidr_block" {
 }
 
 variable "private_subnet_cidr_block" {
-  type        = string
+  type        = map(string)
   description = "The CIDR Block of the private subnet"
 }
 
@@ -115,6 +115,7 @@ variable "domain_name" {
   default     = ""
 }
 
+
 variable "hosted_zone_id" {
   type        = string
   description = "Public Hosted Zone ID in the Route 53"
@@ -135,4 +136,25 @@ variable "slack_channel_url" {
   description = "Slack Channel URL"
   type        = string
   default     = ""
+}
+
+variable "create_cloudtrail_kms" {
+  description = "Fetch the KMS if exist"
+  type        = bool
+}
+
+variable "create_cloudtrail_s3_bucket" {
+  description = "Fetch the S3 if exist"
+  type        = bool
+}
+
+variable "create_cloudtrail" {
+  description = "Fetch the Cloudtrail if exist"
+  type        = bool
+}
+
+variable "env" {
+  description = "Env variable for Dev/Prod"
+  type        = string
+  default     = "dev"
 }

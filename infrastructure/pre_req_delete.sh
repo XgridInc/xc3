@@ -30,28 +30,87 @@ CONFIG_FILE="./config.sh"
 # Load the config.sh file
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=./config.sh
+    # shellcheck disable=SC1091
     source "$CONFIG_FILE"
 else
     echo "Error: config.sh file not found"
     exit 1
 fi
 
-# Input variable KMS key ID
-key_id=$1
+# shellcheck disable=SC2154
 # AWS Region from config.sh to be used in rest of script
 echo "AWS Region: $aws_region"
+# shellcheck disable=SC2154
 # Dynamodb Table Name to be used in deleting dynamo db table
+# shellcheck disable=SC2154
 echo "DynamoDB Table Name: $dynamo_table_name"
+# shellcheck disable=SC2154
 # S3 Bucket Name that will be used in deleting S3 bucket
+# shellcheck disable=SC2154
 echo "Bucket Name: $bucket_name"
+# shellcheck disable=SC2154
 # Project Name that will be used Tag value for Project key to follow tagging compliance best practices
+# shellcheck disable=SC2154
 echo "Project: $project"
+# shellcheck disable=SC2154
 # Domain Name to create ACM Certificate that will be used in creating Route53 Domain
+# shellcheck disable=SC2154
 echo "Domain: $domain"
+# shellcheck disable=SC2154
 # Email Address of Owner of Team
+# shellcheck disable=SC2154
 echo "Owner Email: $owner_email"
+# shellcheck disable=SC2154
 # Email Address of Creator who is spinning up the infrastructure
+# shellcheck disable=SC2154
 echo "Creator Email: $creator_email"
+# shellcheck disable=SC2154
+# Namespace who is spinning up the infrastructure
+# shellcheck disable=SC2154
+echo "Namespace: $namespace"
+
+# Optionally, delete all versions in the S3 bucket
+while true; do
+    read -rp  "Do you want to delete all objects from the terraform state S3 bucket ${bucket_name}? (y/n) " yn
+    case $yn in
+        [yY] )
+
+        if [[ -z $(command -v jq) ]]
+        then
+            echo "jq could not be found. Please install 'apt install jq'."
+            break
+        fi
+
+        echo "Ok, deleting all objects from ${bucket_name}"
+        # Delete all versioned objects
+        versions=$(aws s3api list-object-versions --bucket ${bucket_name} \
+            --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')
+        if [[ $(echo "$versions" | jq '.Objects') != null ]];
+        then
+            aws s3api delete-objects --bucket ${bucket_name} --delete "${versions}"
+        fi
+
+        # Delete all markers
+        deletemarkers=$(aws s3api list-object-versions --bucket ${bucket_name} \
+            --query='{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}')
+        if [[ $(echo "$deletemarkers" | jq '.Objects') != null ]];
+        then
+            aws s3api delete-objects --bucket ${bucket_name} --delete "${deletemarkers}"
+        fi
+
+        echo "Deleted all objects from S3 bucket ${bucket_name}"
+
+        break
+        ;;
+      [nN] )
+        echo "Proceeding without deleting objects...";
+        break
+        ;;
+      * )
+        echo "Invalid response. Please enter 'y' for Yes or 'n' for No."
+        ;;
+    esac
+done
 
 # Delete S3 bucket that was used to maintain state file of terraform
 if aws s3 rb s3://"${bucket_name}" --force; then
@@ -68,29 +127,24 @@ else
 fi
 
 # Delete EC2 key-pair that was used to ssh into EC2 instances
-if aws ec2 delete-key-pair --key-name "${project}-key"; then
+if aws ec2 delete-key-pair --key-name "${namespace}-key" --region "${aws_region}"; then
     rm "${project}-key.pem"
     echo "Key pair deleted successfully"
 else
     echo "Error deleting key pair"
 fi
 
-# Delete ACM Certificat that was used with Route 53 Domain
-if aws acm delete-certificate --certificate-arn "$(aws acm list-certificates --region "${aws_region}" --query "CertificateSummaryList[?DomainName=='${domain}'].CertificateArn" --output text)"; then
-    echo "ACM certificate deleted successfully"
+if [[ -z "${domain}" ]]; then
+    echo "Domain is null. Skipping ACM certificate deletion."
 else
-    echo "Failed to delete ACM certificate"
-fi
-
-# Delete KMS Key Alias
-if aws kms delete-alias --alias-name "alias/${project}-kms-key" --region "${aws_region}"; then
-   echo "KMS Key alias deleted successfully"
-else
-    echo "Failed to delete kms key alias"
-fi
-# Delete KMS key
-if aws kms schedule-key-deletion --key-id ${key_id} --pending-window-in-days 7 --region "${aws_region}"; then
-   echo "KMS key deleted successfully"
-else
-    echo "Failed to delete KMS key"
+    certificate_arn=$(aws acm list-certificates --region "${aws_region}" --query "CertificateSummaryList[?DomainName=='${domain}'].CertificateArn" --output text)
+    if [[ -z "${certificate_arn}" ]]; then
+        echo "No ACM certificate found for the specified domain. Skipping ACM certificate deletion."
+    else
+        if aws acm delete-certificate --certificate-arn "${certificate_arn}"; then
+            echo "ACM certificate deleted successfully"
+        else
+            echo "Failed to delete ACM certificate"
+        fi
+    fi
 fi

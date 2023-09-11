@@ -417,6 +417,20 @@ for data_item in state_file_json["resources"]:
         functionprojectspendcost = data_item["instances"][0]["attributes"][
             "function_name"
         ]
+
+# Getting project cost breakdown
+
+functionprojectcostbreakdown = None
+
+for data_item in state_file_json["resources"]:
+    if (
+        data_item["type"] == "aws_lambda_function"
+        and data_item["name"] == "ProjectCostBreakdown"
+    ):
+        functionprojectcostbreakdown = data_item["instances"][0]["attributes"][
+            "function_name"
+        ]
+
 # Getting function total account cost
 
 functiontotalaccountcost = None
@@ -567,6 +581,20 @@ for data_item in state_file_json["resources"]:
         and data_item["name"] == "ProjectSpendCost"
     ):
         functionprojectspendcost_arn = data_item["instances"][0]["attributes"]["arn"]
+
+
+# Getting function project cost breakdown arn
+
+functionprojectcostbreakdown_arn = None
+
+for data_item in state_file_json["resources"]:
+    if (
+        data_item["type"] == "aws_lambda_function"
+        and data_item["name"] == "ProjectCostBreakdown"
+    ):
+        functionprojectcostbreakdown_arn = data_item["instances"][0]["attributes"][
+            "arn"
+        ]
 
 
 # Getting rest api ID

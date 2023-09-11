@@ -34,5 +34,5 @@ output "public_subnet_ids" {
 
 output "private_subnet_id" {
   description = "Private Subnet ID"
-  value       = aws_subnet.private_subnet.id
+  value       = [for subnet in aws_subnet.private_subnet : subnet.id]
 }
