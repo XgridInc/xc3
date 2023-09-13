@@ -20,7 +20,6 @@ from datetime import date, timedelta
 
 import boto3
 import botocore
-from pkg_resources import resource_filename
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
 # Initialize and Connect to the AWS EC2 Service
@@ -28,22 +27,36 @@ try:
     ec2_client = boto3.client("ec2")
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
+ 
 try:
     s3 = boto3.client("s3")
 except Exception as e:
     logging.error("Error creating boto3 client for s3: " + str(e))
+    
+try:
+    ssm_client = boto3.client("ssm")
+except Exception as e:
+    logging.error("Error creating boto3 client for ssm:" + str(e))
+    
+def get_region_names():
+    """
+    Retrieves the region names dictionary from AWS Systems Manager Parameter Store.
 
-
-# get geolocation name instead of region
-def get_region_name(region_code):
-    default_region = "EU (Ireland)"
-    endpoint_file = resource_filename("botocore", "data/endpoints.json")
+    Returns:
+    - dict: The region names dictionary.
+    """
+    region_path = os.environ["region_names_path"]
+    
     try:
-        with open(endpoint_file, "r") as f:
-            data = json.load(f)
-        return data["partitions"][0]["regions"][region_code]["description"]
-    except IOError:
-        return default_region
+        response = ssm_client.get_parameter(Name=region_path)
+        region_names = json.loads(response["Parameter"]["Value"])
+        return region_names
+    except Exception as e:
+        logging.error("Error retrieving region names from Parameter Store: " + str(e))
+        raise
+
+# Get the region names dictionary
+region_names = get_region_names()
 
 
 def get_cost_and_usage_data(client, start, end, region, account_id):
@@ -54,7 +67,7 @@ def get_cost_and_usage_data(client, start, end, region, account_id):
         client: A boto3.client object for the AWS Cost Explorer API.
         account_id: A string representing the AWS account ID to retrieve
         cost data for.
-        region: A string representing the AWS Region to retrieve cost data for.
+        region: A string representing the AWS Regionto retrieve cost data for.
         start_date: A string representing the start date of the time period to
         retrieve cost data for in YYYY-MM-DD format.
         end_date: A string representing the end date of the time period to
@@ -96,8 +109,8 @@ def get_cost_and_usage_data(client, start, end, region, account_id):
                 f"ValueError occurred: {ve}.\nPlease check the input data format."
             )
 
-
 def lambda_handler(event, context):
+
     """
     List 5 top most expensive services in provided aws region.
     Args:
@@ -130,7 +143,7 @@ def lambda_handler(event, context):
     # Loop through each region
     for region in regions:
         try:
-            # print(region)
+            # region_name = region_names.get(region, "unknown region name")
             ce_region = boto3.client("ce", region_name=region)
         except Exception as e:
             logging.error("Error creating boto3 client: " + str(e))
@@ -160,7 +173,7 @@ def lambda_handler(event, context):
         for resource in top_5_resources:
             resourcedata = {
                 "Account": account_detail,
-                "Region": region,
+                "Region": f"{region} ({region_names.get(region, 'unknown region name')})",
                 "Service": resource["Keys"][0],
                 "Cost": resource["Metrics"]["UnblendedCost"]["Amount"],
             }
@@ -183,7 +196,7 @@ def lambda_handler(event, context):
         )
         for i in range(len(parent_list)):
             service = parent_list[i]["Service"]
-            region = get_region_name(parent_list[i]["Region"])
+            region = parent_list[i]["Region"]
             cost = parent_list[i]["Cost"]
             account_id = parent_list[i]["Account"]
             data_dict = {"Service": service, "Region": region, "Cost": cost}

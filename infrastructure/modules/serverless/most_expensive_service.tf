@@ -145,6 +145,7 @@ resource "aws_lambda_function" "cost_metrics_of_expensive_services" {
       prometheus_ip            = "${var.prometheus_ip}:9091"
       bucket_name              = var.s3_xc3_bucket.bucket
       expensive_service_prefix = var.s3_prefixes.expensive_service_prefix
+      region_names_path        = "/${var.namespace}/region_names"
     }
   }
   layers      = [var.prometheus_layer]

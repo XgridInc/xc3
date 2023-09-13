@@ -89,6 +89,7 @@ resource "aws_lambda_function" "resources_cost_iam_user" {
   environment {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"
+      region_names_path = "/${var.namespace}/region_names"
     }
   }
   memory_size = var.memory_size

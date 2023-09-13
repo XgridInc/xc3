@@ -111,4 +111,6 @@ def lambda_handler(event, context):
     push_to_gateway(
         os.environ["prometheus_ip"], job="TaggingResourceList", registry=registry
     )
+
     return {"statusCode": 200, "body": "success"}
+#EOF
