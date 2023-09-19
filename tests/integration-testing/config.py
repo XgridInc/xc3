@@ -15,59 +15,13 @@
 import boto3
 import json
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+# Read the contents of the state file
+with open('tfplan.json', 'r') as f:
+    state_file_contents = f.read()
 
-
-def get_state_file(bucket_name, object_key):
-    """
-    Get the state file from an S3 bucket.
-
-    This function takes the name of an S3 bucket and the key of
-    the object that contains the state file. The state file is expected
-    to be in JSON format.
-
-    If the object is retrieved successfully and its contents can be decoded
-    as a non-empty JSON string, the function parses the string and
-    returns the resulting Python object along with a string indicating
-    that the state file was retrieved successfully. If the JSON string
-    is empty, the function returns None along with a message indicating
-    that the file was empty.
-
-    If the object cannot be retrieved for any reason, the function returns
-    None along with a message indicating the reason.
-
-    Args:
-        bucket_name (str): The name of the S3 bucket.
-        object_key (str): The key of the object that contains the state file.
-
-    Returns:
-        tuple: A tuple containing the contents of the state file as a dictionary,
-        and a message indicating the success or failure of the operation.
-        If the file could not be retrieved, returns None and a message indicating
-        the reason for the failure.
-    """
-    s3 = boto3.client("s3")
-    try:
-        response = s3.get_object(Bucket=bucket_name, Key=object_key)
-        state_file = response["Body"].read().decode("utf-8")
-        if state_file:
-            json_data = json.loads(state_file)
-            return json_data
-        else:
-            return None, "state file is empty"
-    except Exception as e:
-        return None, f"failed to retrieve state file: {e}"
-
-
-# Name of the bucket
-bucket_name = os.environ.get("BUCKET_NAME")
-
-# Key for the state file
-object_key = os.environ.get("OBJECT_KEY")
-state_file_json = get_state_file(bucket_name, object_key)
-
+# Parse the JSON contents into a Python dictionary
+state_file_json = json.loads(state_file_contents)
 
 # Region
 
@@ -77,13 +31,12 @@ for data_item in state_file_json["resources"]:
         region = data_item["instances"][0]["attributes"]["region"]
         break
 
-
 # Getting S3 bucket arn
 
-s3_bucket_arn = None
+s3_bucket_name = None
 for data_item in state_file_json["resources"]:
     if data_item["type"] == "aws_s3_bucket" and data_item["name"] == "this":
-        s3_bucket_arn = data_item["instances"][0]["attributes"]["arn"]
+        s3_bucket_name = data_item["instances"][0]["attributes"]["bucket"]
         break
 
 # Getting tags attached to s3 bucket
@@ -217,7 +170,7 @@ loadbalancer_name = None
 
 for data_item in state_file_json["resources"]:
     if data_item["type"] == "aws_lb" and data_item["name"] == "this":
-        lb = data_item["instances"][0]["attributes"]["name"]
+        loadbalancer_name = data_item["instances"][0]["attributes"]["name"]
         break
 
 # Getting KMS Name
@@ -249,7 +202,7 @@ for data_item in state_file_json["resources"]:
         data_item["type"] == "aws_sns_topic_subscription"
         and data_item["name"] == "invoke_with_sns"
     ):
-        sns_arn = data_item["instances"][0]["attributes"]["arn"]
+        sns_arn = data_item["instances"][0]["attributes"]["topic_arn"]
         break
 
 # Getting SQS ARN
@@ -272,7 +225,7 @@ for data_item in state_file_json["resources"]:
         ses_name = ses.split("/")[-1]
         break
 
-# Getting VPC ID
+# Getting VPC Name
 
 vpc = None
 
@@ -281,6 +234,14 @@ for data_item in state_file_json["resources"]:
         vpc = data_item["instances"][0]["attributes"]["tags"]["Name"]
         break
 
+# Getting VPC ID
+
+vpc_ids = None
+
+for data_item in state_file_json["resources"]:
+    if data_item["type"] == "aws_internet_gateway" and data_item["name"] == "this":
+        vpc_ids = data_item["instances"][0]["attributes"]["vpc_id"]
+        break
 # Getting VPC CIDR
 
 vpc_cidr = None
@@ -290,33 +251,41 @@ for data_item in state_file_json["resources"]:
         vpc_cidr = data_item["instances"][0]["attributes"]["cidr_block"]
         break
 
-# Getting Subnets for VPC
-
-subnetid1 = None
+publicsubnetid1 = None
 
 for data_item in state_file_json["resources"]:
-    if data_item["type"] == "aws_instance" and data_item["name"] == "this":
-        subnetid1 = data_item["instances"][0]["attributes"]["subnet_id"]
+    if data_item["type"] == "aws_subnet" and data_item["name"] == "public_subnet":
+        publicsubnetid1 = data_item["instances"][0]["attributes"]["id"]
+        break
+
+publicsubnetid2 = None
+
+for data_item in state_file_json["resources"]:
+    if data_item["type"] == "aws_subnet" and data_item["name"] == "public_subnet":
+        publicsubnetid2 = data_item["instances"][1]["attributes"]["id"]
+        break
+
+# Getting Subnets for VPC
+
+subnetid3 = None
+
+for data_item in state_file_json["resources"]:
+    if data_item["type"] == "aws_route_table_association" and data_item["name"] == "this":
+        subnetid3 = data_item["instances"][0]["attributes"]["subnet_id"]
         break
 
 subnetid2 = None
 
 for data_item in state_file_json["resources"]:
-    if (
-        data_item["type"] == "aws_route_table_association"
-        and data_item["name"] == "this"
-    ):
-        subnetid2 = data_item["instances"][1]["attributes"]["subnet_id"]
+    if data_item["type"] == "aws_nat_gateway" and data_item["name"] == "this":
+        subnetid2 = data_item["instances"][0]["attributes"]["subnet_id"]
         break
 
-subnetid3 = None
+subnetid1 = None
 
 for data_item in state_file_json["resources"]:
-    if (
-        data_item["type"] == "aws_route_table_association"
-        and data_item["name"] == "this"
-    ):
-        subnetid3 = data_item["instances"][0]["attributes"]["subnet_id"]
+    if data_item["type"] == "aws_route_table_association" and data_item["name"] == "this":
+        subnetid1 = data_item["instances"][0]["attributes"]["subnet_id"]
         break
 
 # Getting Route Table Name
@@ -324,8 +293,8 @@ for data_item in state_file_json["resources"]:
 routetable = None
 
 for data_item in state_file_json["resources"]:
-    if data_item["type"] == "aws_vpc" and data_item["name"] == "this":
-        routetable = data_item["instances"][0]["attributes"]["default_route_table_id"]
+    if data_item["type"] == "aws_route_table" and data_item["name"] == "this":
+        routetable = data_item["instances"][0]["attributes"]["id"]
 
 # Getting NAT Gateway Name
 
@@ -373,7 +342,7 @@ publicsecuritygroupname = None
 
 for data_item in state_file_json["resources"]:
     if data_item["type"] == "aws_security_group" and data_item["name"] == "public_sg":
-        publicsecuritygroupname = data_item["instances"][0]["attributes"]["name"]
+        publicsecuritygroupname = data_item["instances"][0]["attributes"]["id"]
 
 # Getting Private Security Group Name
 
@@ -381,7 +350,7 @@ privatesecuritygroupname = None
 
 for data_item in state_file_json["resources"]:
     if data_item["type"] == "aws_security_group" and data_item["name"] == "private_sg":
-        privatesecuritygroupname = data_item["instances"][0]["attributes"]["name"]
+        privatesecuritygroupname = data_item["instances"][0]["attributes"]["id"]
 
 # Getting Lambda Functions Name
 
@@ -417,20 +386,6 @@ for data_item in state_file_json["resources"]:
         functionprojectspendcost = data_item["instances"][0]["attributes"][
             "function_name"
         ]
-
-# Getting project cost breakdown
-
-functionprojectcostbreakdown = None
-
-for data_item in state_file_json["resources"]:
-    if (
-        data_item["type"] == "aws_lambda_function"
-        and data_item["name"] == "ProjectCostBreakdown"
-    ):
-        functionprojectcostbreakdown = data_item["instances"][0]["attributes"][
-            "function_name"
-        ]
-
 # Getting function total account cost
 
 functiontotalaccountcost = None
@@ -450,11 +405,11 @@ functionlistiamuserresourcescost = None
 
 for data_item in state_file_json["resources"]:
     if (
-        data_item["type"] == "aws_iam_role"
+        data_item["type"] == "aws_lambda_function"
         and data_item["name"] == "resources_cost_iam_user"
     ):
         functionlistiamuserresourcescost = data_item["instances"][0]["attributes"][
-            "function_name"
+            "arn"
         ]
 
 # Getting function instance change
@@ -581,20 +536,6 @@ for data_item in state_file_json["resources"]:
         and data_item["name"] == "ProjectSpendCost"
     ):
         functionprojectspendcost_arn = data_item["instances"][0]["attributes"]["arn"]
-
-
-# Getting function project cost breakdown arn
-
-functionprojectcostbreakdown_arn = None
-
-for data_item in state_file_json["resources"]:
-    if (
-        data_item["type"] == "aws_lambda_function"
-        and data_item["name"] == "ProjectCostBreakdown"
-    ):
-        functionprojectcostbreakdown_arn = data_item["instances"][0]["attributes"][
-            "arn"
-        ]
 
 
 # Getting rest api ID

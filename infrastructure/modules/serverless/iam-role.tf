@@ -34,6 +34,7 @@ resource "aws_lambda_function" "IamRolestoGrafana" {
     variables = {
       func_name_iam_role_service_mapping = aws_lambda_function.IamRolesServiceMapping.arn
       prometheus_ip                      = "${var.prometheus_ip}:9091"
+      region_names_path                   = "/${var.namespace}/region-names"
     }
   }
   memory_size = var.memory_size
@@ -93,7 +94,10 @@ resource "aws_iam_role" "lambda_execution_role_IamRolestoGrafana" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", 
+  "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", 
+  "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+  "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"]
 
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-to-Grafana" }))
 }
@@ -141,7 +145,10 @@ resource "aws_iam_role" "lambda_execution_role_IamRolesServiceMapping" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+  "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", 
+  "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+  "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"]
   tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-Service-Mapping" }))
 }
 
@@ -207,6 +214,7 @@ resource "aws_lambda_function" "IamRolesService" {
   environment {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"
+      region_names_path = "/${var.namespace}/region_names"
     }
   }
   memory_size = var.memory_size
@@ -284,7 +292,7 @@ resource "aws_iam_role" "lambda_execution_role_IamRolesService" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole", "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"]
   tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-Service" }))
 }
 
@@ -379,7 +387,7 @@ resource "aws_iam_role" "lambda_execution_role_InstanceChangeState" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole","arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"]
   tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-instance-state-change" }))
 }
 

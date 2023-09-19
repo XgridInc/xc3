@@ -138,8 +138,18 @@ variable "slack_channel_url" {
   default     = ""
 }
 
-variable "create_kms" {
+variable "create_cloudtrail_kms" {
   description = "Fetch the KMS if exist"
+  type        = bool
+}
+
+variable "create_cloudtrail_s3_bucket" {
+  description = "Fetch the S3 if exist"
+  type        = bool
+}
+
+variable "create_cloudtrail" {
+  description = "Fetch the Cloudtrail if exist"
   type        = bool
 }
 

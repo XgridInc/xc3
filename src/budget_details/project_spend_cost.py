@@ -34,6 +34,10 @@ try:
     ce_client = boto3.client("ce")
 except Exception as e:
     logging.error("Error creating boto3 client for ce: " + str(e))
+try:
+    lambda_client = boto3.client("lambda")
+except Exception as e:
+    logging.error("Error creating boto3 client for lambda: " + str(e))
 
 
 cost_by_days = 30
@@ -75,6 +79,8 @@ def lambda_handler(event, context):
     Returns:
         str: A message indicating the success or failure of the function execution.
     """
+    project_cost_breakdown_lambda = os.environ["lambda_function_name"]
+
     try:
         registry = CollectorRegistry()
         g = Gauge(
@@ -112,6 +118,33 @@ def lambda_handler(event, context):
         push_to_gateway(
             os.environ["prometheus_ip"], job="Project-Spend-Cost", registry=registry
         )
+
+        # Loop through each project and invoke the project cost breakdown lambda
+        for project_name in project_dict.keys():
+            payload = {"project_name": project_name}
+            try:
+                project_cost_breakdown_response = lambda_client.invoke(
+                    FunctionName=project_cost_breakdown_lambda,
+                    InvocationType="Event",
+                    Payload=json.dumps(payload),
+                )
+                # Extract the status code from the response
+                status_code = project_cost_breakdown_response["StatusCode"]
+                if status_code != 202:
+                    # Handle unexpected status code
+                    logging.error(
+                        (
+                            f"Unexpected status code {status_code}returned from"
+                            "project_spend_cost_breakdown_lambda"
+                        )
+                    )
+            except Exception as e:
+                logging.error("Error in invoking lambda function: " + str(e))
+                return {
+                    "statusCode": 500,
+                    "body": "Error invoking project_cost_breakdown_lambda",
+                }
+
         return {"statusCode": 200, "body": json_data}
     except botocore.exceptions.ClientError as e:
         logging.error(f"Failed to upload file to S3: {e}")

@@ -25,6 +25,10 @@ try:
     client = boto3.client("ce")
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
+try:
+    ssm_client = boto3.client("ssm")
+except Exception as e:
+    logging.error("Error creating boto3 client for ssm:" + str(e))
 
 
 def cost_of_instance(event, client, resource_id):
@@ -54,12 +58,32 @@ def cost_of_instance(event, client, resource_id):
         Metrics=["UnblendedCost"],
     )
     return ce_response
+    
+def get_region_names():
+    """
+    Retrieves the region names dictionary from AWS Systems Manager Parameter Store.
+
+    Returns:
+    - dict: The region names dictionary.
+    """
+    region_path = os.environ["region_names_path"]
+    
+    try:
+        response = ssm_client.get_parameter(Name=region_path)
+        region_names = json.loads(response["Parameter"]["Value"])
+        return region_names
+    except Exception as e:
+        logging.error("Error retrieving region names from Parameter Store: " + str(e))
+        raise
+
+# Get the region names dictionary
+region_names = get_region_names()
 
 
 def cost_of_resources(event, resource_list, account_id):
     """
     Push metrics of cumulative cost under ownership of specific IAM User.
-    Pusj metrics of total services cost for specific IAM User.
+    Push metrics of total services cost for specific IAM User.
     Args:
         Resource List: IAM User's resource list.
         Account ID: AWS Account ID
@@ -73,7 +97,7 @@ def cost_of_resources(event, resource_list, account_id):
     # Initialize the Prometheus registry and gauge
     try:
         registry = CollectorRegistry()
-        # Creating guage metrics for resource's cost for specific IAM User
+        # Creating gauge metrics for resource's cost for specific IAM User
         gauge = Gauge(
             "IAM_USER_Resource_Cost_List",
             "IAM User Resource List And Cost",
@@ -87,7 +111,7 @@ def cost_of_resources(event, resource_list, account_id):
             ],
             registry=registry,
         )
-        # Creating guage metrics for total services cost of IAM User
+        # Creating gauge metrics for total services cost of IAM User
         g_user_cost = Gauge(
             "IAM_USER_Total_Services_Cost_List",
             "IAM User Total Services Cost List",
@@ -129,7 +153,7 @@ def cost_of_resources(event, resource_list, account_id):
                             "%Y-%m-%d %H:%M:%S"
                         ),
                         user,
-                        region,
+                        f"{region} ({region_names.get(region, 'unknown region name')})", 
                         res,
                         cumulative_cost,
                         account_id,
@@ -146,7 +170,7 @@ def cost_of_resources(event, resource_list, account_id):
                             "%Y-%m-%d %H:%M:%S"
                         ),
                         user,
-                        region,
+                        f"{region} ({region_names.get(region, 'unknown region name')})",
                         res,
                         "0",
                         account_id,
@@ -154,7 +178,7 @@ def cost_of_resources(event, resource_list, account_id):
             g_user_cost.labels(
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 user,
-                region,
+                f"{region} ({region_names.get(region, 'unknown region name')})",
                 user_region_wise_cost,
                 account_id,
             ).set(user_region_wise_cost)

@@ -12,13 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-// Terraform Remote State
+# tflint-ignore: terraform_unused_declarations
+data "aws_kms_alias" "check_existing_kms" {
+  name = "alias/${var.namespace}-kms-key"
 
-terraform {
-  backend "s3" {
-    bucket         = "terraform-state-xc3" // S3 bucket for terraform state management
-    key            = "xc3/xc3.tfstate"        // Specifies the S3 object key for storing the Terraform state file
-    region         = "eu-west-1"
-    dynamodb_table = "terraform-lock"
-  }
 }

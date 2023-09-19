@@ -25,10 +25,10 @@ fi
 if ! command -v terraform &> /dev/null; then
     echo "----> Terraform is not installed."
     exit 1
-else echo "Terraform is already installled. Moving forward..."
+else echo "Terraform is already installed. Moving forward..."
 fi
 
-# Check if pip3 is intalled or not
+# Check if pip3 is installed or not
 if ! command -v pip3 &> /dev/null; then
     echo "pip3 is not installed. Installing pip3..."
     sudo apt-get update
@@ -289,7 +289,7 @@ infra_allow_traffic=$(grep 'allow_traffic' infrastructure/terraform.auto.tfvars 
 sed -i "s~$infra_allow_traffic~$allow_traffic~" infrastructure/terraform.auto.tfvars
 
 
-# Envrionment
+# Environment
 infra_environ=$(grep 'env' infrastructure/terraform.auto.tfvars | awk -F'"' '{print $2}')
 
 sed -i "/env/ s/$infra_environ/$environ/" infrastructure/terraform.auto.tfvars
@@ -300,12 +300,12 @@ sed -i "/env/ s/$infra_environ/$environ/" infrastructure/terraform.auto.tfvars
 # Bucket
 backend_bucket=$(grep 'bucket' infrastructure/backend.tf | awk -F'"' '{print $2}')
 
-sed -i "/bucket/ s/$backend_bucket/$bucket_name/" infrastructure/backend.tf 
+sed -i "/bucket/ s/$backend_bucket/$bucket_name/" infrastructure/backend.tf
 
-Region
+# Region
 backend_region=$(grep 'region' infrastructure/backend.tf | awk -F'"' '{print $2}')
 
-sed -i "/region/ s/$backend_region/$region/" infrastructure/backend.tf 
+sed -i "/region/ s/$backend_region/$region/" infrastructure/backend.tf
 
 #************************************** User Inputs  ******************************************#
 
@@ -340,7 +340,7 @@ done
 
 
 # # Package the prometheus client library using following commands:
-echo "Changing Dirctory: $(pwd)"
+echo "Changing Directory: $(pwd)"
 cd infrastructure || { echo "Failure : cd infrastructure not working"; exit 1; }
 mkdir python
 pip3 install -t python/ prometheus-client

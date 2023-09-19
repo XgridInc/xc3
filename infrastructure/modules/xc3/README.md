@@ -1,6 +1,6 @@
 # Terraform XC3 Module
 
-The Terraform XC3 Module is used to create the required infrastructure of XC3. It includes the creation of EC2 insatances, IAM role that will be associated with EC2 instance, EC2 key pair, IAM instance profile, SNS topic, SQS queue, SES email identity, S3 bucket and lambda layer.
+The Terraform XC3 Module is used to create the required infrastructure of XC3. It includes the creation of EC2 instances, IAM role that will be associated with EC2 instance, EC2 key pair, IAM instance profile, SNS topic, SQS queue, SES email identity, S3 bucket and lambda layer.
 The module also allows the user to define custom tags and namespace for the resources created.
 
 ### Usage
@@ -69,9 +69,9 @@ module "xc3" {
 
 - aws_lb: The AWS loadbalancer that will be used to route traffic to private EC2 instance where grafana/prometheus installed.
 
-- aws_cognito_user_pool: The AWS Cognito user pool that will be used for user access management using OAuth on grafna.
+- aws_cognito_user_pool: The AWS Cognito user pool that will be used for user access management using OAuth on grafana.
 
-- aws_route53_record: A recod in any existing public hosted zone.
+- aws_route53_record: A record in any existing public hosted zone.
 
 
 ### Dependencies
@@ -101,5 +101,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-

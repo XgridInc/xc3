@@ -55,7 +55,7 @@ resource "aws_lb" "this" {
 
 }
 
-resource "aws_lb_listener" "this" {
+resource "aws_lb_listener" "https" {
   count             = var.env == "prod" && var.domain_name != "" ? 1 : 0
   load_balancer_arn = aws_lb.this[0].arn
   port              = "443"

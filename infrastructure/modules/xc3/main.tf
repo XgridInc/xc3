@@ -188,14 +188,10 @@ resource "terraform_data" "upload_files_on_s3" {
 }
 
 # tflint-ignore: terraform_required_providers
-resource "terraform_data" "eicendpoint" {
+resource "aws_ec2_instance_connect_endpoint" "eicendpoint" {
   count = var.env == "prod" ? 1 : 0
-  triggers_replace = [
-    aws_instance.this.id
-  ]
-  provisioner "local-exec" {
-    command = "aws ec2 create-instance-connect-endpoint --subnet-id ${var.private_subnet_id[0]} --security-group-id ${var.security_group_ids.private_security_group_id}"
-  }
+  security_group_ids = [var.security_group_ids.private_security_group_id]
+  subnet_id = var.private_subnet_id[0]
 }
 
 # Configuring prometheus layer for lambda functions
