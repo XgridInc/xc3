@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added cloudwatch alarms CPU utilization monitoring.
 - Added WAFv2 and attached with loadbalancer.
 - Integration testing for dev and prod environments respectively.
-- Grafana region dashboard region id readability implementation. 
+- Grafana region dashboard region ID readability implementation. 
 
 ### Fixed
 - Loabalancer health and connection issues.
