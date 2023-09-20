@@ -22,7 +22,7 @@ resource "aws_lb_target_group" "this" {
   target_type = "instance"
 
   health_check {
-    path                = "/"
+    path                = "/login" #by default dashboard is redirected to the login page.
     timeout             = 120
     healthy_threshold   = 3
     unhealthy_threshold = 3
