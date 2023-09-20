@@ -206,3 +206,73 @@ resource "aws_lambda_layer_version" "lambda_layer_prometheus" {
     terraform_data.upload_files_on_s3
   ]
 }
+
+## Cloudwatch Alarms
+# tflint-ignore: terraform_required_providers
+resource "aws_cloudwatch_metric_alarm" "this" { 
+  alarm_name          = "${var.namespace}-xc3_cpu_usage_alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods = "2"
+  metric_name        = "${var.namespace}-xc3_cpu_utilization"
+  namespace          = var.namespace
+  period             = "300"
+  statistic          = "Average"
+  threshold          = "80"
+  alarm_description = "This metric checks for high CPU usage"
+  alarm_actions     = [aws_sns_topic.this.arn]
+  dimensions = {
+    InstanceId = aws_instance.this.id
+  }
+
+   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-cpu_usage_alarm" }))
+}
+
+## Creation of an WAFv2
+# tflint-ignore: terraform_required_providers
+resource "aws_wafv2_web_acl" "this" {
+  name  = "${var.namespace}_xc3_web_acl"
+  scope = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "RateLimit"
+    priority = 1
+
+    action {
+      block {}
+    }
+
+    statement {
+
+      rate_based_statement {
+        aggregate_key_type = "IP"
+        limit              = 500
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "RateLimit"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = false
+    metric_name                = "${var.namespace}_xc3_web_acl"
+    sampled_requests_enabled   = false
+  }
+
+     tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-web_acl_waf" }))
+}
+
+## association code of webacl
+# tflint-ignore: terraform_required_providers
+resource "aws_wafv2_web_acl_association" "web_acl_association_with_lb" {
+  count        = var.env == "prod" && var.domain_name == "" ? 1 : 0
+  resource_arn = aws_lb.this[0].arn
+  web_acl_arn  = aws_wafv2_web_acl.this.arn
+}
