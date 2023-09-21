@@ -180,9 +180,9 @@ resource "terraform_data" "upload_files_on_s3" {
 
   provisioner "local-exec" {
     command = <<EOT
-      aws s3 cp python.zip s3://${aws_s3_bucket.this.id}/lambda_layers/
-      aws s3 cp ../custom_dashboard/grafana_dashboards/. s3://${aws_s3_bucket.this.id}/content/ --recursive --exclude "*.md"
-      aws s3 cp ../cloud_custodian_policies/ s3://${aws_s3_bucket.this.id}/cloud_custodian_policies/ --recursive --exclude "*.md" --include "*"
+      aws s3 cp python.zip s3://${aws_s3_bucket.this.id}/lambda_layers/ || echo "Failed to upload files to S3" 
+      aws s3 cp ../custom_dashboard/grafana_dashboards/. s3://${aws_s3_bucket.this.id}/content/ --recursive --exclude "*.md"  || echo "Failed to upload files to S3"
+      aws s3 cp ../cloud_custodian_policies/ s3://${aws_s3_bucket.this.id}/cloud_custodian_policies/ --recursive --exclude "*.md" --include "*"  || echo "Failed to upload files to S3"
    EOT
   }
 }
