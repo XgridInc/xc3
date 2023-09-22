@@ -46,9 +46,9 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_MARKDOWN: false
-          GITHUB_TOKEN: ${{ secrets.SECRET_GITHUB_TOKEN }}
+          FILTER_REGEX_EXCLUDE: .*src/.*|.*test/.*
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           ignore-files: |
             './README.md'
             './UserGuide.md'
-

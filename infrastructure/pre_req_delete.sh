@@ -69,7 +69,48 @@ echo "Creator Email: $creator_email"
 # shellcheck disable=SC2154
 echo "Namespace: $namespace"
 
+# Optionally, delete all versions in the S3 bucket
+while true; do
+    read -rp  "Do you want to delete all objects from the terraform state S3 bucket ${bucket_name}? (y/n) " yn
+    case $yn in
+        [yY] )
 
+        if [[ -z $(command -v jq) ]]
+        then
+            echo "jq could not be found. Please install 'apt install jq'."
+            break
+        fi
+
+        echo "Ok, deleting all objects from ${bucket_name}"
+        # Delete all versioned objects
+        versions=$(aws s3api list-object-versions --bucket ${bucket_name} \
+            --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')
+        if [[ $(echo "$versions" | jq '.Objects') != null ]];
+        then
+            aws s3api delete-objects --bucket ${bucket_name} --delete "${versions}"
+        fi
+
+        # Delete all markers
+        deletemarkers=$(aws s3api list-object-versions --bucket ${bucket_name} \
+            --query='{Objects: DeleteMarkers[].{Key:Key,VersionId:VersionId}}')
+        if [[ $(echo "$deletemarkers" | jq '.Objects') != null ]];
+        then
+            aws s3api delete-objects --bucket ${bucket_name} --delete "${deletemarkers}"
+        fi
+
+        echo "Deleted all objects from S3 bucket ${bucket_name}"
+
+        break
+        ;;
+      [nN] )
+        echo "Proceeding without deleting objects...";
+        break
+        ;;
+      * )
+        echo "Invalid response. Please enter 'y' for Yes or 'n' for No."
+        ;;
+    esac
+done
 
 # Delete S3 bucket that was used to maintain state file of terraform
 if aws s3 rb s3://"${bucket_name}" --force; then

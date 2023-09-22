@@ -22,7 +22,7 @@ resource "aws_lb_target_group" "this" {
   target_type = "instance"
 
   health_check {
-    path                = "/"
+    path                = "/login" #by default dashboard is redirected to the login page.
     timeout             = 120
     healthy_threshold   = 3
     unhealthy_threshold = 3
@@ -55,7 +55,7 @@ resource "aws_lb" "this" {
 
 }
 
-resource "aws_lb_listener" "this" {
+resource "aws_lb_listener" "https" {
   count             = var.env == "prod" && var.domain_name != "" ? 1 : 0
   load_balancer_arn = aws_lb.this[0].arn
   port              = "443"

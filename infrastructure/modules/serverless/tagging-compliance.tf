@@ -43,7 +43,8 @@ resource "aws_iam_role" "resource_list_service_role" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
     "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess",
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
   ]
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource_list_service_role" }))
 
@@ -93,6 +94,7 @@ resource "aws_lambda_function" "resource_list_function" {
   environment {
     variables = {
       resource_list_lambda_function = aws_lambda_function.resource_parsing_function.arn
+      region_names_path = "/${var.namespace}/region_names"
     }
   }
   memory_size = var.memory_size

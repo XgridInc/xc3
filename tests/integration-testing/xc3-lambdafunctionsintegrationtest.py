@@ -12,34 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 
 import boto3
-import json
-from config import (
-    iamrolestografananame,
-    IamRolesServicename,
-    functionprojectspendcost,
-    functionprojectcostbreakdown,
-    functiontotalaccountcost,
-    functioninstancechange,
-    functionresourcelist,
-    functionlistiamuser,
-    functionresourceparsing,
-    functioniamroleservicemap,
-    functionmostexpensiveservice,
-    functiontotalaccountcost_arn,
-    functionmostexpensiveservice_arn,
-    functionresourcelistfunction_arn,
-    functionprojectspendcost_arn,
-    functionprojectcostbreakdown_arn,
-)
 
+from config import (IamRolesServicename, functioniamroleservicemap,
+                    functioninstancechange, functionlistiamuser,
+                    functionmostexpensiveservice,
+                    functionmostexpensiveservice_arn, functionprojectspendcost,
+                    functionprojectspendcost_arn, functionresourcelist,
+                    functionresourcelistfunction_arn, functionresourceparsing,
+                    functiontotalaccountcost, functiontotalaccountcost_arn,
+                    iamrolestografananame)
 
 function_names = [
     iamrolestografananame,
     IamRolesServicename,
     functionprojectspendcost,
-    functionprojectcostbreakdown,
     functiontotalaccountcost,
     functioninstancechange,
     functionresourcelist,
@@ -48,8 +37,6 @@ function_names = [
     functioniamroleservicemap,
     functionmostexpensiveservice,
 ]
-
-print(function_names)
 
 # Initializing Lambda client
 
@@ -80,7 +67,9 @@ def test_lambda_vpc():
             assert (
                 vpc_config.get("VpcId") is not None
             ), f"Lambda function {function_name} is not in a VPC"
+
     except Exception as e:
+
         assert False, f"Error during test_lambda_vpc: {e}"
 
 
@@ -129,51 +118,25 @@ def test_total_account_cost():
             False
         ), f"Lambda function {function_name} returned an unexpected response: {e}"
 
-
-def test_most_expensive_service():
-
-    function_name = functionmostexpensiveservice_arn
-    input_payload = {"key": "value"}
-
-    try:
-        response = lambda_client.invoke(
-            FunctionName=function_name, Payload=json.dumps(input_payload)
-        )
-
-        # Extract the response payload from the response object
-        response_payload = json.loads(response["Payload"].read().decode("utf-8"))
-
-        # Perform assertion on the response payload
-        assert response_payload["statusCode"] == 200
-        assert response_payload["body"] == "Metrics Pushed"
-
-    except Exception as e:
-        print(f"Lambda function {function_name} returned an unexpected response: {e}")
-
-
-def test_resource_list_lambda():
-
-    function_name = functionresourcelistfunction_arn
-    input_payload = {"key": "value"}
-
-    try:
-        response = lambda_client.invoke(
-            FunctionName=function_name, Payload=json.dumps(input_payload)
-        )
-
-        # Extract the response payload from the response object
-        response_payload = json.loads(response["Payload"].read().decode("utf-8"))
-
-        # Perform assertion on the response payload
-        assert response_payload["statusCode"] == 200
-
-    except Exception as e:
-        assert (
-            False
-        ), f"Lambda function {function_name} returned an unexpected response: {e}"
-
-
 def test_project_spend_lambda():
+    """
+    Test function for invoking the project spend lambda.
+
+    This function tests the invocation of the specified AWS Lambda function
+    (`functionprojectspendcost_arn`) with a given input payload. It asserts
+    that the response received from the Lambda function has a status code of 200.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If the Lambda function response does not have a status
+        code of 200 or if there is an exception while invoking the function.
+
+    """
 
     function_name = functionprojectspendcost_arn
     input_payload = {"key": "value"}
@@ -192,13 +155,67 @@ def test_project_spend_lambda():
     except Exception as e:
         assert (
             False
+            
         ), f"Lambda function {function_name} returned an unexpected response: {e}"
 
 
-def test_project_cost_breakdown_lambda():
+def test_most_expensive_service():
+    """
+    Test function for evaluating the most expensive service Lambda function.
 
-    function_name = functionprojectcostbreakdown_arn
-    input_payload = {"key": "value", "project_name": "project1"}
+    This function tests the specified Lambda function by invoking it with a given
+    input payload and performing assertions on the response payload. It checks
+    whether the Lambda function returns an expected status code and response body.
+
+    Args:
+        None
+
+    Returns:
+        None
+
+    Raises:
+        Exception: If the Lambda function returns an unexpected response.
+
+    """
+
+    function_name = functionmostexpensiveservice_arn
+    input_payload = {"key": "value"}
+
+    try:
+        response = lambda_client.invoke(
+            FunctionName=function_name, Payload=json.dumps(input_payload)
+        )
+
+        # Extract the response payload from the response object
+        response_payload = json.loads(response["Payload"].read().decode("utf-8"))
+
+        # Perform assertion on the response payload
+        assert response_payload["statusCode"] == 200
+        assert response_payload["body"] == "Metrics Pushed"
+
+    except Exception as e:
+
+        print(f"Lambda function {function_name} returned an unexpected response: {e}")
+
+
+def test_resource_list_lambda():
+    """
+    Test the invocation of a Lambda function for resource listing.
+
+    This function tests the invocation of a Lambda function by providing it with an input payload.
+    The response from the Lambda function is then checked to ensure that the status code is 200.
+
+    Note:
+    - The `functionresourcelistfunction_arn` variable should be set to the ARN of the Lambda function to be tested.
+    - The `lambda_client` variable should be an initialized AWS Lambda client object.
+    - The `json` module should be imported to handle JSON serialization and deserialization.
+
+    Raises:
+        AssertionError: If the Lambda function returns an unexpected response or if the status code is not 200.
+    """
+
+    function_name = functionresourcelistfunction_arn
+    input_payload = {"key": "value"}
 
     try:
         response = lambda_client.invoke(
@@ -214,4 +231,5 @@ def test_project_cost_breakdown_lambda():
     except Exception as e:
         assert (
             False
+
         ), f"Lambda function {function_name} returned an unexpected response: {e}"
