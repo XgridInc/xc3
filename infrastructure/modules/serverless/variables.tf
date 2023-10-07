@@ -138,3 +138,8 @@ variable "create_cloudtrail" {
   description = "Fetch the Cloudtrail if exist"
   type        = bool
 }
+
+variable "env" {
+  description = "Env variable for Dev/Prod"
+  type        = string
+}

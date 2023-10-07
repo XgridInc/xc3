@@ -82,4 +82,5 @@ module "serverless" {
   create_cloudtrail_kms       = var.create_cloudtrail_kms
   create_cloudtrail           = var.create_cloudtrail
   create_cloudtrail_s3_bucket = var.create_cloudtrail_s3_bucket
+  env                         = var.env
 }
