@@ -145,3 +145,52 @@ else
         echo "Failed to request ACM certificate"
     fi
 fi
+
+# Create the KMS key for cloudtrail and capture the key ID in a variable
+if [ "${env}" = "prod" ];then
+# echo "Creating due to ${env} environment."
+if key_id=$(aws kms create-key \
+        --description "kms key for cloudtrail" \
+        --tags "[{\"TagKey\":\"Project\",\"TagValue\":\"${project}\"}, {\"TagKey\":\"Owner\",\"TagValue\":\"${owner_email}\"}, {\"TagKey\":\"Creator\",\"TagValue\":\"${creator_email}\"}]" \
+        --policy '{
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "Enable IAM User Permissions",
+                "Effect": "Allow",
+                "Principal": {
+                  "AWS": "*"
+                },
+                "Action": "kms:*",
+                "Resource": "*"
+              },
+              {
+                "Sid": "Allow CloudTrail to encrypt logs",
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "cloudtrail.amazonaws.com"
+                },
+                "Action": [
+                  "kms:GenerateDataKey",
+                  "kms:Decrypt"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }' \
+        --output text \
+        --query 'KeyMetadata.KeyId' \
+        --region "${aws_region}"); then
+   echo "KMS Key created successfully"
+else
+    echo "Failed to create KMS key"
+fi
+# Create alias on KMS key
+if aws kms create-alias --alias-name "alias/${project}-kms-key" --target-key-id "${key_id}" --region "${aws_region}" ; then
+   echo "Alias created successfully on KMS key"
+else
+    echo "Failed to create alias on kms key"
+fi
+else
+    echo "Skiping due to ${env} environment."
+fi
