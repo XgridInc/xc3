@@ -73,3 +73,23 @@ for data_item in combined_list:
     if data_item["type"] == "apigw" and data_item["name"] == "this":
         api_gateway = data_item["values"]["name"]
         break
+# SQS
+sqs_name = None
+for data_item in combined_list:
+    if data_item["type"] == "aws_sqs_queue" and data_item["name"] == "this":
+        sqs_name = data_item["values"]["name"]
+        break
+# EIC endpoint
+ec2_instance_connect_endpoint = None
+for data_item in combined_list:
+    if (
+        data_item["type"] == "aws_ec2_instance_connect_endpoint"
+        and data_item["name"] == "eicendpoint"
+    ):
+        ec2_instance_connect_endpoint = data_item["instances"]["arn"]
+        break
+# AWS Lambda fucntions
+lambda_function_names = []
+for data_item in combined_list:
+    if data_item["type"] == "aws_lambda_function":
+        lambda_function_names.append(data_item["name"])
