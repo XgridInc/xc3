@@ -14,42 +14,6 @@ Tests will be run frequently throughout the development cycle, including during 
 First, clone the repository [XC3](https://github.com/XgridInc/xc3.git)
 and follow the [installation guide](https://docs.google.com/document/d/1YoaWoDSOjdOY2Wk3FXYHOni4wERCU7_WvsQamYkqS_o/edit) until you reach the 'terraform init' step within the 'XC3/infrastructure' directory. Once you've completed those initial steps, navigate to the 'XC3/test/unittests' directory.
 
-To set up the required dependencies, create a file named `requirements.txt` and paste the following content into the file:
-
-```plaintext
-boto3==1.28.7
-botocore==1.31.7
-certifi==2023.5.7
-cffi==1.15.1
-charset-normalizer==3.2.0
-cryptography==41.0.2
-ecdsa==0.18.0
-idna==3.4
-iniconfig==2.0.0
-Jinja2==3.1.2
-jmespath==1.0.1
-MarkupSafe==2.1.3
-moto==4.1.13
-packaging==23.1
-pluggy==1.2.0
-pyasn1==0.5.0
-pycparser==2.21
-pytest==7.4.0
-python-dateutil==2.8.2
-python-dotenv==1.0.0
-python-jose==3.3.0
-PyYAML==6.0.1
-requests==2.31.0
-responses==0.23.1
-rsa==4.9
-s3transfer==0.6.1
-six==1.16.0
-types-PyYAML==6.0.12.10
-urllib3==1.26.16
-Werkzeug==2.3.6
-xmltodict==0.13.0
-```
-
 Run following command. 
 ```
 python3 -m venv venv
@@ -58,12 +22,12 @@ pip3 install -r requirements.txt
 ```
 First run any test available to check all things are fine using this command.
 ```
-pytest -v file.py
+pytest -v "filename.py"
 ```
 This will show test failed/passed. if passed. 
 then now you can create new unit test file and test them by running same command 
 ```
-pytest -v file.py
+pytest -v "fileName.py"
 ```
 
 ## Work Flow
