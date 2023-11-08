@@ -21,11 +21,27 @@ import boto3
 from config import lambda_function_names, region, env
 
 class LambdaMockTests(unittest.TestCase):
+    """
+    Unit tests for AWS Lambda functions.
+
+    These tests validate the existence of Lambda functions with the specified names.
+    """
     def setUp(self):
+        """
+        Set up the test case by initializing the AWS Lambda client.
+        """
         # Initialize the AWS Lambda client
         self.lambda_client = boto3.client('lambda', region_name=region)
 
     def test_lambda_functions_created(self):
+        """
+        Test if the expected Lambda functions have been created.
+
+        This test checks if the Lambda functions exist and logs debugging information.
+
+        Raises:
+            AssertionError: If any of the expected Lambda functions are not found.
+        """
         # Log information for debugging
         logging.info(f"Testing Lambda Functions in Region: {region}, Environment: {env}")
 

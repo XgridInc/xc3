@@ -22,6 +22,11 @@ import boto3
 from config import ec2_instance_connect_endpoint, region, env
 
 class EicMockTests(unittest.TestCase):
+    """
+    Unit tests for EC2 Instance Connect Endpoint creation.
+
+    These tests validate the existence of an EC2 Instance Connect Endpoint with the specified ARN when the environment is 'prod'.
+    """
     # Define a decorator to skip the test if the environment is "dev"
     def skip_if_dev(func):
         def wrapper(self, *args, **kwargs):
@@ -34,11 +39,22 @@ class EicMockTests(unittest.TestCase):
 
     @skip_if_dev
     def setUp(self):
+        """
+        Set up the test case by initializing the AWS EC2 client.
+        """
         # Initialize the AWS EC2 client
         self.ec2_client = boto3.client('ec2', region_name=region)
 
     @skip_if_dev
     def test_eni_endpoint_created(self):
+        """
+        Test if the EC2 Instance Connect Endpoint with the specified ARN has been created.
+
+        This test checks if the EC2 Instance Connect Endpoint exists and logs information for debugging.
+
+        Raises:
+            AssertionError: If the number of EC2 Instance Connect Endpoints with the specified ARN is not equal to 1.
+        """
         # Log information for debugging
         logging.info(f"Testing EC2 Instance Connect Endpoint: ARN: {ec2_instance_connect_endpoint}, Region: {region}, Environment: {env}")
         # Check if the ENI endpoint exists
@@ -60,4 +76,4 @@ class EicMockTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    logging.shutdown()  # Ensure buffered log messages are written
+    logging.shutdown()  

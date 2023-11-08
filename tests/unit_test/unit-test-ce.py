@@ -21,6 +21,12 @@ from unittest.mock import patch, MagicMock
 from config import region
 
 def function_to_get_cost_and_usage():
+    """
+    This function retrieves cost and usage information from AWS Cost Explorer for Amazon S3 services.
+
+    Returns:
+        dict: A dictionary containing the total cost and currency, or None if no results are available.
+    """
     ce_client = boto3.client('ce', region_name=region)  
 
     start_date = '2023-01-01'
@@ -55,8 +61,16 @@ def function_to_get_cost_and_usage():
         return None
 
 class TestCostExplorer(unittest.TestCase):
+    """
+    This class contains test cases for the `function_to_get_cost_and_usage` function.
+    """
     @patch('boto3.client')
     def test_get_cost_and_usage(self, mock_boto3):
+        """
+        Test the `function_to_get_cost_and_usage` function with mock data.
+
+        The function should return the expected cost and currency information.
+        """
         # Mock the Boto3 client
         ce_mock = MagicMock()
         mock_boto3.return_value = ce_mock

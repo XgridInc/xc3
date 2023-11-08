@@ -21,7 +21,13 @@ import unittest
 import boto3
 from moto import mock_route53
 from config import ec2_instance_connect_endpoint, region, env
+
 class TestRoute53(unittest.TestCase):
+    """
+    Unit tests for Route 53 DNS record creation.
+
+    These tests validate the creation of a DNS record in Route 53 when the environment is 'prod'.
+    """
     # Define a decorator to skip the test if the environment is "dev"
     def skip_if_dev(func):
         def wrapper(self, *args, **kwargs):
@@ -35,6 +41,14 @@ class TestRoute53(unittest.TestCase):
     @skip_if_dev
     @mock_route53
     def test_create_dns_record(self):
+        """
+        Test the creation of a DNS record in Route 53.
+
+        This test creates a mock Route 53 client, a hosted zone, and a DNS record. It checks if the DNS record was created successfully.
+
+        Raises:
+            AssertionError: If the DNS record creation does not return an HTTP status code of 200.
+        """
         # Create a mock Route 53 client
         route53_client = boto3.client('route53', region_name=region)
 
@@ -49,10 +63,10 @@ class TestRoute53(unittest.TestCase):
         # Define DNS record details
         dns_name = 'xccc.xgrid.co'
         dns_type = 'A'
-        dns_value = '192.168.1.1'     #randome dns for testing.
+        dns_value = '192.168.1.1'  # Random DNS value for testing.
 
         # Create a DNS record
-        change_batch = {
+        dns_record_change = {
             'Changes': [
                 {
                     'Action': 'CREATE',
@@ -68,8 +82,9 @@ class TestRoute53(unittest.TestCase):
 
         response = route53_client.change_resource_record_sets(
             HostedZoneId=hosted_zone_id,
-            ChangeBatch=change_batch
+            ChangeBatch=dns_record_change
         )
+
 
         # Check if the DNS record was created successfully
         self.assertEqual(response['ResponseMetadata']['HTTPStatusCode'], 200)
