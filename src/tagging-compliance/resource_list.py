@@ -24,12 +24,36 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 try:
-    regions = [
+    regions = {
         region["RegionName"] for region in ec2_client.describe_regions()["Regions"]
-    ]
+    }
 except Exception as e:
     logging.error("Error describing ec2 regions: " + str(e))
 
+try:
+    ssm_client = boto3.client("ssm")
+except Exception as e:
+    logging.error("Error creating boto3 client for ssm:" + str(e))
+    
+def get_region_names():
+    """
+    Retrieves the region names dictionary from AWS Systems Manager Parameter Store.
+
+    Returns:
+    - dict: The region names dictionary.
+    """
+    region_path = os.environ["region_names_path"]
+    
+    try:
+        response = ssm_client.get_parameter(Name=region_path)
+        region_names = json.loads(response["Parameter"]["Value"])
+        return region_names
+    except Exception as e:
+        logging.error("Error retrieving region names from Parameter Store: " + str(e))
+        raise
+
+# Get the region names dictionary
+region_names = get_region_names()
 
 def lambda_handler(event, context):
     """
@@ -53,6 +77,7 @@ def lambda_handler(event, context):
         except Exception as e:
             logging.error("Error initializing resourcegroupstaggingapi api: " + str(e))
             return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
+
         try:
             response = client_resource.get_resources()
         except Exception as e:
@@ -65,7 +90,9 @@ def lambda_handler(event, context):
         if dict_len == 0:
             continue
         else:
-            result_list = {"Region": region_name, "ResourceList": resources}
+            # Get the region name from the region code
+            region_display_name = f"{region_name} ({region_names.get(region_name, 'Unknown')})"
+            result_list = {"Region": region_display_name, "ResourceList": resources}
             case_list.append(result_list)
     try:
         cost_lambda_response = lambda_client.invoke(

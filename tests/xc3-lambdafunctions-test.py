@@ -19,6 +19,7 @@ from config import (
     iamrolestografananame,
     IamRolesServicename,
     functionprojectspendcost,
+    functionprojectcostbreakdown,
     functiontotalaccountcost,
     functioninstancechange,
     functionresourcelist,
@@ -30,6 +31,7 @@ from config import (
     functionmostexpensiveservice_arn,
     functionresourcelistfunction_arn,
     functionprojectspendcost_arn,
+    functionprojectcostbreakdown_arn,
 )
 
 
@@ -37,6 +39,7 @@ function_names = [
     iamrolestografananame,
     IamRolesServicename,
     functionprojectspendcost,
+    functionprojectcostbreakdown,
     functiontotalaccountcost,
     functioninstancechange,
     functionresourcelist,
@@ -174,6 +177,28 @@ def test_project_spend_lambda():
 
     function_name = functionprojectspendcost_arn
     input_payload = {"key": "value"}
+
+    try:
+        response = lambda_client.invoke(
+            FunctionName=function_name, Payload=json.dumps(input_payload)
+        )
+
+        # Extract the response payload from the response object
+        response_payload = json.loads(response["Payload"].read().decode("utf-8"))
+
+        # Perform assertion on the response payload
+        assert response_payload["statusCode"] == 200
+
+    except Exception as e:
+        assert (
+            False
+        ), f"Lambda function {function_name} returned an unexpected response: {e}"
+
+
+def test_project_cost_breakdown_lambda():
+
+    function_name = functionprojectcostbreakdown_arn
+    input_payload = {"key": "value", "project_name": "project1"}
 
     try:
         response = lambda_client.invoke(

@@ -30,7 +30,7 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 
-# Initializing enviornment variables
+# Initializing environment variables
 runtime_region = os.environ["REGION"]
 topic_arn = os.environ["sns_topic"]
 
@@ -39,9 +39,9 @@ def lambda_handler(event, context):
     """
     List IAM User Details.
     Args:
-        Accound ID: AWS account id.
+        Account ID: AWS account id.
     Returns:
-        It return list of IAM Users details in provided aws account.
+        It returns a list of IAM Users details in provided aws account.
     Raises:
         Lambda Invoke Error: Raise error if message doesn't publish in SNS topic
     """
@@ -110,7 +110,7 @@ def lambda_handler(event, context):
                 MessageStructure="json",
             )
         except Exception as e:
-            logging.error("Error in publoish SNS message: " + str(e))
+            logging.error("Error in publish SNS message: " + str(e))
             return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
 
     return {"statusCode": 200, "body": json.dumps(iam_user_detail)}

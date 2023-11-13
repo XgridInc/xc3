@@ -70,7 +70,7 @@ resource "aws_cognito_user_pool" "grafana_pool" {
 
 resource "aws_cognito_user_pool_domain" "main" {
   count        = var.domain_name != "" ? 1 : 0
-  domain       = var.cognito_domain
+  domain       = "${var.namespace}-domain"
   user_pool_id = aws_cognito_user_pool.grafana_pool[0].id
 }
 
@@ -93,8 +93,8 @@ resource "aws_cognito_user_pool_client" "grafana_client" {
   allowed_oauth_flows  = ["code"]
   allowed_oauth_scopes = ["email", "openid", "aws.cognito.signin.user.admin", "profile"]
 
-  callback_urls = ["https://${coalesce(var.domain_name, aws_lb.this.dns_name)}/generic_oauth", "https://${coalesce(var.domain_name, aws_lb.this.dns_name)}/login", "https://${coalesce(var.domain_name, aws_lb.this.dns_name)}/login/generic_oauth"]
-  logout_urls   = ["https://${coalesce(var.domain_name, aws_lb.this.dns_name)}/login"]
+  callback_urls = ["https://${coalesce(var.domain_name, aws_lb.this[0].dns_name)}/generic_oauth", "https://${coalesce(var.domain_name, aws_lb.this[0].dns_name)}/login", "https://${coalesce(var.domain_name, aws_lb.this[0].dns_name)}/login/generic_oauth"]
+  logout_urls   = ["https://${coalesce(var.domain_name, aws_lb.this[0].dns_name)}/login"]
 
   explicit_auth_flows = ["ALLOW_ADMIN_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_PASSWORD_AUTH"]
 

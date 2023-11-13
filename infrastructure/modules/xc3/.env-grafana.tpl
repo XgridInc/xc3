@@ -51,6 +51,7 @@ GF_AUTH_GENERIC_OAUTH_AUTH_URL=https://${user_pool_domain}.auth.${region}.amazon
 GF_AUTH_GENERIC_OAUTH_TOKEN_URL=https://${user_pool_domain}.auth.${region}.amazoncognito.com/oauth2/token
 GF_AUTH_GENERIC_OAUTH_API_URL=https://${user_pool_domain}.auth.${region}.amazoncognito.com/oauth2/userInfo
 
+
 GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH=(\"cognito:groups\" | contains([*], 'Admin') && 'Admin' || 'Viewer')
 
 # Logout callback to redirect signout from Grafana to AWS Cognito OAuth signout

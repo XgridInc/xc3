@@ -31,6 +31,7 @@ module "networking" {
   owner_email               = var.owner_email
   domain_name               = var.domain_name
   project                   = var.project
+  env                       = var.env
 }
 // Terraform Module for Xgrid Cloud Cost Control
 
@@ -38,7 +39,7 @@ module "xc3" {
   source = "./modules/xc3"
 
   vpc_id              = module.networking.vpc_id
-  subnet_id           = module.networking.private_subnet_id
+  private_subnet_id   = module.networking.private_subnet_id
   public_subnet_ids   = module.networking.public_subnet_ids
   security_group_ids  = module.networking.security_group_ids
   ses_email_address   = var.ses_email_address
@@ -50,31 +51,36 @@ module "xc3" {
   region              = var.region
   prometheus_layer    = var.prometheus_layer
   domain_name         = var.domain_name
-  parent_domain_name  = var.parent_domain_name
   hosted_zone_id      = var.hosted_zone_id
   grafana_api_gateway = module.serverless.grafana_api_gateway
+  env                 = var.env
+  # removed network module dependency - fixed - in case if you face any issues regarding network timeout
+  # _ in instance level, write -> depends_on = [module.networking] 
 }
 
 // Terraform Module for Serverless Application
 module "serverless" {
-  source                     = "./modules/serverless"
-  namespace                  = var.namespace
-  owner_email                = var.owner_email
-  creator_email              = var.creator_email
-  project                    = var.project
-  region                     = var.region
-  subnet_id                  = module.networking.private_subnet_id
-  security_group_id          = module.networking.security_group_ids.serverless_security_group_id
-  s3_xc3_bucket              = module.xc3.s3_xc3_bucket
-  sns_topic_arn              = module.xc3.sns_topic_arn
-  prometheus_ip              = module.xc3.private_ip
-  prometheus_layer           = module.xc3.prometheus_layer_arn
-  timeout                    = var.timeout
-  memory_size                = var.memory_size
-  total_account_cost_lambda  = var.total_account_cost_lambda
-  account_id                 = var.account_id
-  total_account_cost_cronjob = var.total_account_cost_cronjob
-  cron_jobs_schedule         = var.cron_jobs_schedule
-  slack_channel_url          = var.slack_channel_url
-
+  source                      = "./modules/serverless"
+  namespace                   = var.namespace
+  owner_email                 = var.owner_email
+  creator_email               = var.creator_email
+  project                     = var.project
+  region                      = var.region
+  subnet_id                   = module.networking.private_subnet_id
+  security_group_id           = module.networking.security_group_ids.serverless_security_group_id
+  s3_xc3_bucket               = module.xc3.s3_xc3_bucket
+  sns_topic_arn               = module.xc3.sns_topic_arn
+  prometheus_ip               = module.xc3.private_ip
+  prometheus_layer            = module.xc3.prometheus_layer_arn
+  timeout                     = var.timeout
+  memory_size                 = var.memory_size
+  total_account_cost_lambda   = var.total_account_cost_lambda
+  account_id                  = var.account_id
+  total_account_cost_cronjob  = var.total_account_cost_cronjob
+  cron_jobs_schedule          = var.cron_jobs_schedule
+  slack_channel_url           = var.slack_channel_url
+  create_cloudtrail_kms       = var.create_cloudtrail_kms
+  create_cloudtrail           = var.create_cloudtrail
+  create_cloudtrail_s3_bucket = var.create_cloudtrail_s3_bucket
+  env                         = var.env
 }

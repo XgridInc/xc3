@@ -20,9 +20,10 @@ data "archive_file" "lambda_function_zip" {
 }
 
 resource "aws_lambda_function" "IamRolestoGrafana" {
-  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0483 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0485 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0484 We are aware of the risk and choose to skip this rule
+
   function_name = "${var.namespace}-iamrolestografana"
   role          = aws_iam_role.lambda_execution_role_IamRolestoGrafana.arn
   runtime       = "python3.9"
@@ -33,12 +34,13 @@ resource "aws_lambda_function" "IamRolestoGrafana" {
     variables = {
       func_name_iam_role_service_mapping = aws_lambda_function.IamRolesServiceMapping.arn
       prometheus_ip                      = "${var.prometheus_ip}:9091"
+      region_names_path                   = "/${var.namespace}/region-names"
     }
   }
   memory_size = var.memory_size
   timeout     = var.timeout
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
 
@@ -92,15 +94,18 @@ resource "aws_iam_role" "lambda_execution_role_IamRolestoGrafana" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", 
+  "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", 
+  "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+  "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"]
 
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-to-Grafana" }))
 }
 
 resource "aws_lambda_function" "IamRolesServiceMapping" {
-  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0483 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0485 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0484 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-iamrolesservicemapping"
   role          = aws_iam_role.lambda_execution_role_IamRolesServiceMapping.arn
   runtime       = "python3.9"
@@ -116,7 +121,7 @@ resource "aws_lambda_function" "IamRolesServiceMapping" {
   memory_size = var.memory_size
   timeout     = var.timeout
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
 
@@ -140,7 +145,10 @@ resource "aws_iam_role" "lambda_execution_role_IamRolesServiceMapping" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess",
+  "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", 
+  "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+  "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"]
   tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-Service-Mapping" }))
 }
 
@@ -195,9 +203,9 @@ resource "aws_iam_role_policy" "IamRolesServiceMapping" {
 
 
 resource "aws_lambda_function" "IamRolesService" {
-  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0483 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0485 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0484 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-iamrolesservice"
   role          = aws_iam_role.lambda_execution_role_IamRolesService.arn
   runtime       = "python3.9"
@@ -206,12 +214,13 @@ resource "aws_lambda_function" "IamRolesService" {
   environment {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"
+      region_names_path = "/${var.namespace}/region_names"
     }
   }
   memory_size = var.memory_size
   timeout     = var.timeout
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
 
@@ -283,13 +292,13 @@ resource "aws_iam_role" "lambda_execution_role_IamRolesService" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole", "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"]
   tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-Service" }))
 }
 
 resource "aws_lambda_function" "InstanceChangeState" {
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0485 We are aware of the risk and choose to skip this rule
+  #ts:skip=AC_AWS_0484 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-instancestatechange"
   role          = aws_iam_role.lambda_execution_role_InstanceChangeState.arn
   runtime       = "python3.9"
@@ -299,7 +308,7 @@ resource "aws_lambda_function" "InstanceChangeState" {
   memory_size = var.memory_size
   timeout     = var.timeout
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
 
@@ -378,7 +387,7 @@ resource "aws_iam_role" "lambda_execution_role_InstanceChangeState" {
       }
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess", "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess", "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole","arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"]
   tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-instance-state-change" }))
 }
 
@@ -468,13 +477,15 @@ resource "aws_lambda_permission" "apigw" {
   source_arn    = "${aws_api_gateway_rest_api.apiLambda.execution_arn}/*/*"
 }
 
-resource "null_resource" "delete_zips" {
-  for_each = var.lambda_names
-  triggers = {
-    lambda_function_arn = "arn:aws:lambda:${var.region}:${var.account_id}:function:${each.key}"
-  }
+resource "terraform_data" "delete_zips" {
+  for_each         = var.lambda_names
+  triggers_replace = ["arn:aws:lambda:${var.region}:${var.account_id}:function:${each.key}"]
+
+  depends_on = [aws_lambda_function.IamRolesService, aws_lambda_function.InstanceChangeState, aws_lambda_function.IamRolesServiceMapping,
+  aws_lambda_function.IamRolestoGrafana]
 
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.lambda_function_zip[each.key].output_path}"
   }
+
 }

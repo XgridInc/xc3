@@ -43,7 +43,8 @@ resource "aws_iam_role" "resource_list_service_role" {
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
     "arn:aws:iam::aws:policy/ResourceGroupsandTagEditorReadOnlyAccess",
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+    "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
+    "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
   ]
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource_list_service_role" }))
 
@@ -93,12 +94,13 @@ resource "aws_lambda_function" "resource_list_function" {
   environment {
     variables = {
       resource_list_lambda_function = aws_lambda_function.resource_parsing_function.arn
+      region_names_path = "/${var.namespace}/region_names"
     }
   }
   memory_size = var.memory_size
   timeout     = var.timeout
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource_list_lambda" }))
@@ -125,26 +127,22 @@ resource "aws_lambda_function" "resource_parsing_function" {
   timeout     = var.timeout
   layers      = [var.prometheus_layer]
   vpc_config {
-    subnet_ids         = [var.subnet_id]
+    subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource_parsing_lambda" }))
 
 }
 
-resource "null_resource" "delete_resource_list_zip_file" {
-  triggers = {
-    lambda_function_arn = aws_lambda_function.resource_list_function.arn
-  }
+resource "terraform_data" "delete_resource_list_zip_file" {
+  triggers_replace = [aws_lambda_function.resource_list_function.arn]
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.resource_list_archive.output_path}"
   }
 }
 
-resource "null_resource" "delete_resource_parsing_zip_file" {
-  triggers = {
-    lambda_function_arn = aws_lambda_function.resource_parsing_function.arn
-  }
+resource "terraform_data" "delete_resource_parsing_zip_file" {
+  triggers_replace = [aws_lambda_function.resource_parsing_function.arn]
   provisioner "local-exec" {
     command = "rm -r ${data.archive_file.resource_parsing_archive.output_path}"
   }

@@ -79,7 +79,7 @@ def lambda_handler(event, context):
 
     try:
         registry = CollectorRegistry()
-        resource_list_guage = Gauge(
+        resource_list_gauge = Gauge(
             "TaggingResourceList",
             "Resource List",
             labelnames=["resource", "region", "account_id"],
@@ -105,10 +105,12 @@ def lambda_handler(event, context):
                     subset_list.append(subset_value)
         # Push resource list to Prometheus metric
         for resource in subset_list:
-            resource_list_guage.labels(resource, lambda_item["Region"], account_id).set(
+            resource_list_gauge.labels(resource, lambda_item["Region"], account_id).set(
                 0
             )
     push_to_gateway(
         os.environ["prometheus_ip"], job="TaggingResourceList", registry=registry
     )
+
     return {"statusCode": 200, "body": "success"}
+#EOF

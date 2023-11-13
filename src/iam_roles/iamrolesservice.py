@@ -33,6 +33,10 @@ try:
     ec2_client = boto3.client("ec2")
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
+try:
+    ssm_client = boto3.client("ssm")
+except Exception as e:
+    logging.error("Error creating boto3 client for ssm:" + str(e))
 
 
 def cost_of_instance(event, client, resource_id, start_date, end_date):
@@ -64,7 +68,26 @@ def cost_of_instance(event, client, resource_id, start_date, end_date):
         Metrics=["UnblendedCost"],
     )
     return response
+    
+def get_region_names():
+    """
+    Retrieves the region names dictionary from AWS Systems Manager Parameter Store.
 
+    Returns:
+    - dict: The region names dictionary.
+    """
+    region_path = os.environ["region_names_path"]
+    
+    try:
+        response = ssm_client.get_parameter(Name=region_path)
+        region_names = json.loads(response["Parameter"]["Value"])
+        return region_names
+    except Exception as e:
+        logging.error("Error retrieving region names from Parameter Store: " + str(e))
+        raise
+
+# Get the region names dictionary
+region_names = get_region_names()
 
 def lambda_handler(event, context):
     """
@@ -101,7 +124,9 @@ def lambda_handler(event, context):
     end_date = str(datetime.now().date())
     start_date = str(datetime.now().date() - timedelta(days=cost_by_days))
     account_id = context.invoked_function_arn.split(":")[4]
-
+    
+    new_time = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    
     for i in range(len(roles)):
         arn = roles[i]["Role"]
         role = arn.rsplit("/", 1)[-1]
@@ -169,7 +194,7 @@ def lambda_handler(event, context):
                                         )
                                     ).strftime("%Y-%m-%d %H:%M:%S"),
                                     role,
-                                    role_region,
+                                    f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                                     account_id,
                                     ec2,
                                     cumulative,
@@ -195,7 +220,7 @@ def lambda_handler(event, context):
                                         )
                                     ).strftime("%Y-%m-%d %H:%M:%S"),
                                     role,
-                                    role_region,
+                                    f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                                     account_id,
                                     ec2,
                                     cumulative,
@@ -210,7 +235,7 @@ def lambda_handler(event, context):
                             "%Y-%m-%d %H:%M:%S"
                         ),
                         role,
-                        role_region,
+                        f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                         account_id,
                         detail,
                         "0",
@@ -222,3 +247,4 @@ def lambda_handler(event, context):
     )
 
     return {"statusCode": 200, "body": json.dumps("Service Lambda Data Pushed")}
+#EOF

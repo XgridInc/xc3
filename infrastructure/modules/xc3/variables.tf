@@ -22,8 +22,8 @@ variable "vpc_id" {
   description = "The ID of the VPC where the resources will be created"
 }
 
-variable "subnet_id" {
-  type        = string
+variable "private_subnet_id" {
+  type        = list(string)
   description = "The ID of the subnet where the resources will be created"
 }
 
@@ -77,25 +77,22 @@ variable "project" {
 variable "domain_name" {
   type        = string
   description = "Domain name for Grafana Dashboard"
+  default     = ""
 }
 
-variable "parent_domain_name" {
-  type        = string
-  description = "Parent domain name for SSL Certificate"
-}
 
 variable "hosted_zone_id" {
   type        = string
   description = "Public Hosted Zone ID in the Route 53"
 }
 
-variable "cognito_domain" {
-  type        = string
-  description = "Cognito Domain"
-  default     = "grafana-domain"
-}
 
 variable "grafana_api_gateway" {
   type        = string
   description = "The API Gateway link "
+}
+
+variable "env" {
+  description = "Env variable for Dev/Prod"
+  type        = string
 }
