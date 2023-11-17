@@ -38,6 +38,27 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client for ssm:" + str(e))
     
+def get_region_names():
+    """
+    Retrieves the region names dictionary from AWS Systems Manager Parameter Store.
+
+    Returns:
+    - dict: The region names dictionary.
+    """
+    region_path = os.environ["region_names_path"]
+    
+    try:
+        response = ssm_client.get_parameter(Name=region_path)
+        region_names = json.loads(response["Parameter"]["Value"])
+        return region_names
+    except Exception as e:
+        logging.error("Error retrieving region names from Parameter Store: " + str(e))
+        raise
+
+# Get the region names dictionary
+region_names = get_region_names()
+
+
 def get_cost_and_usage_data(client, start, end, region, account_id):
     """
     Retrieves the unblended cost of a given account within a specified time period
@@ -152,7 +173,7 @@ def lambda_handler(event, context):
         for resource in top_5_resources:
             resourcedata = {
                 "Account": account_detail,
-                "Region": region,
+                "Region": f"{region}-{region_names.get(region, 'unknown region name')}",
                 "Service": resource["Keys"][0],
                 "Cost": resource["Metrics"]["UnblendedCost"]["Amount"],
             }
