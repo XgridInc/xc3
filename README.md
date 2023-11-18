@@ -1,5 +1,6 @@
 <br>
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Docs](https://img.shields.io/badge/docs-latest-blue)](https://github.com/XgridInc/xc3)
 [![Slack](https://slackin.px.dev/badge.svg)](https://app.slack.com/client/T055VHJ0087/C0571UK3SBG)
 [![Open AI Reviewer](https://github.com/XgridInc/xc3/actions/workflows/openai-pr-reviewer.yml/badge.svg)](https://github.com/XgridInc/xc3/actions/workflows/openai-pr-reviewer.yml)
@@ -27,14 +28,15 @@ Check the below video for a quick demo of XC3.
 
 - Provides cost optimization recommendation workflow without exposing your private information
 
-# XC3 System Architecture Visual Overview 
+# XC3 System Architecture Visual Overview
 
-<b>``` XC3 has two architecture diagrams, representing its 'Dev' and 'Prod' environments.```</b>
+<b>` XC3 has two architecture diagrams, representing its 'Dev' and 'Prod' environments.`</b>
+
 # XC3 Dev Architecture
 
 ![XC3 Dev Architecture](https://github.com/XgridInc/xc3/assets/138758061/8bd4a8f3-ee54-44ee-a152-865d7ce6bb2b)
 
-```This diagram illustrates the architecture of the "dev" environment for XC3. Below are the key components:```
+`This diagram illustrates the architecture of the "dev" environment for XC3. Below are the key components:`
 
 - EC2 Instance (Public Subnet): Acts as the entry point for the "dev" environment.
 - Lambda Functions (Private Subnet): Executes serverless tasks within a secure private subnet.
@@ -51,7 +53,7 @@ Access to the "dev" environment is primarily through the EC2 instance's IP addre
 
 ![XC3 Prod Architecture](https://github.com/XgridInc/xc3/assets/122358742/1f9b1c1e-92ca-4b2e-af17-8465214f25e9)
 
-```This diagram illustrates the architecture of the "prod" environment for XC3. It includes the following components:```
+`This diagram illustrates the architecture of the "prod" environment for XC3. It includes the following components:`
 
 - Cognito: Manages user authentication and authorization.
 - Route 53: Provides DNS routing services for efficient access.
@@ -92,7 +94,6 @@ Access to the "prod" environment is facilitated through a DNS URL, thanks to Rou
 
 3. VPC needs to be present in the master account where you want to set up XC3
 
-
 4. To store terraform state and to maintain lock, S3 bucket and dynamodb should be available in master account.
 
 5. ACM certificate should be available. It will be associated with loadbalancer and domain.
@@ -113,7 +114,8 @@ Access to the "prod" environment is facilitated through a DNS URL, thanks to Rou
     git clone https://github.com/XgridInc/xc3.git
     ```
 
-2. Go to the directory xc3/ and configure the input.sh file and run the below command
+2.  Go to the directory xc3/ and configure the input.sh file and run the below command
+
     ```
     cd xc3/
 
@@ -137,23 +139,20 @@ Access to the "prod" environment is facilitated through a DNS URL, thanks to Rou
     bash init.sh
     ```
 
-3. Wait for few minutes before proceeding further for the application to come online.
+3.  Wait for few minutes before proceeding further for the application to come online.
     Verify the readiness of the metrics system. Load the Grafana URL in a browser. Live Grafana UI ensures the system is ready to accept and visualize metrics.
-
 
     > Verify the readiness of metrics system by accessing Grafana UI: https://xc3.xxx.com/login
 
     > Verify the readiness of metrics system by accessing Grafana UI: `loadbalancer-dns`. If Hosted zone ID is not provided in `input.tfvars`.
 
+4.  Now setup is complete. If domain is provided in the input.sh then users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
 
+5.  SSH into the private instance using EIC Endpoint to check if everything is working fine. Here replace [instance-id] needs to be replaced with ID
 
-4. Now setup is complete. If domain is provided in the input.sh then users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
+    `ssh ubuntu@[instance-id] -i keypair.pem -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %h'`
 
-5. SSH into the private instance using EIC Endpoint to check if everything is working fine. Here replace [instance-id] needs to be replaced with ID
-
-    ``` ssh ubuntu@[instance-id] -i keypair.pem -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %h' ```
-
-6. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
+6.  Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
 
         Note :
             1. If data is not available in Grafana UI then follow the troubleshooting guide at the last section of this page.
