@@ -173,7 +173,7 @@ def lambda_handler(event, context):
         for resource in top_5_resources:
             resourcedata = {
                 "Account": account_detail,
-                "Region": f"{region} ({region_names.get(region, 'unknown region name')})",
+                "Region": f"{region}-{region_names.get(region, 'unknown region name')}",
                 "Service": resource["Keys"][0],
                 "Cost": resource["Metrics"]["UnblendedCost"]["Amount"],
             }

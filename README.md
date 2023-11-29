@@ -149,11 +149,13 @@ Access to the "prod" environment is facilitated through a DNS URL, thanks to Rou
 
 4. Now setup is complete. If domain is provided in the input.sh then users needs to be added in Cognito pool with requested role (admin/editor/viewer) in respective cognito group. User get random username/password from cognito then you can set password on domain by sign in using random credentials.
 
-5. SSH into the private instance using EIC Endpoint to check if everything is working fine. Here replace [instance-id] needs to be replaced with ID
+5. Go to AWS Systems Manager, select Parameter Store, and create a new parameter named "/{namespace}/region_names". Set the value as a dictionary with region IDs as keys and region names as values.
+
+6. SSH into the private instance using EIC Endpoint to check if everything is working fine. Here replace [instance-id] needs to be replaced with ID
 
     ``` ssh ubuntu@[instance-id] -i keypair.pem -o ProxyCommand='aws ec2-instance-connect open-tunnel --instance-id %h' ```
 
-6. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
+7. Now XC3 will run at 05:00AM UTC every day to generate data and populate Grafana. Few lambdas (Total Account Cost and Project spend) will run twice in a month.
 
         Note :
             1. If data is not available in Grafana UI then follow the troubleshooting guide at the last section of this page.
@@ -172,6 +174,8 @@ case 1: If data is not showing into Grafana UI, there could be several reasons a
    [ERROR] DataUnavailableException: An error occurred (DataUnavailableException) when calling the GetCostAndUsage operation: Data is not available. Please try to adjust the time period. If just enabled Cost Explorer, data might not be ingested yet
 
 3. XC3 Budget Detail/IAM Role/User Workflow lambda may have failed to execute , please check Cloudwatch logs to address the issue.
+
+4. Check if XC3's most expensive services data is missing, and if so, verify the existence of the corresponding SSM parameter in AWS Systems Manager. To address this issue, ensure you follow step 5 of the deployment instructions.
 
 case 2: user not able to change/update/modify default dashboards in Grafana UI
 
