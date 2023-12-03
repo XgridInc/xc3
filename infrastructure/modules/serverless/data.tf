@@ -15,6 +15,6 @@
 # tflint-ignore: terraform_unused_declarations
 data "aws_kms_alias" "check_existing_kms" {
   count = var.env == "prod" ? 1 : 0
-  name = "alias/${var.namespace}-kms-key"
+  name  = "alias/${var.namespace}-kms-key"
 
 }

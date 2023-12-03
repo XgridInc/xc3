@@ -94,7 +94,7 @@ resource "aws_lambda_function" "resource_list_function" {
   environment {
     variables = {
       resource_list_lambda_function = aws_lambda_function.resource_parsing_function.arn
-      region_names_path = "/${var.namespace}/region_names"
+      region_names_path             = "/${var.namespace}/region_names"
     }
   }
   memory_size = var.memory_size
