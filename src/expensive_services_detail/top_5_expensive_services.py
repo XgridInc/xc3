@@ -14,7 +14,7 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 
-bucket_name = os.environ["bucket_name"]
+bucket_name = os.environ["bucket_name_get_report"]
 report_prefix = os.environ["report_prefix"]
 
 
@@ -168,7 +168,7 @@ def push_to_s3_bucket(json_data):
         f'{os.environ["top5_expensive_service_prefix"]}/top5_expensive_service.json'
     )
     try:
-        s3.put_object(Bucket=bucket_name, Key=key_name, Body=json_data)
+        s3.put_object(Bucket=os.environ["bucket_name"], Key=key_name, Body=json_data)
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchBucket":
             raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
