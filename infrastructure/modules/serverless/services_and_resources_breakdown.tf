@@ -87,8 +87,8 @@ resource "aws_iam_role_policy" "ServicesResourcesCost" {
         "Resource" : [
           "arn:aws:s3:::${var.s3_xc3_bucket.id}",
           "arn:aws:s3:::${var.s3_xc3_bucket.id}/*",
-          "arn:aws:s3:::${aws_s3_bucket.cur_bucket.bucket}",
-          "arn:aws:s3:::${aws_s3_bucket.cur_bucket.bucket}/*"
+          "arn:aws:s3:::${aws_s3_bucket.cur_bucket.id}",
+          "arn:aws:s3:::${aws_s3_bucket.cur_bucket.id}/*"
         ]
       }
     ]
