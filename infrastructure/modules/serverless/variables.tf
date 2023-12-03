@@ -116,6 +116,8 @@ variable "s3_prefixes" {
     monthly_cost_prefix           = "cost-metrics/total_account_cost.json"
     expensive_service_prefix      = "cost-metrics/expensive-services"
     project_cost_breakdown_prefix = "cost-metrics/project-cost-breakdown"
+    top5_expensive_service_prefix = "cost-metrics/top5-expensive-services"
+    report                        = "report/"
   }
 }
 
@@ -143,4 +145,3 @@ variable "env" {
   description = "Env variable for Dev/Prod"
   type        = string
 }
-
