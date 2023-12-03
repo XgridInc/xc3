@@ -11,6 +11,11 @@ resource "aws_s3_bucket" "cur_bucket" {
   bucket   = "${var.namespace}-xc3-report"
 }
 
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket      = aws_s3_bucket.cur_bucket.bucket
+  eventbridge = true
+}
+
 resource "aws_s3_bucket_versioning" "cur_bucket_versioning" {
   provider = aws.us_east_1
   bucket   = aws_s3_bucket.cur_bucket.bucket
