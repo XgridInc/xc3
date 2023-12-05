@@ -28,7 +28,7 @@ class TestLoadBalancerCreation(unittest.TestCase):
         # Initialize the AWS ELB client
         self.elb_client = boto3.client('elbv2', region_name=region)
 
-    @unittest.skipIf(env == 'dev', "Skipping test in dev environment")
+    @unittest.skipIf(env == 'dev', "Skipping test in dev environment.")
     def test_load_balancer_created(self):
         
         # Log the load balancer name and other relevant information for debugging
