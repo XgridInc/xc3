@@ -16,56 +16,42 @@ limitations under the License.
 SPDX-License-Identifier: Apache-2.0
 """
 
-import logging
 import unittest
-
 import boto3
-from config import (  # Import the 'env' variable and 'api_gateway_name' from your config   # noqa: E501
-    api_gateway,
-    env,
-    region,
-)
+import logging
 
+from config import region, load_balancer, env
 
-class TestApiGatewayCreation(unittest.TestCase):
+class TestLoadBalancerCreation(unittest.TestCase):
+
     def setUp(self):
-        # Initialize the AWS API Gateway client
-        self.apigateway_client = boto3.client("apigateway", region_name=region)
+        # Initialize the AWS ELB client
+        self.elb_client = boto3.client('elbv2', region_name=region)
 
-    @unittest.skipIf(env == "dev", "Skipping test in dev environment")
-    def test_api_gateway_created(self):
-        # Log the API Gateway name and other relevant information for debugging
-        logging.info(
-            f"Testing API Gateway: {api_gateway}, Region: {region}, Environment: {env}"  # noqa: E501
-        )
+    @unittest.skipIf(env == 'dev', "Skipping test in dev environment")
+    def test_load_balancer_created(self):
+        
+        # Log the load balancer name and other relevant information for debugging
+        logging.info(f"Testing load balancer: {load_balancer}, Region: {region}, Environment: {env}")
 
-        # Check if the API Gateway exists
+        # Check if the load balancer exists
         try:
-            response = self.apigateway_client.get_rest_apis()
-            api_gateways = response["items"]
+            response = self.elb_client.describe_load_balancers(Names=[load_balancer])
+            load_balancer_count = len(response['LoadBalancers'])
 
-            # Filter API Gateways by name
-            matching_api_gateways = [
-                api for api in api_gateways if api["name"] == api_gateway
-            ]
-
-            if len(matching_api_gateways) == 1:
-                logging.info(f"API Gateway '{api_gateway}' has been created.")
-            elif len(matching_api_gateways) == 0:
-                logging.warning(f"API Gateway '{api_gateway}' not found.")
+            if load_balancer_count == 1:
+                logging.info(f"Load balancer '{load_balancer}' has been created.")
+            elif load_balancer_count == 0:
+                logging.warning(f"Load balancer '{load_balancer}' not found.")
             else:
-                logging.warning(
-                    f"Multiple API Gateways with the name '{api_gateway}' found."  # noqa: E501
-                )
+                logging.warning(f"Multiple load balancers with the name '{load_balancer}' found.")
 
-            self.assertEqual(
-                len(matching_api_gateways),
-                1,
-                "Expected one API Gateway to be created.",  # noqa: E501
-            )
-        except Exception as e:
-            logging.warning(f"Error while checking API Gateway: {str(e)}")
+            self.assertEqual(load_balancer_count, 1, "Expected one load balancer to be created.")
+        except self.elb_client.exceptions.ClientError as e:
+            if e.response['Error']['Code'] == 'LoadBalancerNotFound':
+                logging.warning(f"Load balancer '{load_balancer}' not found.")
+            else:
+                raise
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
