@@ -16,9 +16,16 @@
 resource "aws_s3_bucket" "this" {
   #ts:skip=AWS.S3Bucket.IAM.High.0370 We are aware of the risk and choose to skip this rule
   count = var.create_cloudtrail_s3_bucket ? 1 : 0
-
   bucket = "${var.namespace}-cloudtrail-logs-storage"
   tags   = merge(local.tags, tomap({ "Name" = "${var.namespace}-bucket" }))
+}
+
+resource "aws_s3_bucket_versioning" "this" {
+  count = var.create_cloudtrail_s3_bucket ? 1 : 0
+  bucket = aws_s3_bucket.this[count.index].id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 # Create a CloudTrail trail and enable logging to the S3 bucket
