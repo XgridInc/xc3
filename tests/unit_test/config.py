@@ -43,7 +43,9 @@ project_spend_cost = "project_spend_cost"
 resource_list = "resource_list"
 
 combined_list = []
-for item in terraform_plan_json["planned_values"]["root_module"]["child_modules"]: # noqa: E501
+for item in terraform_plan_json["planned_values"]["root_module"][
+    "child_modules"
+]:  # noqa: E501
     combined_list.extend(item["resources"])
 
 kms_id = None
