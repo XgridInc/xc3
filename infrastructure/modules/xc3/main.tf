@@ -173,6 +173,13 @@ resource "aws_s3_bucket" "this" {
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-Bucket" }))
 }
 
+resource "aws_s3_bucket_versioning" "this" {
+  bucket = aws_s3_bucket.this.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 # Uploading Cloud Custodian Policies and lambda layers in S3 bucket
 # tflint-ignore: terraform_required_providers
 resource "terraform_data" "upload_files_on_s3" {
@@ -209,12 +216,12 @@ resource "aws_lambda_layer_version" "lambda_layer_prometheus" {
 
 ## Cloudwatch Alarms
 # tflint-ignore: terraform_required_providers
-resource "aws_cloudwatch_metric_alarm" "this" { 
-  alarm_name          = "${var.namespace}-xc3_cpu_usage_alarm"
+resource "aws_cloudwatch_metric_alarm" "cpu_utilization_queue_alarm" { 
+  alarm_name          = "${var.namespace}-xc3-cpu-usage-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods = "2"
-  metric_name        = "${var.namespace}-xc3_cpu_utilization"
-  namespace          = var.namespace
+  evaluation_periods = "1"
+  metric_name        = "CPUUtilization"
+  namespace          = "AWS/EC2"
   period             = "300"
   statistic          = "Average"
   threshold          = "80"
@@ -222,6 +229,25 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   alarm_actions     = [aws_sns_topic.this.arn]
   dimensions = {
     InstanceId = aws_instance.this.id
+  }
+
+   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-cpu_usage_alarm" }))
+}
+
+resource "aws_cloudwatch_metric_alarm" "sqs_queue_alarm" {
+  alarm_name          = "${var.namespace}-xc3-sqs-queue-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods = 1
+  metric_name        = "ApproximateAgeOfOldestMessage"
+  namespace          = "AWS/SQS"
+  period             = 300
+  statistic          = "Average"
+  threshold          = 10 
+  alarm_description  = "Alarm for SQS queue visibility threshold"
+  alarm_actions      = [aws_sns_topic.this.arn]
+
+  dimensions = {
+    QueueName = aws_sqs_queue.this.name
   }
 
    tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-cpu_usage_alarm" }))
@@ -272,7 +298,7 @@ resource "aws_wafv2_web_acl" "this" {
 ## association code of webacl
 # tflint-ignore: terraform_required_providers
 resource "aws_wafv2_web_acl_association" "web_acl_association_with_lb" {
-  count        = var.env == "prod" && var.domain_name == "" ? 1 : 0
+  count        = var.env == "prod" && var.domain_name != "" ? 1 : 0
   resource_arn = aws_lb.this[0].arn
   web_acl_arn  = aws_wafv2_web_acl.this.arn
 }
