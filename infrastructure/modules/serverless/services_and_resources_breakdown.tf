@@ -86,9 +86,7 @@ resource "aws_iam_role_policy" "ServicesResourcesCost" {
         ],
         "Resource" : [
           "arn:aws:s3:::${var.s3_xc3_bucket.id}",
-          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*",
-          "arn:aws:s3:::${aws_s3_bucket.cur_bucket.id}",
-          "arn:aws:s3:::${aws_s3_bucket.cur_bucket.id}/*"
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*"
         ]
       }
     ]
@@ -128,7 +126,7 @@ resource "aws_lambda_function" "ResourcesCost" {
     variables = {
       prometheus_ip                 = "${var.prometheus_ip}:9091"
       bucket_name                   = var.s3_xc3_bucket.bucket
-      bucket_name_get_report        = aws_s3_bucket.cur_bucket.bucket
+      bucket_name_get_report        = var.s3_xc3_bucket.bucket
       report_prefix                 = var.s3_prefixes.report
       top5_expensive_service_prefix = var.s3_prefixes.top5_expensive_service_prefix
     }
@@ -157,7 +155,7 @@ resource "aws_lambda_function" "ServicesCost" {
     variables = {
       prometheus_ip                 = "${var.prometheus_ip}:9091"
       bucket_name                   = var.s3_xc3_bucket.bucket
-      bucket_name_get_report        = aws_s3_bucket.cur_bucket.bucket
+      bucket_name_get_report        = var.s3_xc3_bucket.bucket
       report_prefix                 = var.s3_prefixes.report
       top5_expensive_service_prefix = var.s3_prefixes.top5_expensive_service_prefix
 
@@ -187,6 +185,10 @@ resource "terraform_data" "delete_services_resources_lambda_zip_files" {
   }
 }
 
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket      = var.s3_xc3_bucket.id
+  eventbridge = true
+}
 
 # EventBridge Rule
 resource "aws_cloudwatch_event_rule" "s3_event_rule" {
@@ -195,15 +197,15 @@ resource "aws_cloudwatch_event_rule" "s3_event_rule" {
 
   event_pattern = <<EOF
 {
-  "detail-type": [
-    "Object Created"
-  ],
   "source": [
     "aws.s3"
   ],
+  "detail-type": [
+    "Object Created"
+  ],
   "detail": {
     "bucket": {
-      "name": ["${aws_s3_bucket.cur_bucket.bucket}"]
+      "name": ["${var.s3_xc3_bucket.bucket}"]
     },
     "object": {
       "key": [{
