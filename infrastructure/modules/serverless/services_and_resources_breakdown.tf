@@ -158,6 +158,7 @@ resource "aws_lambda_function" "ServicesCost" {
       bucket_name_get_report        = var.s3_xc3_bucket.bucket
       report_prefix                 = var.s3_prefixes.report
       top5_expensive_service_prefix = var.s3_prefixes.top5_expensive_service_prefix
+      lambda_function_name          = aws_lambda_function.ResourcesCost.arn
 
     }
   }
@@ -223,10 +224,10 @@ resource "aws_cloudwatch_event_target" "services_cost" {
   arn  = aws_lambda_function.ServicesCost.arn
 }
 
-resource "aws_cloudwatch_event_target" "resources_cost" {
-  rule = aws_cloudwatch_event_rule.s3_event_rule.name
-  arn  = aws_lambda_function.ResourcesCost.arn
-}
+# resource "aws_cloudwatch_event_target" "resources_cost" {
+#   rule = aws_cloudwatch_event_rule.s3_event_rule.name
+#   arn  = aws_lambda_function.ResourcesCost.arn
+# }
 
 resource "aws_iam_policy" "service_resources_event_policy" {
   name = "${var.namespace}-serviceresourceseventpolicy"
@@ -239,7 +240,7 @@ resource "aws_iam_policy" "service_resources_event_policy" {
           "lambda:InvokeFunction"
         ]
         Effect   = "Allow"
-        Resource = [aws_lambda_function.ServicesCost.arn, aws_lambda_function.ResourcesCost.arn]
+        Resource = [aws_lambda_function.ServicesCost.arn]
       }
     ]
   })
@@ -259,10 +260,10 @@ resource "aws_lambda_permission" "services_cost_breakdown" {
   source_arn    = aws_cloudwatch_event_rule.s3_event_rule.arn
 }
 
-resource "aws_lambda_permission" "resources_cost_breakdown" {
-  statement_id  = "AllowExecutionFromEventBridge"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.ResourcesCost.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.s3_event_rule.arn
-}
+# resource "aws_lambda_permission" "resources_cost_breakdown" {
+#   statement_id  = "AllowExecutionFromEventBridge"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.ResourcesCost.function_name
+#   principal     = "events.amazonaws.com"
+#   source_arn    = aws_cloudwatch_event_rule.s3_event_rule.arn
+# }
