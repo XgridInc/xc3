@@ -32,6 +32,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -110,7 +111,7 @@
             "type": "prometheus"
           },
           "editorMode": "code",
-          "expr": "top_service_cost{region=\"$region\"}",
+          "expr": "top_service_cost{account = \"$account\",region=\"$region\"}",
           "format": "table",
           "instant": false,
           "legendFormat": "{{service}}",
@@ -123,14 +124,13 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 38,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "ap-southeast-2",
           "value": "ap-southeast-2"
         },
@@ -156,7 +156,7 @@
       },
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "AWS WAF",
           "value": "AWS WAF"
         },
@@ -176,6 +176,30 @@
         },
         "refresh": 1,
         "regex": "/service=\"(?<text>[^\"]+)/g",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "212146601504",
+          "value": "212146601504"
+        },
+        "definition": "query_result(top_service_cost)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "account",
+        "multi": false,
+        "name": "account",
+        "options": [],
+        "query": {
+          "qryType": 3,
+          "query": "query_result(top_service_cost)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "/account=\"(?<text>[^\"]+)/g",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"

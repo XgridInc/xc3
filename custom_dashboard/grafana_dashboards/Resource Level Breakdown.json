@@ -18,13 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
@@ -103,7 +103,7 @@
             "type": "prometheus"
           },
           "editorMode": "code",
-          "expr": "topk(5,resources_cost{region=\"$region\", service=\"$service\"})",
+          "expr": "topk(5,Resource_Cost_${account}{service=\"$service\", region=\"$region\"})",
           "format": "table",
           "instant": false,
           "legendFormat": "{{resource}}",
@@ -154,7 +154,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 987
+                "value": 666
               }
             ]
           }
@@ -171,9 +171,9 @@
         "cellHeight": "sm",
         "footer": {
           "countRows": false,
-          "fields": "",
+          "fields": ["Value"],
           "reducer": ["sum"],
-          "show": false
+          "show": true
         },
         "showHeader": true,
         "sortBy": [
@@ -190,7 +190,7 @@
             "type": "prometheus"
           },
           "editorMode": "code",
-          "expr": "resources_cost{region=\"$region\", service=\"$service\"}",
+          "expr": "Resource_Cost_${account}{service=\"$service\", region=\"$region\"}",
           "format": "table",
           "instant": false,
           "legendFormat": "{{resource}}",
@@ -227,7 +227,7 @@
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "ap-southeast-2",
           "value": "ap-southeast-2"
         },
@@ -276,6 +276,32 @@
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "212146601504",
+          "value": "212146601504"
+        },
+        "datasource": {
+          "type": "prometheus"
+        },
+        "definition": "query_result(top_service_cost)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "account",
+        "multi": false,
+        "name": "account",
+        "options": [],
+        "query": {
+          "query": "query_result(top_service_cost)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "/account=\"(?<text>[^\"]+)/g",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
@@ -287,6 +313,6 @@
   "timezone": "",
   "title": "Resource Level Breakdown",
   "uid": "ff3be7e8-f294-4134-966d-33868b4b59f3",
-  "version": 6,
+  "version": 1,
   "weekStart": ""
 }
