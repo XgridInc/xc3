@@ -88,7 +88,7 @@ resource "aws_lambda_function" "resources_cost_iam_user" {
   filename      = data.archive_file.lambda_function_listcost_zip.output_path
   environment {
     variables = {
-      prometheus_ip = "${var.prometheus_ip}:9091"
+      prometheus_ip     = "${var.prometheus_ip}:9091"
       region_names_path = "/${var.namespace}/region_names"
     }
   }

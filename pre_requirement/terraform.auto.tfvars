@@ -14,7 +14,7 @@
 
 
 project       = "example"
-creator_email = "example@example.co"
-owner_email   = "example@example.co"
-namespace     = "example"
-region        = "eu-west-1"
+creator_email = "example@example.com"
+owner_email   = "example@example.com"
+namespace     = "example@example.com"
+region        = "ap-southeast-2"
