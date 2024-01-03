@@ -287,28 +287,13 @@ def lambda_handler(event, context):
 
     # Now you can iterate over the payload dictionary
     for account_id, data_list in payload.items():
-        payload_data = {"account_id": {account_id: data_list}}
-        try:
-            resource_breakdown_response = lambda_client.invoke(
-                FunctionName=resource_cost_breakdown_lambda,
-                InvocationType="Event",
-                payload=payload_data,
-            )
-            # Extract the status code from the response
-            status_code = resource_breakdown_response["StatusCode"]
-            if status_code != 202:
-                # Handle unexpected status code
-                logging.error(
-                    (
-                        f"Unexpected status code {status_code}returned from"
-                        "resource_cost_breakdown_lambda"
-                    )
-                )
-        except Exception as e:
-            logging.error("Error in invoking lambda function: " + str(e))
-            return {
-                "statusCode": 500,
-                "body": "Error invoking resource_cost_breakdown_lambda",
-            }
+        payload_data = json.dumps({"account_id": {account_id: data_list}})
+
+        lambda_client.invoke(
+            FunctionName=resource_cost_breakdown_lambda,
+            InvocationType="Event",
+            Payload=payload_data,
+        )
+
     # Return the response
     return {"statusCode": 200, "body": json.dumps(json_data)}
