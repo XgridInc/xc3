@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace      = "sujanpersonal"
+namespace      = "example"
 env            = "dev"
 region         = "ap-southeast-2"
-account_id     = "212146601504" #"692569658689"
+account_id     = "1234567890" #"692569658689"
 vpc_cidr_block = "10.0.0.0/16"
 public_subnet_cidr_block = {
   "ap-southeast-2a" = "10.0.0.0/24"
@@ -29,16 +29,16 @@ private_subnet_cidr_block = {
 }
 # private_subnet_cidr_block  = "10.0.100.0/24"
 allow_traffic               = ["0.0.0.0/0"] // Use your own network CIDR
-ses_email_address           = "sujanbudhathoki123@gmail.com"
-creator_email               = "sujanbudhathoki123@gmail.com"
-owner_email                 = "sujanbudhathoki123@gmail.com"
+ses_email_address           = "admin@example.co"
+creator_email               = "admin@example.co"
+owner_email                 = "admin@example.co"
 instance_type               = "t2.micro"
 total_account_cost_lambda   = "total_account_cost"
 total_account_cost_cronjob  = "cron(0 0 1,15 * ? *)"     // flexible can be set according to need
 prometheus_layer            = "lambda_layers/python.zip" // s3 key for lambda layer
 memory_size                 = 128
 timeout                     = 300
-project                     = "sujanpersonal"
+project                     = "example"
 create_cloudtrail_kms       = false
 create_cloudtrail           = false
 create_cloudtrail_s3_bucket = false

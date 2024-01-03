@@ -13,8 +13,8 @@
 # limitations under the License.
 
 
-project       = "sujanpersonal"
-creator_email = "sujanbudhathoki123@gmail.com"
-owner_email   = "sujanbudhathoki123@gmail.com"
-namespace     = "sujanbudhathoki123@gmail.com"
+project       = "example"
+creator_email = "example@example.com"
+owner_email   = "example@example.com"
+namespace     = "example@example.com"
 region        = "ap-southeast-2"
