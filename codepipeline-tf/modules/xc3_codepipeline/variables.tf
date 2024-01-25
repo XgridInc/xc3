@@ -120,3 +120,8 @@ variable "docker_image_used" {
   description = "Docker image used in project variable."
   type        = string
 }
+
+variable "key" {
+  description = "key used in codepipeline(state file key)."
+  type        = string
+}

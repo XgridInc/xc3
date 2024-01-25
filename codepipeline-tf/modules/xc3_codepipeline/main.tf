@@ -19,9 +19,15 @@ SPDX-License-Identifier: Apache-2.0
 #creating S3 bucket
 resource "aws_s3_bucket" "this" {
   bucket        = var.s3_bucket_name
+  force_destroy = true
   tags = var.tags
 }
-
+resource "aws_s3_bucket_versioning" "this" {
+  bucket = aws_s3_bucket.this.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 # codepipeline main resource
 resource "aws_codepipeline" "this" {
   name     = "${var.tags.app}-${var.tags.environment}-tf-pipeline"
@@ -187,6 +193,22 @@ resource "aws_codebuild_project" "codebuild_project_init_stage" {
             name  = "namespace"
             value = var.namespace_name
         }
+        environment_variable {
+            name  = "account_id"
+            value = var.account_id
+        }
+        environment_variable {
+            name  = "domain_name"
+            value = var.domain_name
+        }
+        environment_variable {
+            name  = "s3_bucket_name"
+            value = var.s3_bucket_name
+        }
+        environment_variable {
+            name  = "key"
+            value = var.key
+        }
   }
   
   source {
@@ -212,14 +234,6 @@ resource "aws_codebuild_project" "codebuild_project_plan_stage" {
         environment_variable {
             name  = "namespace"
             value = var.namespace_name
-        }
-        environment_variable {
-            name  = "account_id"
-            value = var.account_id
-        }
-        environment_variable {
-            name  = "domain_name"
-            value = var.domain_name
         }
   }
 
