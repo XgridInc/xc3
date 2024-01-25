@@ -11,7 +11,7 @@ region         = "eu-west-1"
 s3_bucket_name = "terraform-state-xc3-example-pipeline"
 
 //delete after deployment
-key = "example\\/example.tfstate"
+key = var.namespace_name+"\\/"+var.namespace_name+".tfstate"
 
 xc3_codepipeline_role  = "arn:aws:iam::test:role/xccc-pipeline-role"
 codebuild_service_role = "arn:aws:iam::test:role/service-role/codebuild-test-service-role"

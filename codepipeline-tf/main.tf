@@ -42,5 +42,6 @@ module "xc3_pipeline" {
   s3_bucket_name              = var.s3_bucket_name
   full_repository_id          = var.full_repository_id
   full_branch_name            = var.full_branch_name
+  region = var.region
   key = var.key
 }
