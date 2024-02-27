@@ -13,9 +13,9 @@ s3_bucket_name = "terraform-state-xc3-example-pipeline"
 //delete after deployment
 key = var.namespace_name+"\\/"+var.namespace_name+".tfstate"
 
-xc3_codepipeline_role  = "arn:aws:iam::test:role/xccc-pipeline-role"
-codebuild_service_role = "arn:aws:iam::test:role/service-role/codebuild-test-service-role"
-codestar_connections   = "arn:aws:codestar-connections:eu-west-1:test:connection/code-star-connection-role"
+xc3_codepipeline_role = "irfan-pipeline-role"
+codebuild_service_role = "codebuild-irfan-service"
+codestar_connections   = "code-star-connection-role"
 
 approve_comment_for_apply   = "This approval needs to create XC3 infrastructure."
 approve_comment_for_destroy = "This approval needs to destroy XC3 infrastructure."
