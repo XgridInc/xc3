@@ -11,10 +11,10 @@ region         = "eu-west-1"
 s3_bucket_name = "terraform-state-xc3-example-pipeline"
 
 //delete after deployment
-key = var.namespace_name+"\\/"+var.namespace_name+".tfstate"
+key = "xc3\\/xc3.tfstate"
 
-xc3_codepipeline_role = "irfan-pipeline-role"
-codebuild_service_role = "codebuild-irfan-service"
+xc3_codepipeline_role = "example-pipeline-role"
+codebuild_service_role = "codebuild-example-service"
 codestar_connections   = "code-star-connection-role"
 
 approve_comment_for_apply   = "This approval needs to create XC3 infrastructure."
