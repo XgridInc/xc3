@@ -34,6 +34,7 @@ creator_email               = "mailtosagarpoudel@gmail.com"
 owner_email                 = "mailtosagarpoudel@gmail.com"
 instance_type               = "t2.micro"
 total_account_cost_lambda   = "total_account_cost"
+iam_role_cost_lambda        = "iam_role_cost"
 total_account_cost_cronjob  = "cron(0 0 1,15 * ? *)"     // flexible can be set according to need
 prometheus_layer            = "lambda_layers/python.zip" // s3 key for lambda layer
 memory_size                 = 128

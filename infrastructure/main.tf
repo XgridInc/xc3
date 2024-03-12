@@ -75,6 +75,7 @@ module "serverless" {
   timeout                     = var.timeout
   memory_size                 = var.memory_size
   total_account_cost_lambda   = var.total_account_cost_lambda
+  iam_role_cost_lambda        = var.iam_role_cost_lambda
   account_id                  = var.account_id
   total_account_cost_cronjob  = var.total_account_cost_cronjob
   cron_jobs_schedule          = var.cron_jobs_schedule
