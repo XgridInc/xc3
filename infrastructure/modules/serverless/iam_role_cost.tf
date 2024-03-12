@@ -84,6 +84,15 @@ resource "aws_lambda_function" "iam_role_cost" {
         account_detail      = var.namespace
       }
   }
+    memory_size = var.memory_size
+    timeout     = var.timeout
+    layers      = [var.prometheus_layer]
+    vpc_config {
+      subnet_ids         = [var.subnet_id[0]]
+      security_group_ids = [var.security_group_id]
+    }
+    tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-iam_role_cost" }))
+
 }
 
 
