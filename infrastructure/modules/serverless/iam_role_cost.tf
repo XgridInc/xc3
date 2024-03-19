@@ -70,7 +70,12 @@ resource "aws_iam_role_policy" "iam_role_cost" {
             "Effect": "Allow",
             "Action": "s3:GetObject",
             "Resource": "arn:aws:s3:::team1reportbucket/*"
-        }
+        },
+        {
+			"Effect": "Allow",
+			"Action": "ses:SendEmail",
+			"Resource": "arn:aws:ses:ap-southeast-2:211125640160:identity/mailtosagarpoudel@gmail.com"
+		}
     ]
   })
 }
