@@ -163,3 +163,13 @@ variable "env" {
   type        = string
   default     = "dev"
 }
+
+variable "cur_bucket_name"{
+  description = "bucket name where CUR is located"
+  type        = string
+}
+
+variable "cur_file_key"{
+  description = "path of csv file where cur is located"
+  type        = string
+}

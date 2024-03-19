@@ -101,6 +101,7 @@ variable "lambda_names" {
   type        = map(string)
   description = "The names of lambda functions in IAM Role Workflow"
   default = {
+    "iam_role_cost"          = "../src/iam_roles/iam_role_cost.py"
     "iam_roles_all"          = "../src/iam_roles/iam_roles_all.py"
     "iamrolesservice"        = "../src/iam_roles/iamrolesservice.py"
     "iamrolesservicemapping" = "../src/iam_roles/iamrolesservicemapping.py"
@@ -146,6 +147,16 @@ variable "create_cloudtrail" {
 
 variable "env" {
   description = "Env variable for Dev/Prod"
+  type        = string
+}
+
+variable "cur_bucket_name"{
+  description = "bucket name where CUR is located"
+  type        = string
+}
+
+variable "cur_file_key"{
+  description = "path of csv file where cur is located"
   type        = string
 }
 

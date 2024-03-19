@@ -5,7 +5,7 @@ data "archive_file" "iam_role_cost" {
   output_path = "${path.module}/iam_role_cost.zip"
   
   source {
-    content  = file("../src/budget_details/iam_role_cost.py")
+    content  = file("../src/iam_roles/iam_role_cost.py")
     filename = "iam_role_cost.py"
   }
 }
@@ -65,7 +65,12 @@ resource "aws_iam_role_policy" "iam_role_cost" {
           "ssm:GetParameter"
         ],
         "Resource": "arn:aws:ssm:*:*:parameter/*"
-      }
+      }, 
+      {
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::team1reportbucket/*"
+        }
     ]
   })
 }
@@ -82,6 +87,9 @@ resource "aws_lambda_function" "iam_role_cost" {
       variables = {
         prometheus_ip       = "${var.prometheus_ip}:9091"
         account_detail      = var.namespace
+        cur_bucket_name     = var.cur_bucket_name
+        cur_file_key        = var.cur_file_key
+      
       }
   }
     memory_size = var.memory_size
