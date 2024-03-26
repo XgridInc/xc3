@@ -187,6 +187,8 @@ resource "terraform_data" "upload_files_on_s3" {
 
   provisioner "local-exec" {
     command = <<EOT
+
+      # Upload files to the folder
       aws s3 cp python.zip s3://${aws_s3_bucket.this.id}/lambda_layers/
       aws s3 cp ../custom_dashboard/grafana_dashboards/. s3://${aws_s3_bucket.this.id}/content/ --recursive --exclude "*.md"
       aws s3 cp ../cloud_custodian_policies/ s3://${aws_s3_bucket.this.id}/cloud_custodian_policies/ --recursive --exclude "*.md" --include "*"
