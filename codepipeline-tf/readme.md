@@ -80,3 +80,35 @@ module "my_codepipeline" {
   namespace_name = "my_namespace"
   # ... Provide values for other variables ...
 }
+```
+
+## Deploying CodePipeline
+To deploy the CodePipeline defined by this module, follow these steps:
+
+- ### Defined the pipeline configuration: 
+  Change the variable from terraform auto.tf.var file to defined the pipeline configuration.
+
+- ### Deploy Pipeline: 
+  Once you've defined the pipeline configuration, use Terraform to deploy it. Ensure that you have configured your AWS credentials properly and have the necessary permissions to create CodePipeline resources.
+
+
+## Codepipeline Satges
+The CodePipeline consists of multiple stages, each representing a phase of the CI/CD process. Here are the stages typically included in this pipeline:
+
+- ### Source Stage: 
+  Fetches changes from the GitHub repository specified in the auto.tfvars file.
+
+- ### Initialization Stage: 
+  Initializes the environment by creating necessary resources such as S3 buckets, DynamoDB tables, keys, and certificates.
+
+- ### Plan Stage: 
+  Checks the proposed changes for any issues without actually applying them.
+
+- ### Approval Stage: 
+  Requires manual approval before proceeding with applying changes.
+
+- ### Apply Stage: 
+  Deploys the changes using Terraform after approval.
+
+- ### Destroy Stage: 
+  Requires manual approval before destroying infrastructure.
