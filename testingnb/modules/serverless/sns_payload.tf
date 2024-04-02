@@ -56,15 +56,30 @@ resource "aws_lambda_function" "sns_payload_lambda" {
       SNS_TOPIC_ARN = aws_sns_topic.resource_alert.arn  # Pass the ARN of the SNS topic as an environment variable
     }
   }
+
+# Add tags for better organization and management
+  tags = {
+
+    Owner   = var.Owner
+    Creator = var.Creator
+    Project = var.Project
+  }
+
 }
 
 # Grant permission to EventBridge to invoke the Lambda function
 # -------------------------------------------------------------
-resource "aws_lambda_permission" "allow_eventbridge_invoke" {
-  statement_id  = "AllowExecutionFromEventBridge"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.sns_payload_lambda.function_name
-  principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.cron_job.arn
-}
+#resource "aws_lambda_permission" "allow_eventbridge_invoke" {
+ # statement_id  = "AllowExecutionFromEventBridge"
+ # action        = "lambda:InvokeFunction"
+ # function_name = aws_lambda_function.sns_payload_lambda.function_name
+ # principal     = "events.amazonaws.com"
+ # source_arn    = aws_cloudwatch_event_rule.federated_cron_job.arn
+#}
 
+resource "aws_lambda_permission" "allow_untagged_resource_lambda_invoke" {
+  statement_id  = "AllowExecutionFromUntaggedResourceLambda"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.sns_payload_lambda.arn
+  principal     = "lambda.amazonaws.com"
+}

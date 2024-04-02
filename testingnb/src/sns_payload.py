@@ -9,48 +9,27 @@ sns_topic_arn = os.environ['SNS_TOPIC_ARN']  # Retrieve SNS topic ARN from envir
 sns = boto3.client('sns')  # Creating an SNS client
 
 def lambda_handler(event, context):
-    """
-    Lambda function handler to check for untagged resources and publish a notification to SNS if any are found.
-    
-    Parameters:
-        event (dict): Event data passed to the function.
-        context (object): Lambda function context object.
-    
-    Returns:
-        dict: Response containing status code and message indicating success.
-    """
-
-    s3_client = boto3.client('s3')  # Creating an S3 client
-    
-    bucket_name = 'xc3'  # Name of the S3 bucket
-    file_name = 'cRt.csv'  # Name of the CSV file
-    
-    # Read the CSV file from S3
-    response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
-    csv_data = response['Body'].read().decode('utf-8')
-
-    # Parse CSV data
-    csv_reader = csv.DictReader(io.StringIO(csv_data), fieldnames=['Resource', 'Tagged'])
-    next(csv_reader)  # Skip header row
-    
-    # Check for untagged resources
+    # List of untagged resources
     untagged_resources = []
-    for row in csv_reader:
-        if row['Tagged'].lower() == 'no':
-            untagged_resources.append(row['Resource'])
-    
+
+  # Extract payload data from the event
+    payload = event.get('Payload')  # Assuming payload is passed directly
+
+    if payload:
+        # Append payload data to the untagged_resources list
+        untagged_resources.extend(payload)
+
     # Prepare message
-    message = ""
-    if untagged_resources:
-        message += "Important Notification: Untagged Resources Detected\nDear User,\nFollowing listed are the untagged resources found:\n"
-        for resource in untagged_resources:
-            message += resource + "\n"
-    else:
-        message += "No untagged resources found."
+    message = "Dear Team and Administrator,\n\n"+ "I hope this message finds you well. I wanted to bring to your attention a list of untagged resources and the resources that does not have proper tags for proper cost allocation.\n"+ "Below is the list of resources found without proper tags for cost allocation.\n\n\n"
+
+    for index in range(len(untagged_resources)):
+        message += f"{index + 1}. {untagged_resources[index]}\n\n"
+
+    message += "\n\nYour assistance in reviewing these resources and assigning appropriate tags to them would be greatly appreciated.\n"+ "Thank you for your attention to this matter.\n\nBest Regards"
 
     # Publish message to SNS topic
-    sns.publish(
-        TopicArn=sns_topic_arn,  # Use dynamically retrieved SNS topic ARN
+    response = sns.publish(
+        TopicArn=sns_topic_arn,  # Use dynamically retrieved SNS topic ARN 
         Message=message
     )
 

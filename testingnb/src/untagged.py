@@ -1,83 +1,83 @@
-import boto3  # Importing boto3 library for AWS interactions
-import csv  # Importing csv module for CSV file handling
+import boto3
+import json
+import os
+from botocore.exceptions import ClientError
 
-def get_service_name_and_region(resource_arn):
-    """
-    Function to extract service name and region from an AWS resource ARN.
-
-    Args:
-    - resource_arn (str): AWS resource ARN to extract information from.
-
-    Returns:
-    -  Service name and region extracted from the ARN.
-    """
-    arn_parts = resource_arn.split(':')  # Splitting ARN to extract parts
-    region = arn_parts[3]  # Extracting region from ARN
-    service_name = arn_parts[2]  # Extracting service name from ARN
-    return service_name, region  # Returning extracted service name and region
+sns_payload_lambda_arn = os.environ['SNS_PAYLOAD_LAMBDA_ARN']  # Retrieve SNS topic ARN from environment variable
 
 def lambda_handler(event, context):
-    """
-    Lambda function handler to list untagged AWS resources, write their details to a CSV file,
-    and upload the CSV file to an S3 bucket.
+    # Create AWS clients for S3, EC2, VPC, and Lambda
+    s3_client = boto3.client('s3')
+    ec2_client = boto3.client('ec2')
+    vpc_client = boto3.client('ec2')
+    lambda_client = boto3.client('lambda')
 
-    Returns:
-    - dict: Dictionary containing status code and response body.
-    """
-    # Initialize Boto3 AWS clients
-    resource_client = boto3.client('resourcegroupstaggingapi')  # Creating client for resource tagging API
-    s3_client = boto3.client('s3')  # Creating client for S3
-    
-    # List untagged resources
-    try:
-        untagged_response = resource_client.get_resources(ResourcesPerPage=50, TagFilters=[])  # Getting untagged resources
-        untagged_resources = untagged_response['ResourceTagMappingList']  # Extracting list of untagged resources
+    # List untagged S3 buckets
+    response = s3_client.list_buckets()
+    s3_buckets = []
+    for bucket in response['Buckets']:
+        try:
+            tagging = s3_client.get_bucket_tagging(Bucket=bucket['Name'])
+            if 'TagSet' not in tagging:
+                s3_buckets.append({'ResourceType': 'S3 Bucket', 'ResourceName': bucket['Name'], 'ResourceARN': f"arn:aws:s3:::{bucket['Name']}"})
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'NoSuchTagSet':
+                s3_buckets.append({'ResourceType': 'S3 Bucket', 'ResourceName': bucket['Name'], 'ResourceARN': f"arn:aws:s3:::{bucket['Name']}"})
+            else:
+                print(f"Error retrieving tags for bucket {bucket['Name']}: {e}")
 
-        """# Check if there are more pages to retrieve""
-        if 'NextToken' in untagged_response:
-            next_token = untagged_response['NextToken']
-        else:
-            break"""
+    # List untagged EC2 instances
+    response = ec2_client.describe_instances()
+    ec2_instances = [{'ResourceType': 'EC2 Instance', 'ResourceName': instance['InstanceId'], 'ResourceARN': instance['Arn']} 
+    for reservation in response['Reservations'] 
+        for instance in reservation['Instances'] 
+            if not instance.get('Tags')]
 
+    # List untagged VPCs
+    response = vpc_client.describe_vpcs()
+    vpcs = [{'ResourceType': 'VPC', 'ResourceName': vpc['VpcId'], 'ResourceARN': vpc['VpcId']} 
+    for vpc in response['Vpcs'] 
+        if not vpc.get('Tags')]
 
+    # List untagged Lambda functions
+    response = lambda_client.list_functions()
+    lambda_functions = [{'ResourceType': 'Lambda Function', 'ResourceName': function['FunctionName'], 'ResourceARN': function['FunctionArn']} 
+    for function in response['Functions'] 
+        if not lambda_client.list_tags(Resource=function['FunctionArn']).get('Tags')]
 
-
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': {
-                'errorMessage': f'Error listing untagged resources: {str(e)}'
-            }
-        }
-    
-    # Define file path for CSV
-    csv_file_path = '/tmp/untagged_resources.csv'
-    
-    # Write CSV data to file
-    with open(csv_file_path, mode='w', newline='') as csv_file:
-        csv_writer = csv.writer(csv_file)  # Creating CSV writer object
-        csv_writer.writerow(['ResourceARN', 'ServiceName', 'Region'])  # Writing header row
-        for resource in untagged_resources:  # Iterating through untagged resources
-            resource_arn = resource.get('ResourceARN', 'Unknown')  # Getting resource ARN
-            service_name, region = get_service_name_and_region(resource_arn)  # Extracting service name and region
-            csv_writer.writerow([resource_arn, service_name, region])  # Writing data row
-    
-    # Upload CSV file to S3 bucket
-    s3_bucket = "xc3team12nb-metadata-storage"  # Target S3 bucket name
-    s3_key = "untagged_resources.csv"  # Target S3 key
-    try:
-        s3_client.upload_file(csv_file_path, s3_bucket, s3_key)  # Uploading CSV file to S3
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': {
-                'errorMessage': f'Error uploading CSV file to S3: {str(e)}'
-            }
-        }
-    
-    return {
-        'statusCode': 200,
-        'body': {
-            'message': f'CSV file uploaded to S3 bucket {s3_bucket} with key {s3_key}'
-        }
+    # Combine the lists of untagged resources
+    untagged_resources = {
+        "S3 Buckets": s3_buckets,
+        "EC2 Instances": ec2_instances,
+        "VPCs": vpcs,
+        "Lambda Functions": lambda_functions
     }
+
+    # Store untagged resources in a list
+    untagged_resources_found = []
+    for resource_type, resources in untagged_resources.items():
+        for resource in resources:
+            untagged_resources_found.append(f"Resource Type: {resource['ResourceType']}\n Resource Name: {resource['ResourceName']}\n Resource ARN: {resource['ResourceARN']}")
+
+
+    # Invoke another Lambda function with the untagged resources as payload
+    invoke_response = lambda_client.invoke(
+        FunctionName=sns_payload_lambda_arn,
+        InvocationType='RequestResponse',
+        Payload=json.dumps({"Payload": untagged_resources_found})
+    )
+
+    responseJson = json.load(response['Payload'])
+
+
+
+    # Print the untagged resources
+    print("Untagged Resources Found:")
+    for resource in untagged_resources_found:
+        print(resource)
+    print(responseJson)
+
+
+
+    # Return a success message or any necessary response
+    return "Printed untagged resources successfully."
