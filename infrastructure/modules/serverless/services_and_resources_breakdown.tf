@@ -33,13 +33,10 @@ data "archive_file" "services_resources_cost_lambda_src" {
   output_path = each.value.output_path
 }
 
-
-
-
 # Creating Inline policy
-resource "aws_iam_role_policy" "ServicesResourcesCost" {
+resource "aws_iam_role_policy" "resource_cost_policy" {
   name = "${var.namespace}-lambda-inline-policy"
-  role = aws_iam_role.ServicesResourcesCost.id
+  role = aws_iam_role.resource_cost_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -94,15 +91,15 @@ resource "aws_iam_role_policy" "ServicesResourcesCost" {
 }
 
 # Creating IAM Role for Lambda functions
-resource "aws_iam_role" "ServicesResourcesCost" {
-  name = "${var.namespace}-services-resources-cost-role"
+resource "aws_iam_role" "resource_cost_role" {
+  name = "${var.namespace}-resources-cost-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid    = "servicesresourcesrole"
+        Sid    = "resourcecostrole"
         Principal = {
           Service = "lambda.amazonaws.com"
         }
@@ -110,15 +107,12 @@ resource "aws_iam_role" "ServicesResourcesCost" {
     ]
   })
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
-  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-Services-Resources-Cost-Role" }))
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-Resources-Cost-Role" }))
 }
 
-resource "aws_lambda_function" "ResourcesCost" {
-  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
+resource "aws_lambda_function" "top_expensive_service" {
   function_name = "${var.namespace}-resources-cost-breakdown"
-  role          = aws_iam_role.ServicesResourcesCost.arn
+  role          = aws_iam_role.resource_cost_role.arn
   runtime       = "python3.9"
   handler       = "resources_breakdown.lambda_handler"
   filename      = values(data.archive_file.services_resources_cost_lambda_src)[0].output_path
@@ -143,11 +137,8 @@ resource "aws_lambda_function" "ResourcesCost" {
 }
 
 resource "aws_lambda_function" "ServicesCost" {
-  #ts:skip=AWS.LambdaFunction.LM.MEIDUM.0063 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.Logging.0470 We are aware of the risk and choose to skip this rule
-  #ts:skip=AWS.LambdaFunction.EncryptionandKeyManagement.0471 We are aware of the risk and choose to skip this rule
   function_name = "${var.namespace}-expensive-services-cost"
-  role          = aws_iam_role.ServicesResourcesCost.arn
+  role          = aws_iam_role.resource_cost_role.arn
   runtime       = "python3.9"
   handler       = "top_5_expensive_services.lambda_handler"
   filename      = values(data.archive_file.services_resources_cost_lambda_src)[1].output_path
@@ -158,7 +149,7 @@ resource "aws_lambda_function" "ServicesCost" {
       bucket_name_get_report        = var.s3_xc3_bucket.bucket
       report_prefix                 = var.s3_prefixes.report
       top5_expensive_service_prefix = var.s3_prefixes.top5_expensive_service_prefix
-      lambda_function_name          = aws_lambda_function.ResourcesCost.arn
+      lambda_function_name          = aws_lambda_function.top_expensive_service.arn
 
     }
   }
@@ -170,16 +161,14 @@ resource "aws_lambda_function" "ServicesCost" {
     subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
-
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-services_cost_function" }))
-
 }
 
-
+# deleting lambda zip files associated with services and resources, triggered by lambda function.
 resource "terraform_data" "delete_services_resources_lambda_zip_files" {
   for_each         = local.services_resources_lambda_archive
   triggers_replace = ["arn:aws:lambda:${var.region}:${var.account_id}:function:${each.key}"]
-  depends_on       = [aws_lambda_function.ResourcesCost, aws_lambda_function.ServicesCost]
+  depends_on       = [aws_lambda_function.top_expensive_service, aws_lambda_function.ServicesCost]
 
   provisioner "local-exec" {
     command = "rm -rf ${each.value.output_path}"
@@ -187,11 +176,12 @@ resource "terraform_data" "delete_services_resources_lambda_zip_files" {
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
+  # create an S3 bucket notification configuration that sends events to CloudWatch Events
   bucket      = var.s3_xc3_bucket.id
   eventbridge = true
 }
 
-# EventBridge Rule
+# triggers Lambda functions when S3 objects are created
 resource "aws_cloudwatch_event_rule" "s3_event_rule" {
   name        = "s3_event_rule"
   description = "Rule to trigger Lambda functions on S3 events"
@@ -224,11 +214,6 @@ resource "aws_cloudwatch_event_target" "services_cost" {
   arn  = aws_lambda_function.ServicesCost.arn
 }
 
-# resource "aws_cloudwatch_event_target" "resources_cost" {
-#   rule = aws_cloudwatch_event_rule.s3_event_rule.name
-#   arn  = aws_lambda_function.ResourcesCost.arn
-# }
-
 resource "aws_iam_policy" "service_resources_event_policy" {
   name = "${var.namespace}-serviceresourceseventpolicy"
 
@@ -248,9 +233,8 @@ resource "aws_iam_policy" "service_resources_event_policy" {
 
 resource "aws_iam_role_policy_attachment" "services_resources_policy_attachment" {
   policy_arn = aws_iam_policy.service_resources_event_policy.arn
-  role       = aws_iam_role.ServicesResourcesCost.name
+  role       = aws_iam_role.resource_cost_role.name
 }
-
 
 resource "aws_lambda_permission" "services_cost_breakdown" {
   statement_id  = "AllowExecutionFromEventBridge"
@@ -259,11 +243,3 @@ resource "aws_lambda_permission" "services_cost_breakdown" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.s3_event_rule.arn
 }
-
-# resource "aws_lambda_permission" "resources_cost_breakdown" {
-#   statement_id  = "AllowExecutionFromEventBridge"
-#   action        = "lambda:InvokeFunction"
-#   function_name = aws_lambda_function.ResourcesCost.function_name
-#   principal     = "events.amazonaws.com"
-#   source_arn    = aws_cloudwatch_event_rule.s3_event_rule.arn
-# }

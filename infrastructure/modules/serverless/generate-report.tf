@@ -1,11 +1,12 @@
 provider "aws" {
-  alias  = "us_east_1"
-  region = "us-east-1"
+  alias  = "west"
+  region = var.region
 }
 
 data "aws_caller_identity" "current" {}
 
-# S3 Bucket Policy for specific access
+# Define an S3 bucket policy to grant permissions for AWS Cost 
+# and Usage Report service to access the bucket.
 resource "aws_s3_bucket_policy" "cur_bucket_policy" {
   bucket = var.s3_xc3_bucket.bucket
   policy = jsonencode({
@@ -47,8 +48,9 @@ resource "aws_s3_bucket_policy" "cur_bucket_policy" {
   })
 }
 
-resource "aws_cur_report_definition" "example_cur_report_definition" {
-  provider = aws.us_east_1
+resource "aws_cur_report_definition" "example_cur" {
+  #it's a configuration setting that defines how AWS generates and delivers your cost and usage reports.
+  provider = aws.west
 
   report_name                = "xc3report"
   time_unit                  = "DAILY"

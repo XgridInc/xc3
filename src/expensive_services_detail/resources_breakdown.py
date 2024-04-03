@@ -13,10 +13,11 @@ except Exception as e:
 
 
 bucket_name = os.environ["bucket_name_get_report"]
-# report_prefix = 'report/'
 report_prefix = os.environ["report_prefix"]
 
-
+# Creates Prometheus gauges to track resource costs for 5 services by region and account ID,
+# adds extracted cost data to the gauges as labels, and pushes metrics to Prometheus Pushgateway.
+# Handles potential errors during the process.
 def create_and_push_gauge(data_json):
     try:
         # Creating an empty list to store the data
@@ -25,7 +26,8 @@ def create_and_push_gauge(data_json):
         # Adding the extracted cost data to the Prometheus
         # gauge as labels for service, region,resource_id, and cost
         registry = CollectorRegistry()
-
+        
+        # Create Prometheus gauge to track the cost of resources for 5 services by region and account ID
         for account_id, resource_list in data_json.items():
             gauge_resources_cost = Gauge(
                 f"Resource_Cost_{account_id}",
@@ -33,7 +35,7 @@ def create_and_push_gauge(data_json):
                 ["region", "service", "resource"],
                 registry=registry,
             )
-
+            # Set Prometheus gauge labels with region, service, and resource ID, and update the cost value
             for resource in resource_list:
                 region = resource["Region"]
                 service = resource["Service"]
@@ -56,6 +58,12 @@ def create_and_push_gauge(data_json):
         push_to_gateway(
             os.environ["prometheus_ip"], job="resources_cost", registry=registry
         )
+        try:
+            push_to_gateway(
+                os.environ["prometheus_ip"], job="resources_cost", registry=registry
+            )
+        except Exception as e:
+            print(f"Error occurred while pushing metrics to Prometheus Push Gateway: {e}")
         json_data = json.dumps(data_list)
         return json_data
 
@@ -63,9 +71,8 @@ def create_and_push_gauge(data_json):
         logging.error("Error initializing Prometheus Registry and Gauge: " + str(e))
         return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
 
-
+# uploads JSON data to an S3 bucket and handles potential errors.
 def push_to_s3_bucket(json_data):
-    # upload JSON file to S3 bucket
     key_name = f'{os.environ["top5_expensive_service_prefix"]}/resource_breakdown.json'
     try:
         s3.put_object(Bucket=os.environ["bucket_name"], Key=key_name, Body=json_data)

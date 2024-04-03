@@ -4,6 +4,10 @@ The lambda function top_5_expensive_services and resource_breakdown uses the AWS
 
 The script imports several libraries at the top, including json, boto3, os, logging, date, timedelta,pandas, and prometheus_client.
 
+# Purpose
+
+The script retrieves the latest Cost and Usage Report from an S3 bucket, processes the data to identify the top 5 services by cost, and pushes metrics to a Prometheus Push Gateway.
+
 # Working
 
 The script starts by initializing the necessary library and making boto3 connection to the S3 and retrieves the environment variable.
@@ -29,3 +33,5 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+![infra diagram](infra_diagram.jpg)

@@ -14,6 +14,7 @@ try:
 except Exception as e:
     logging.error("Error creating boto3 client: " + str(e))
 
+# Create a boto3 client for Lambda
 try:
     lambda_client = boto3.client("lambda")
 except Exception as e:
@@ -37,7 +38,15 @@ def get_latest_cost_and_usage_report(bucket_name, report_prefix):
     - str: The key of the latest Cost and Usage Report in the S3 bucket.
     """
     # List objects in the S3 bucket with the specified prefix
-    response = s3.list_objects(Bucket=bucket_name, Prefix=report_prefix)
+    try:
+        # Try to list objects in the S3 bucket with the given prefix
+        response = s3.list_objects(Bucket=bucket_name, Prefix=report_prefix)
+    except Exception as e:
+        # Handle any errors that occur during the operation
+        print("An error occurred:", e)
+        # Optionally, log the error for further analysis
+        logging.error("Error listing objects in S3 bucket: " + str(e))
+
 
     # Extract the keys and timestamps from the response
     report_keys = [
@@ -56,9 +65,18 @@ def get_latest_cost_and_usage_report(bucket_name, report_prefix):
 
 
 def read_content_of_report():
-    latest_report_key = get_latest_cost_and_usage_report(bucket_name, report_prefix)
-    response = s3.get_object(Bucket=bucket_name, Key=latest_report_key)
-    zipContent = response["Body"].read()
+    try:
+        # Get the latest report key
+        latest_report_key = get_latest_cost_and_usage_report(bucket_name, report_prefix)
+        # Get the object containing the report
+        response = s3.get_object(Bucket=bucket_name, Key=latest_report_key)
+        # Read the content of the report
+        zipContent = response["Body"].read()
+    except Exception as e:
+        # Handle any errors that occur during the operation
+        print("An error occurred:", e)
+        # Optionally, log the error for further analysis
+        logging.error("Error reading content of report: " + str(e))
     # Unzip the report in memory
     with zipfile.ZipFile(BytesIO(zipContent), "r") as zip_ref:
         # Assume there's only one file in the zip archive (adjust as needed)
@@ -271,29 +289,48 @@ def push_to_s3_bucket(json_data):
 
 
 def lambda_handler(event, context):
-    df = read_content_of_report()
-    extract_service_data = df.copy()
-    extract_service_resource_data = df.copy()
-    expensiveService = extract_cost_by_service_and_region(extract_service_data)
-    json_data = create_and_push_gauge(expensiveService)
-    push_to_s3_bucket(json_data)
-    resource_breakdown = extract_cost_by_service_and_resource(
-        extract_service_resource_data
-    )
-    payload_json_string = create_payload(resource_breakdown)
+    try:
+        # Read content of the report
+        df = read_content_of_report()
+        # Copy DataFrame for further processing
+        extract_service_data = df.copy()
+        extract_service_resource_data = df.copy()
+        # Extract cost data by service and region
+        expensiveService = extract_cost_by_service_and_region(extract_service_data)
+        # Create Prometheus gauge and push data to S3 bucket
+        json_data = create_and_push_gauge(expensiveService)
+        push_to_s3_bucket(json_data)
+        # Extract cost data by service and resource
+        resource_breakdown = extract_cost_by_service_and_resource(extract_service_resource_data)
+        # Create payload JSON string
+        payload_json_string = create_payload(resource_breakdown)
+        
+        # Parse the JSON string into a dictionary
+        payload = json.loads(payload_json_string)
 
-    # Parse the JSON string into a dictionary
-    payload = json.loads(payload_json_string)
+        # Iterate over the payload dictionary
+        for account_id, data_list in payload.items():
+            try:
+                payload_data = json.dumps({"account_id": {account_id: data_list}})
+                # Invoke another Lambda function with payload data
+                lambda_client.invoke(
+                    FunctionName=resource_cost_breakdown_lambda,
+                    InvocationType="Event",
+                    Payload=payload_data,
+                )
+            except Exception as e:
+                # Handle any errors that occur during the operation
+                print("An error occurred while invoking Lambda function:", e)
+                # Optionally, log the error for further analysis
+                logging.error("Error invoking Lambda function: " + str(e))
 
-    # Now you can iterate over the payload dictionary
-    for account_id, data_list in payload.items():
-        payload_data = json.dumps({"account_id": {account_id: data_list}})
 
-        lambda_client.invoke(
-            FunctionName=resource_cost_breakdown_lambda,
-            InvocationType="Event",
-            Payload=payload_data,
-        )
-
-    # Return the response
-    return {"statusCode": 200, "body": json.dumps(json_data)}
+        # Return success response
+        return {"statusCode": 200, "body": json.dumps(json_data)}
+    except Exception as e:
+        # Handle any errors that occur during the operation
+        print("An error occurred:", e)
+        # Optionally, log the error for further analysis
+        logging.error("Error in lambda_handler: " + str(e))
+        # Return error response
+        return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
