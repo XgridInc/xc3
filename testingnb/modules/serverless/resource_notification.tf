@@ -1,9 +1,9 @@
-# IAM Role for sns_payload Lambda Function
+# IAM Role for resource_notification Lambda Function
 # -----------------------------------------
-# This resource block defines an IAM role for the Lambda function named sns_payload_lambda.
+# This resource block defines an IAM role for the Lambda function named resource_notification_lambda.
 
-resource "aws_iam_role" "sns_payload_lambda_role" {
-  name = "sns_payload_lambda_execution_role"  # Name of the IAM role
+resource "aws_iam_role" "resource_notification_lambda_role" {
+  name = "resource_notification_lambda_execution_role"  # Name of the IAM role
   
   # Policy allowing Lambda service to assume the role
   assume_role_policy = jsonencode({
@@ -32,28 +32,29 @@ resource "aws_iam_role" "sns_payload_lambda_role" {
 # -----------------------------
 # This data source archives the Lambda function code located in the "src/federated_user" directory.
 
-data "archive_file" "sns_payload_lambda_zip" {
+data "archive_file" "resource_notification_lambda_zip" {
   type        = "zip"
   source_dir  = "src/federated_user"
-  output_path = "${path.module}/sns_payload_lambda.zip"
+  output_path = "${path.module}/resource_notification_lambda.zip"
 }
 
 
-# Lambda Function - sns_payload
+# Lambda Function - resource_notification
 # ------------------------------
-# This resource block defines the Lambda function named sns_payload_lambda.
+# This resource block defines the Lambda function named resource_notification_lambda.
 
-resource "aws_lambda_function" "sns_payload_lambda" {
-  filename      = data.archive_file.sns_payload_lambda_zip.output_path  # Path to the Lambda function code zip archive
-  function_name = "sns_payload_lambda"  # Name of the Lambda function
-  role          = aws_iam_role.sns_payload_lambda_role.arn  # IAM role ARN attached to the Lambda function
-  handler       = "sns_payload.lambda_handler"  # Entry point to the Lambda function
+resource "aws_lambda_function" "resource_notification_lambda" {
+  filename      = data.archive_file.resource_notification_lambda_zip.output_path  # Path to the Lambda function code zip archive
+  function_name = "resource_notification_lambda"  # Name of the Lambda function
+  role          = aws_iam_role.resource_notification_lambda_role.arn  # IAM role ARN attached to the Lambda function
+  handler       = "resource_notification.lambda_handler"  # Entry point to the Lambda function
   runtime       = "python3.8"  # Runtime environment for the Lambda function
 
   # Environment variables passed to the Lambda function
   environment {
     variables = {
       SNS_TOPIC_ARN = aws_sns_topic.resource_alert.arn  # Pass the ARN of the SNS topic as an environment variable
+      SLACK_WEBHOOK_URL = var.slack_webhook_url
     }
   }
 
@@ -72,7 +73,7 @@ resource "aws_lambda_function" "sns_payload_lambda" {
 #resource "aws_lambda_permission" "allow_eventbridge_invoke" {
  # statement_id  = "AllowExecutionFromEventBridge"
  # action        = "lambda:InvokeFunction"
- # function_name = aws_lambda_function.sns_payload_lambda.function_name
+ # function_name = aws_lambda_function.resource_notification_lambda.function_name
  # principal     = "events.amazonaws.com"
  # source_arn    = aws_cloudwatch_event_rule.federated_cron_job.arn
 #}
@@ -80,6 +81,6 @@ resource "aws_lambda_function" "sns_payload_lambda" {
 resource "aws_lambda_permission" "allow_untagged_resource_lambda_invoke" {
   statement_id  = "AllowExecutionFromUntaggedResourceLambda"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.sns_payload_lambda.arn
+  function_name = aws_lambda_function.resource_notification_lambda.arn
   principal     = "lambda.amazonaws.com"
 }

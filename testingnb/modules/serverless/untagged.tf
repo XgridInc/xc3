@@ -56,7 +56,7 @@ resource "aws_lambda_function" "untagged_resource_lambda" {
   # Environment variables passed to the Lambda function
   environment {
     variables = {
-      SNS_PAYLOAD_LAMBDA_ARN = aws_lambda_function.sns_payload_lambda.arn
+      RESOURCE_NOTIFICATION_LAMBDA_ARN = aws_lambda_function.resource_notification_lambda.arn
       ACC_NUM = data.aws_caller_identity.current.account_id
       NAME_SPACE = var.namespace
     }

@@ -4,7 +4,7 @@ import os
 from botocore.exceptions import ClientError
 from datetime import datetime
 
-sns_payload_lambda_arn = os.environ['SNS_PAYLOAD_LAMBDA_ARN']  # Retrieve SNS topic ARN from environment variable
+resource_notification_lambda_arn = os.environ['RESOURCE_NOTIFICATION_LAMBDA_ARN']  # Retrieve SNS topic ARN from environment variable
 acc_num = os.environ['ACC_NUM']
 namespace = os.environ['NAME_SPACE']
 
@@ -90,7 +90,7 @@ def lambda_handler(event, context):
 
     # Invoke another Lambda function with the untagged resources as payload
     invoke_response = lambda_client.invoke(
-        FunctionName=sns_payload_lambda_arn,
+        FunctionName=resource_notification_lambda_arn,
         InvocationType='RequestResponse',
         Payload=json.dumps({"Payload1": untagged_resources_found, "Payload2": non_compliant_resources})
     )

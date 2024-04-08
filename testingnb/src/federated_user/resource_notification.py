@@ -4,11 +4,17 @@ import csv   # Importing csv library for CSV file operations
 import io    # Importing io library for input and output operations
 import os    # Importing os library for operating system related operations
 
+import urllib3   # Importing urllib3 library for HTTP requests
+
+
 sns_topic_arn = os.environ['SNS_TOPIC_ARN']  # Retrieve SNS topic ARN from environment variable
+http = urllib3.PoolManager()  # Creating an HTTP connection pool manager
 
 sns = boto3.client('sns')  # Creating an SNS client
 
 def lambda_handler(event, context):
+
+    url = os.environ["SLACK_WEBHOOK_URL"]  # Slack webhook URL
     # List of untagged resources
     untagged_resources = []
     non_compliant_resources = []
@@ -42,7 +48,30 @@ def lambda_handler(event, context):
         Message=message
     )
 
+    # Sending Message to Slack Channel
+    msg = {
+        "channel": "#untagged-resources",  # Slack channel where the message will be posted
+        "username": "WEBHOOK_USERNAME",    # Username for the message
+        "text": message,  # Message content obtained from SNS event
+        "icon_emoji": "",  # Icon emoji for the message
+    }
+
+    # Encode message as JSON
+    encoded_msg = json.dumps(msg).encode("utf-8")
+    
+    # Send HTTP POST request to Slack webhook URL
+    resp = http.request("POST", url, body=encoded_msg)
+
+    # Print response details
+    print(
+        {
+            "message": message,  # Original SNS message
+            "status_code": resp.status,  # HTTP status code of the response
+            "response": resp.data,       # Response data
+        }
+    )
+
     return {
         'statusCode': 200,
-        'body': json.dumps('Message published to SNS topic')
+        'body': json.dumps('Notification sent to SNS topic and Slack channel.')
     }

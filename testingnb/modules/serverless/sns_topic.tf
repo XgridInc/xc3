@@ -36,11 +36,3 @@ resource "aws_sns_topic_subscription" "email_subscription" {
 
 
 }
-
-
-# Subscribe Lambda to SNS Topic
-resource "aws_sns_topic_subscription" "lambda_subscription" {
-  topic_arn = aws_sns_topic.resource_alert.arn  # ARN of the SNS topic
-  protocol  = "lambda"
-  endpoint  = aws_lambda_function.slack_notification_lambda.arn
-}
