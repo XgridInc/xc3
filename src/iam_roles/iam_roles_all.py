@@ -22,6 +22,8 @@ from urllib.parse import unquote_plus
 import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 
+import pandas as pd
+
 try:
     s3 = boto3.client("s3")
 except Exception as e:
@@ -55,6 +57,29 @@ def get_region_names():
 
 # Get the region names dictionary
 region_names = get_region_names()
+
+def get_cur_data():
+    bucket = "team4reportbucket"
+    key = "report/reportbucket/20240301-20240401/reportbucket-00001.csv.gz"
+    try:
+        response = s3.get_object(Bucket=bucket, Key=key)
+        resource_file = response["Body"].read()
+        cur_data = {}
+        with gzip.GzipFile(fileobj=io.BytesIO(resource_file), mode="rb") as data:
+            cur_data = pd.read_csv(io.BytesIO(data.read()))
+            cur_data = cur_data[[
+                "product/ProductName",
+                "lineItem/ResourceId",
+                "lineItem/UnblendedCost",
+            ]]
+            return cur_data
+    except Exception as e:
+        logging.error(
+            "Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.".format(
+                key, bucket
+            )
+        )
+        return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
 
 def lambda_handler(event, context):
     """
@@ -100,12 +125,17 @@ def lambda_handler(event, context):
         registry=registry,
     )
 
+    payload_service_mapping = {
+        "list_of_iam_roles": list_of_iam_roles,
+        "cur_data": json.loads(get_cur_data().to_json(orient='records'))
+    }
+
     functionName = os.environ["func_name_iam_role_service_mapping"]
     try:
         iam_role_service_lambda_payload = lambda_client.invoke(
             FunctionName=functionName,
             InvocationType="Event",
-            Payload=json.dumps(list_of_iam_roles),
+            Payload=json.dumps(payload_service_mapping),
         )
         # Extract the status code from the response
         status_code = iam_role_service_lambda_payload["StatusCode"]
