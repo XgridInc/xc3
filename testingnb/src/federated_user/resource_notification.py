@@ -45,7 +45,8 @@ def lambda_handler(event, context):
     # Publish message to SNS topic
     response = sns.publish(
         TopicArn=sns_topic_arn,  # Use dynamically retrieved SNS topic ARN 
-        Message=message
+        Message=message,
+        Subject='Regarding Untagged Resources',
     )
 
     # Sending Message to Slack Channel
