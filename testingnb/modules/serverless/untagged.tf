@@ -35,7 +35,7 @@ resource "aws_iam_role" "untagged_resource_lambda_role" {
 
 data "archive_file" "untagged_resource_lambda_zip" {
   type        = "zip"
-  source_dir  = "src"
+  source_dir  = "src/federated_user"
   output_path = "${path.module}/untagged_resource_lambda.zip"
 }
 
@@ -57,6 +57,8 @@ resource "aws_lambda_function" "untagged_resource_lambda" {
   environment {
     variables = {
       SNS_PAYLOAD_LAMBDA_ARN = aws_lambda_function.sns_payload_lambda.arn
+      ACC_NUM = data.aws_caller_identity.current.account_id
+      NAME_SPACE = var.namespace
     }
   }
 
@@ -69,6 +71,9 @@ resource "aws_lambda_function" "untagged_resource_lambda" {
   }
 
 }
+
+
+
 
 # Grant permission to EventBridge to invoke the Lambda function
 # -------------------------------------------------------------

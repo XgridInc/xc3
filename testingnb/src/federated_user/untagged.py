@@ -2,8 +2,11 @@ import boto3
 import json
 import os
 from botocore.exceptions import ClientError
+from datetime import datetime
 
 sns_payload_lambda_arn = os.environ['SNS_PAYLOAD_LAMBDA_ARN']  # Retrieve SNS topic ARN from environment variable
+acc_num = os.environ['ACC_NUM']
+namespace = os.environ['NAME_SPACE']
 
 def lambda_handler(event, context):
     # Create AWS clients for S3, EC2, VPC, and Lambda
@@ -59,15 +62,41 @@ def lambda_handler(event, context):
         for resource in resources:
             untagged_resources_found.append(f"Resource Type: {resource['ResourceType']}\n Resource Name: {resource['ResourceName']}\n Resource ARN: {resource['ResourceARN']}")
 
+    
+    #Current Date and time to access file in S3 bucket
+    current_date = datetime.now()
+    year = str(current_date.year)
+    month = current_date.strftime('%m')
+    day = current_date.strftime('%d')
+    
+    # S3 bucket and object key
+    #bucket_name = 'xc3team12pradhumna-metadata-storage'
+    object_key = 'fed-resources/2024/04/03/resources.json'
+    bucket_name = (f"{namespace}-metadata-storage")
+    # object_key = f"fed-resources/{year}/{month}/{day}/resources.json"
+    # Get the JSON file from S3
+    response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+    data = response['Body'].read().decode('utf-8')
+        
+    # Parse JSON data
+    json_data = json.loads(data)
+        
+    # Filter data where Compliance is false
+    non_compliant_resources = []
+    for idx, resource in enumerate(json_data['body'][acc_num], start=1):
+        if resource['Compliance'] == True:
+            non_compliant_resources.append (f"ResourceArn: {resource['ResourceARN']}")
+
 
     # Invoke another Lambda function with the untagged resources as payload
     invoke_response = lambda_client.invoke(
         FunctionName=sns_payload_lambda_arn,
         InvocationType='RequestResponse',
-        Payload=json.dumps({"Payload": untagged_resources_found})
+        Payload=json.dumps({"Payload1": untagged_resources_found, "Payload2": non_compliant_resources})
     )
 
-    responseJson = json.load(response['Payload'])
+    # Extract and load the payload from the invoke response
+    responseJson = json.loads(invoke_response['Payload'].read().decode("utf-8"))
 
 
 
@@ -76,6 +105,7 @@ def lambda_handler(event, context):
     for resource in untagged_resources_found:
         print(resource)
     print(responseJson)
+    print(non_compliant_resources)
 
 
 

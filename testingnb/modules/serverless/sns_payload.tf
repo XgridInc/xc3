@@ -30,11 +30,11 @@ resource "aws_iam_role" "sns_payload_lambda_role" {
 
 # Archive Lambda function code
 # -----------------------------
-# This data source archives the Lambda function code located in the "src" directory.
+# This data source archives the Lambda function code located in the "src/federated_user" directory.
 
 data "archive_file" "sns_payload_lambda_zip" {
   type        = "zip"
-  source_dir  = "src"
+  source_dir  = "src/federated_user"
   output_path = "${path.module}/sns_payload_lambda.zip"
 }
 

@@ -23,7 +23,7 @@ resource "aws_iam_role" "lambda_role" {
 # Archive Lambda function code
 data "archive_file" "lambda_function_zip" {
   type        = "zip"
-  source_dir  = "src"
+  source_dir  = "src/federated_user"
   output_path = "${path.module}/lambda_function.zip"
 }
 

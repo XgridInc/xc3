@@ -14,4 +14,5 @@ module "serverless" {
   Project = var.Project
   snsendpoint = var.snsendpoint
   slack_webhook_url = var.slack_webhook_url
+  namespace = var.namespace
 }

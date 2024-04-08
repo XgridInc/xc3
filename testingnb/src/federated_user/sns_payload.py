@@ -11,19 +11,28 @@ sns = boto3.client('sns')  # Creating an SNS client
 def lambda_handler(event, context):
     # List of untagged resources
     untagged_resources = []
+    non_compliant_resources = []
 
   # Extract payload data from the event
-    payload = event.get('Payload')  # Assuming payload is passed directly
+    payload1 = event.get('Payload1')  # Assuming payload is passed directly
+    payload2 = event.get('Payload2')
 
-    if payload:
+    if payload1:
         # Append payload data to the untagged_resources list
-        untagged_resources.extend(payload)
+        untagged_resources.extend(payload1)
+    if payload2:
+        non_compliant_resources.extend(payload2)
 
     # Prepare message
     message = "Dear Team and Administrator,\n\n"+ "I hope this message finds you well. I wanted to bring to your attention a list of untagged resources and the resources that does not have proper tags for proper cost allocation.\n"+ "Below is the list of resources found without proper tags for cost allocation.\n\n\n"
 
     for index in range(len(untagged_resources)):
         message += f"{index + 1}. {untagged_resources[index]}\n\n"
+
+    message += "\nFollowing are the resources without proper tags for cost allocation:\n"
+
+    for index in range(len(non_compliant_resources)):
+        message += f"{index + 1}. {non_compliant_resources[index]}\n\n"
 
     message += "\n\nYour assistance in reviewing these resources and assigning appropriate tags to them would be greatly appreciated.\n"+ "Thank you for your attention to this matter.\n\nBest Regards"
 
