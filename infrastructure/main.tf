@@ -42,11 +42,11 @@ module "xc3" {
   private_subnet_id   = module.networking.private_subnet_id
   public_subnet_ids   = module.networking.public_subnet_ids
   security_group_ids  = module.networking.security_group_ids
-  ses_email_address   = var.ses_email_address
   instance_type       = var.instance_type
   namespace           = var.namespace
   owner_email         = var.owner_email
   creator_email       = var.creator_email
+  ses_email_address   = var.ses_email_address
   project             = var.project
   region              = var.region
   prometheus_layer    = var.prometheus_layer
@@ -79,11 +79,16 @@ module "serverless" {
   account_id                  = var.account_id
   total_account_cost_cronjob  = var.total_account_cost_cronjob
   cron_jobs_schedule          = var.cron_jobs_schedule
-  slack_channel_url           = var.slack_channel_url
   create_cloudtrail_kms       = var.create_cloudtrail_kms
   create_cloudtrail           = var.create_cloudtrail
   create_cloudtrail_s3_bucket = var.create_cloudtrail_s3_bucket
   env                         = var.env
-  cur_bucket_name             = var.cur_bucket_name
-  cur_file_key                = var.cur_file_key
+  CUR_s3_bucket_name             = var.CUR_s3_bucket_name
+  CUR_s3_file_key                = var.CUR_s3_file_key
+  slack_channel_url           = var.slack_channel_url
+  slack_channel               = var.slack_channel
+  slack_icon_emoji            = var.slack_icon_emoji
+  slack_username              = var.slack_username
+  ses_email_address   = var.ses_email_address
+  receiver_email_address = var.receiver_email_address
 }

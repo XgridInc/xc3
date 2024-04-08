@@ -17,15 +17,25 @@ variable "namespace" {
   description = "The namespace referring to an env"
 }
 
-variable "owner_email" {
+variable "receiver_email_address" {
   type        = string
-  description = "Email address of a owner who is leading the team"
+  description = "The email address for receiver"
 }
 
+variable "ses_email_address" {
+  type        = string
+  description = "The email address for SES identity"
+}
 variable "creator_email" {
   type        = string
-  description = "Email of the the Creator who is provisioning the infrastructure"
+  description = "Email address of a person who is provisioning the infrastructure"
 }
+
+variable "owner_email" {
+  type        = string
+  description = "Email address of a person who is owner of the team/project"
+}
+
 
 variable "project" {
   type        = string
@@ -125,10 +135,6 @@ variable "s3_prefixes" {
   }
 }
 
-variable "slack_channel_url" {
-  description = "Slack Channel URL"
-  type        = string
-}
 
 variable "create_cloudtrail_kms" {
   description = "Fetch the KMS if exist"
@@ -150,13 +156,32 @@ variable "env" {
   type        = string
 }
 
-variable "cur_bucket_name"{
+variable "CUR_s3_bucket_name"{
   description = "bucket name where CUR is located"
   type        = string
 }
 
-variable "cur_file_key"{
+variable "CUR_s3_file_key"{
   description = "path of csv file where cur is located"
   type        = string
 }
+
+variable "slack_channel_url"{
+  description = "slack web hook url to send notification via slack"
+  type        = string
+}
+variable "slack_username"{
+  description = "user_name"
+  type        = string
+}
+variable "slack_icon_emoji"{
+  description = "emoji"
+  type        = string
+}
+
+variable "slack_channel"{
+  description = "Name of channel of slack"
+  type        = string
+}
+
 

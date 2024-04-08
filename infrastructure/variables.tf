@@ -47,6 +47,11 @@ variable "ses_email_address" {
   description = "The email address for SES identity"
 }
 
+variable "receiver_email_address" {
+  type        = string
+  description = "The email address for receiver"
+}
+
 variable "instance_type" {
   type        = string
   description = "The type of the EC2 instance"
@@ -137,11 +142,6 @@ variable "cron_jobs_schedule" {
   }
 }
 
-variable "slack_channel_url" {
-  description = "Slack Channel URL"
-  type        = string
-  default     = ""
-}
 
 variable "create_cloudtrail_kms" {
   description = "Fetch the KMS if exist"
@@ -164,12 +164,30 @@ variable "env" {
   default     = "dev"
 }
 
-variable "cur_bucket_name"{
+variable "CUR_s3_bucket_name"{
   description = "bucket name where CUR is located"
   type        = string
 }
 
-variable "cur_file_key"{
+variable "CUR_s3_file_key"{
   description = "path of csv file where cur is located"
+  type        = string
+}
+
+variable "slack_channel_url"{
+  description = "slack web hook url to send notification via slack"
+  type        = string
+}
+variable "slack_username"{
+  description = "user_name"
+  type        = string
+}
+variable "slack_icon_emoji"{
+  description = "emoji"
+  type        = string
+}
+
+variable "slack_channel"{
+  description = "Name of channel of slack"
   type        = string
 }
