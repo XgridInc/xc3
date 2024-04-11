@@ -1,7 +1,0 @@
-namespace = "xc3team12pradhumna"
-region = "ap-southeast-2"
-snsendpoint = "mail@gmail.com"
-slack_webhook_url = "webhook here"
-Owner = "X1"
-Creator = "X1"
-Project = "xc3"

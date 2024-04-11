@@ -70,10 +70,10 @@ def lambda_handler(event, context):
     day = current_date.strftime('%d')
     
     # S3 bucket and object key
-    #bucket_name = 'xc3team12pradhumna-metadata-storage'
-    object_key = 'fed-resources/2024/04/03/resources.json'
+    # bucket_name = 'xc3team12-metadata-storage'
+    # object_key = 'fed-resources/2024/04/03/resources.json'
     bucket_name = (f"{namespace}-metadata-storage")
-    # object_key = f"fed-resources/{year}/{month}/{day}/resources.json"
+    object_key = f"fed-resources/{year}/{month}/{day}/resources.json"
     # Get the JSON file from S3
     response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
     data = response['Body'].read().decode('utf-8')

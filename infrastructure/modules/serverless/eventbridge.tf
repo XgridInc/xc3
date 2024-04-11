@@ -7,12 +7,12 @@ resource "aws_cloudwatch_event_rule" "federated_cron_job" {
   # Runs every minute
   schedule_expression = "cron(*/1 * * * ? *)"
 
-  # Add tags for better organization and management
+# Add tags for better organization and management
   tags = {
 
-    Owner   = var.Owner
-    Creator = var.Creator
-    Project = var.Project
+    Owner   = var.owner_email
+    Creator = var.creator_email
+    Project = var.project
   }
 }
 

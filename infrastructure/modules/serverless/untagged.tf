@@ -65,9 +65,9 @@ resource "aws_lambda_function" "untagged_resource_lambda" {
 # Add tags for better organization and management
   tags = {
 
-    Owner   = var.Owner
-    Creator = var.Creator
-    Project = var.Project
+    Owner   = var.owner_email
+    Creator = var.creator_email
+    Project = var.project
   }
 
 }

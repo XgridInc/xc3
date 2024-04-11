@@ -14,6 +14,8 @@
 
 namespace      = "testing"
 env            = "test"
+snsendpoint = "test@gmail.com"
+slack_webhook_url = "write webhook link here"
 region         = "eu-west-1"
 account_id     = "123456789"
 vpc_cidr_block = "10.0.0.0/16"
