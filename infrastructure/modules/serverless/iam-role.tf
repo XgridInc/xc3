@@ -35,6 +35,7 @@ resource "aws_lambda_function" "IamRolestoGrafana" {
       func_name_iam_role_service_mapping = aws_lambda_function.IamRolesServiceMapping.arn
       prometheus_ip                      = "${var.prometheus_ip}:9091"
       region_names_path                   = "/${var.namespace}/region-names"
+      report_bucket_name                  = var.report_bucket_name
     }
   }
   memory_size = var.memory_size

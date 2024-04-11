@@ -18,10 +18,11 @@ import json
 import logging
 import os
 from urllib.parse import unquote_plus
+import datetime
+from dateutil import relativedelta
 
 import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
-
 import pandas as pd
 
 try:
@@ -59,8 +60,15 @@ def get_region_names():
 region_names = get_region_names()
 
 def get_cur_data():
-    bucket = "team4reportbucket"
-    key = "report/reportbucket/20240301-20240401/reportbucket-00001.csv.gz"
+    bucket = os.environ["report_bucket_name"]
+
+    current_date = datetime.datetime.now()
+    start_date_str = f"{current_date.strftime('%Y%m')}01"
+    end_date = datetime.datetime.strptime(start_date_str, "%Y%m%d") + relativedelta.relativedelta(months=1)
+    end_date_str = f"{end_date.strftime('%Y%m')}01"
+    full_date_range = f"{start_date_str}-{end_date_str}"
+
+    key = f"report/reportbucket/{full_date_range}/reportbucket-00001.csv.gz"
     try:
         response = s3.get_object(Bucket=bucket, Key=key)
         resource_file = response["Body"].read()
