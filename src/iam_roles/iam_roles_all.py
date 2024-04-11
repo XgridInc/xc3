@@ -80,7 +80,7 @@ def get_cur_data():
                 "lineItem/ResourceId",
                 "lineItem/UnblendedCost",
             ]]
-            return cur_data
+            return cur_data.to_json(orient='records')
     except Exception as e:
         logging.error(
             "Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.".format(
@@ -135,7 +135,7 @@ def lambda_handler(event, context):
 
     payload_service_mapping = {
         "list_of_iam_roles": list_of_iam_roles,
-        "cur_data": json.loads(get_cur_data().to_json(orient='records'))
+        "cur_data": get_cur_data()
     }
 
     functionName = os.environ["func_name_iam_role_service_mapping"]
