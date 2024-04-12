@@ -127,13 +127,14 @@ def get_cur_data():
         )
         return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
 
+# Get the cost and usage report data
+cur_data = get_cur_data()
 
-def get_cumulative_cost(cur_data, resource_id):
+def get_cumulative_cost(resource_id):
     """
     Fetches the cost for a given resource ID from the Cost and Usage Report.
 
     Args:
-        cur_data: The Cost and Usage Report data.
         resource_id (str): The ID of the resource to fetch the cost for.
 
     Returns:
@@ -288,7 +289,7 @@ def lambda_handler(event, context):
                         # extract the "Function" field
                         function = detail["Function"]
                         lambda_function = "lambda:function/" + function
-                        lambda_cost = get_cumulative_cost(get_cur_data(), function)
+                        lambda_cost = get_cumulative_cost(function)
 
                         iam_service_gauge.labels(
                             (
