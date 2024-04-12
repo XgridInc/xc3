@@ -18,8 +18,6 @@ import json
 import logging
 import os
 from urllib.parse import unquote_plus
-import datetime
-from dateutil import relativedelta
 
 import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
@@ -59,35 +57,6 @@ def get_region_names():
 # Get the region names dictionary
 region_names = get_region_names()
 
-def get_cur_data():
-    bucket = os.environ["report_bucket_name"]
-
-    current_date = datetime.datetime.now()
-    start_date_str = f"{current_date.strftime('%Y%m')}01"
-    end_date = datetime.datetime.strptime(start_date_str, "%Y%m%d") + relativedelta.relativedelta(months=1)
-    end_date_str = f"{end_date.strftime('%Y%m')}01"
-    full_date_range = f"{start_date_str}-{end_date_str}"
-
-    key = f"report/reportbucket/{full_date_range}/reportbucket-00001.csv.gz"
-    try:
-        response = s3.get_object(Bucket=bucket, Key=key)
-        resource_file = response["Body"].read()
-        cur_data = {}
-        with gzip.GzipFile(fileobj=io.BytesIO(resource_file), mode="rb") as data:
-            cur_data = pd.read_csv(io.BytesIO(data.read()))
-            cur_data = cur_data[[
-                "product/ProductName",
-                "lineItem/ResourceId",
-                "lineItem/UnblendedCost",
-            ]]
-            return cur_data.to_json(orient='records')
-    except Exception as e:
-        logging.error(
-            "Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.".format(
-                key, bucket
-            )
-        )
-        return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
 
 def lambda_handler(event, context):
     """
@@ -133,17 +102,12 @@ def lambda_handler(event, context):
         registry=registry,
     )
 
-    payload_service_mapping = {
-        "list_of_iam_roles": list_of_iam_roles,
-        "cur_data": get_cur_data()
-    }
-
     functionName = os.environ["func_name_iam_role_service_mapping"]
     try:
         iam_role_service_lambda_payload = lambda_client.invoke(
             FunctionName=functionName,
             InvocationType="Event",
-            Payload=json.dumps(payload_service_mapping),
+            Payload=json.dumps(list_of_iam_roles),
         )
         # Extract the status code from the response
         status_code = iam_role_service_lambda_payload["StatusCode"]

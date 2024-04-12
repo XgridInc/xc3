@@ -12,16 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import gzip
+import io
 import json
 import logging
 import os
 from datetime import datetime, timedelta
+from dateutil import relativedelta
 
 import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 import pandas as pd
 
-
+try:
+    s3 = boto3.client("s3")
+except Exception as e:
+    logging.error("Error creating boto3 client: " + str(e))
 try:
     client = boto3.client("ce")
 except Exception as e:
@@ -90,6 +96,38 @@ def get_region_names():
 # Get the region names dictionary
 region_names = get_region_names()
 
+
+def get_cur_data():
+    bucket = os.environ["report_bucket_name"]
+
+    current_date = datetime.now()
+    start_date_str = f"{current_date.strftime('%Y%m')}01"
+    end_date = datetime.strptime(start_date_str, "%Y%m%d") + relativedelta.relativedelta(months=1)
+    end_date_str = f"{end_date.strftime('%Y%m')}01"
+    full_date_range = f"{start_date_str}-{end_date_str}"
+
+    key = f"report/reportbucket/{full_date_range}/reportbucket-00001.csv.gz"
+    try:
+        response = s3.get_object(Bucket=bucket, Key=key)
+        resource_file = response["Body"].read()
+        cur_data = {}
+        with gzip.GzipFile(fileobj=io.BytesIO(resource_file), mode="rb") as data:
+            cur_data = pd.read_csv(io.BytesIO(data.read()))
+            cur_data = cur_data[[
+                "product/ProductName",
+                "lineItem/ResourceId",
+                "lineItem/UnblendedCost",
+            ]]
+            return cur_data.to_json(orient='records')
+    except Exception as e:
+        logging.error(
+            "Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.".format(
+                key, bucket
+            )
+        )
+        return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
+
+
 def get_cumulative_cost(cur_data, resource_id):
     """
     Fetches the cost for a given resource ID from the Cost and Usage Report.
@@ -101,7 +139,7 @@ def get_cumulative_cost(cur_data, resource_id):
     Returns:
         The cumulative cost of the resource in the Cost and Usage Report.
     """
-    df = pd.json_normalize(cur_data)
+    df = pd.json_normalize(json.loads(cur_data))
     cost = df.loc[df["lineItem/ResourceId"] == resource_id].sum()["lineItem/UnblendedCost"]
     return cost
 
@@ -135,8 +173,7 @@ def lambda_handler(event, context):
         registry=registry,
     )
 
-    roles = event["resource_mapping"]
-    cur_data = event["cur_data"]
+    roles = event
     cost_by_days = 14
     end_date = str(datetime.now().date())
     start_date = str(datetime.now().date() - timedelta(days=cost_by_days))
@@ -251,7 +288,7 @@ def lambda_handler(event, context):
                         # extract the "Function" field
                         function = detail["Function"]
                         lambda_function = "lambda:function/" + function
-                        lambda_cost = get_cumulative_cost(cur_data, function)
+                        lambda_cost = get_cumulative_cost(get_cur_data(), function)
 
                         iam_service_gauge.labels(
                             (

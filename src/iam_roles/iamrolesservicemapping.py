@@ -46,8 +46,7 @@ def lambda_handler(event, context):
     """
 
     function_name = os.environ["function_name_iamroleservice"]
-    resource_file_content = event["list_of_iam_roles"]
-    cur_data = event["cur_data"]
+    resource_file_content = event
     resource_mapping = []
 
     # parsing iam role detail
@@ -179,16 +178,11 @@ def lambda_handler(event, context):
         }
         resource_mapping.append(role_mapping)
 
-        payload_service = {
-            "resource_mapping": resource_mapping,
-            "cur_data": cur_data
-        }
-
         try:
             invoker = lambda_client.invoke(
                 FunctionName=function_name,
                 InvocationType="Event",
-                Payload=json.dumps(payload_service),
+                Payload=json.dumps(resource_mapping),
             )
             # Extract the status code from the response
             status_code = invoker["StatusCode"]

@@ -35,7 +35,6 @@ resource "aws_lambda_function" "IamRolestoGrafana" {
       func_name_iam_role_service_mapping = aws_lambda_function.IamRolesServiceMapping.arn
       prometheus_ip                      = "${var.prometheus_ip}:9091"
       region_names_path                   = "/${var.namespace}/region-names"
-      report_bucket_name                  = var.report_bucket_name
     }
   }
   memory_size = var.memory_size
@@ -172,7 +171,8 @@ resource "aws_iam_role_policy" "IamRolesServiceMapping" {
         "Effect" : "Allow",
         "Action" : [
           "iam:ListInstanceProfilesForRole",
-          "iam:PassRole"
+          "iam:PassRole",
+          "lambda:ListFunctions"
         ],
         "Resource" : ["*"]
       },
@@ -216,6 +216,7 @@ resource "aws_lambda_function" "IamRolesService" {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"
       region_names_path = "/${var.namespace}/region_names"
+      report_bucket_name = var.report_bucket_name
     }
   }
   memory_size = var.memory_size
@@ -272,6 +273,15 @@ resource "aws_iam_role_policy" "IamRolesService" {
           "ec2:AttachNetworkInterface"
         ],
         "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${var.s3_xc3_bucket.id}/*"
+        ]
       }
     ]
   })
