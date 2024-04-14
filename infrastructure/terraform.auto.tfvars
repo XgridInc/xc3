@@ -38,11 +38,10 @@ total_account_cost_lambda   = "total_account_cost"
 iam_role_cost_lambda        = "iam_role_cost"
 CUR_s3_bucket_name             = "team1reportbucket"
 CUR_s3_file_key                = "report/mycostreport/20240401-20240501/20240405T101631Z/mycostreport-00002.csv"
-slack_channel_url           ="https://hooks.slack.com/services/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"
+slack_channel_url           ="https://hooks.slack.com/services/0011T06FJLPT25D0011/0011B06TQHHGHSQ0011/0011Rqmhc6wxZ1LtLx1NMXf1EtI10011" #omit 0011s 
 slack_channel               = "C06NAMZR69E"
 slack_icon_emoji            = ":rocket:"
 slack_username              = "bot"
-
 total_account_cost_cronjob  = "cron(0 0 1,15 * ? *)"     // flexible can be set according to need
 prometheus_layer            = "lambda_layers/python.zip" // s3 key for lambda layer
 memory_size                 = 128

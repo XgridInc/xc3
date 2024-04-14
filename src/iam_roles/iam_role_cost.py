@@ -320,6 +320,6 @@ def lambda_handler(event, context):
     # Send the payload to Slack via webhook
     send_to_slack(payload, slack_channel_url)
 
-    send_email_ses(role_costs, sender_email, recipient_email)
+    #send_email_ses(role_costs, sender_email, recipient_email)
 
     print("Email sent successfully.")

@@ -143,3 +143,27 @@ resource "aws_iam_role_policy_attachment" "iam_role_cost" {
   policy_arn = aws_iam_policy.iam_role_cost.arn
   role       = aws_iam_role.iam_role_cost.name
 }
+
+# Creating CloudWatch Event Rule for scheduling Lambda function
+resource "aws_cloudwatch_event_rule" "lambda_schedule" {
+  name                = "iam_role_cost_schedule"
+  description         = "Schedule rule for triggering iam_role_cost Lambda"
+  schedule_expression = "cron(0/1 * * * ? *)" # Runs every day "cron(0 0 * * ? *)" 
+}
+
+# Creating CloudWatch Event Target for Lambda function
+resource "aws_cloudwatch_event_target" "iam_role_cost_target" {
+  rule      = aws_cloudwatch_event_rule.lambda_schedule.name
+  target_id = "invoke-iam_role_cost-lambda"
+  arn       = aws_lambda_function.iam_role_cost.arn
+}
+
+# Adding Lambda permission to allow CloudWatch Events to invoke the Lambda function
+resource "aws_lambda_permission" "allow_cloudwatch" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.iam_role_cost.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.lambda_schedule.arn
+}
+
