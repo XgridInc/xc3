@@ -114,11 +114,11 @@ def lambda_handler(event, context):
         all_resources.update({account_id:resources})
         
     
-    # Define the parameters for invoking untagged resource lambda
-    invoke_params = {
-        'FunctionName': untagged_resource_lambda_arn, 
-        'InvocationType': 'Event'  # Asynchronous invocation
-    }
+    # # Define the parameters for invoking untagged resource lambda
+    # invoke_params = {
+    #     'FunctionName': untagged_resource_lambda_arn, 
+    #     'InvocationType': 'Event'  # Asynchronous invocation
+    # }
 
     current_date = datetime.now()
     year = str(current_date.year)
@@ -131,7 +131,13 @@ def lambda_handler(event, context):
     try:
         s3.put_object(Bucket=bucket_name, Key=destination_key, Body=json.dumps({'body':all_resources}))
         # Invoke untagged resource
-        response = lambda_client.invoke(**invoke_params)
+        # response = lambda_client.invoke(**invoke_params)
+        # Invoke another Lambda function with the untagged resources as payload
+        invoke_response = lambda_client.invoke(
+            FunctionName=untagged_resource_lambda_arn,
+            InvocationType='RequestResponse',
+            Payload=json.dumps({"accId": accounts})
+        )
         # Check the response from untagged resource
         if response['StatusCode'] == 202:
             print("Untagged Resource invoked successfully")

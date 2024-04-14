@@ -15,6 +15,10 @@ def lambda_handler(event, context):
     vpc_client = boto3.client('ec2')
     lambda_client = boto3.client('lambda')
 
+    # Extract payload data from the event
+    #Federated User account
+    account_id_list = event.get('accId')  # Assuming payload is passed directly
+
     # List untagged S3 buckets
     response = s3_client.list_buckets()
     s3_buckets = []
@@ -60,7 +64,15 @@ def lambda_handler(event, context):
     untagged_resources_found = []
     for resource_type, resources in untagged_resources.items():
         for resource in resources:
-            untagged_resources_found.append(f"Resource Type: {resource['ResourceType']}\n Resource Name: {resource['ResourceName']}\n Resource ARN: {resource['ResourceARN']}")
+            if resource['ResourceType'] == "S3 Bucket":
+                untagged_resources_found.append(f"Resource Type: {resource['ResourceType']}\n Resource Name: {resource['ResourceName']}\n Resource ARN: {resource['ResourceARN']}")
+            else:
+                # Split the Resource ARN to extract the account ID
+                arn_parts = resource['ResourceARN'].split(':')
+                account_id = arn_parts[4]
+                # Check if the account ID matches any item in the list of account IDs
+                if account_id in account_id_list:
+                    untagged_resources_found.append(f"Resource Type: {resource['ResourceType']}\n Resource Name: {resource['ResourceName']}\n Resource ARN: {resource['ResourceARN']}")
 
     
     #Current Date and time to access file in S3 bucket
