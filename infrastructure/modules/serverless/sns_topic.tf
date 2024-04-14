@@ -6,7 +6,7 @@ resource "aws_sns_topic" "resource_alert" {
   # Topic Name
   # ----------
   # Specifies the name of the SNS topic.
-  name        = "resource_alert"
+  name        = "${var.namespace}-resource_alert"
   
   # Display Name
   # ------------

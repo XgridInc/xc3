@@ -74,18 +74,41 @@ def lambda_handler(event, context):
     # object_key = 'fed-resources/2024/04/03/resources.json'
     bucket_name = (f"{namespace}-metadata-storage")
     object_key = f"fed-resources/{year}/{month}/{day}/resources.json"
-    # Get the JSON file from S3
-    response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
-    data = response['Body'].read().decode('utf-8')
+    # # Get the JSON file from S3
+    # response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+    # data = response['Body'].read().decode('utf-8')
         
-    # Parse JSON data
-    json_data = json.loads(data)
+    # # Parse JSON data
+    # json_data = json.loads(data)
         
-    # Filter data where Compliance is false
-    non_compliant_resources = []
-    for idx, resource in enumerate(json_data['body'][acc_num], start=1):
-        if resource['Compliance'] == True:
-            non_compliant_resources.append (f"ResourceArn: {resource['ResourceARN']}")
+    # # Filter data where Compliance is false
+    # non_compliant_resources = []
+    # for idx, resource in enumerate(json_data['body'][acc_num], start=1):
+    #     if resource['Compliance'] == False:
+    #         non_compliant_resources.append (f"ResourceArn: {resource['ResourceARN']}")
+    try:
+        # Get the JSON file from S3
+        response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+        data = response['Body'].read().decode('utf-8')
+        
+        # Parse JSON data
+        json_data = json.loads(data)
+        
+        # Filter data where Compliance is false
+        non_compliant_resources = []
+        for idx, resource in enumerate(json_data.get('body', {}).get(acc_num, []), start=1):
+            if resource.get('Compliance') == False:
+                non_compliant_resources.append(f"ResourceArn: {resource.get('ResourceARN')}")
+                
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'NoSuchKey':
+            print(f"No such key: {object_key} in bucket: {bucket_name}")
+            # Handle the case where the file does not exist
+        elif e.response['Error']['Code'] == 'NoSuchBucket':
+            print(f"No such bucket: {bucket_name}")
+            # Handle the case where the bucket does not exist
+        else:
+            print(f"An unexpected error occurred: {e}")
 
 
     # Invoke another Lambda function with the untagged resources as payload

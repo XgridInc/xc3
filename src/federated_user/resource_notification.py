@@ -35,10 +35,12 @@ def lambda_handler(event, context):
     for index in range(len(untagged_resources)):
         message += f"{index + 1}. {untagged_resources[index]}\n\n"
 
-    message += "\nFollowing are the resources without proper tags for cost allocation:\n"
+    #Show this message only if there are resource with tags that are not appropriate for cost allocation
+    if non_compliant_resources:
+        message += "\nFollowing are the resources without proper tags for cost allocation:\n"
 
-    for index in range(len(non_compliant_resources)):
-        message += f"{index + 1}. {non_compliant_resources[index]}\n\n"
+        for index in range(len(non_compliant_resources)):
+            message += f"{index + 1}. {non_compliant_resources[index]}\n\n"
 
     message += "\n\nYour assistance in reviewing these resources and assigning appropriate tags to them would be greatly appreciated.\n"+ "Thank you for your attention to this matter.\n\nBest Regards"
 

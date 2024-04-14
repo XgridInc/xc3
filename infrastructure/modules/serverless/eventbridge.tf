@@ -8,12 +8,7 @@ resource "aws_cloudwatch_event_rule" "federated_cron_job" {
   schedule_expression = "cron(*/1 * * * ? *)"
 
 # Add tags for better organization and management
-  tags = {
-
-    Owner   = var.owner_email
-    Creator = var.creator_email
-    Project = var.project
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-federatedCron-job" }))
 }
 
 
@@ -25,5 +20,5 @@ data "aws_caller_identity" "current" {}
 resource "aws_cloudwatch_event_target" "invoke_lambda" {
   rule      = aws_cloudwatch_event_rule.federated_cron_job.name
   target_id = "invoke-lambda-target"
-  arn       = "arn:aws:lambda:${var.region}:${data.aws_caller_identity.current.account_id}:function:untagged_resource_lambda"  # Replace <REGION> and <ACCOUNT_ID> with your Lambda's region and account ID
+  arn       = "arn:aws:lambda:${var.region}:${data.aws_caller_identity.current.account_id}:function:${var.namespace}-list_fed_users"  
 }

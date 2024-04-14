@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-namespace      = "xc3team12nb"
+namespace      = "xc3team12nilanshu"
 env            = "dev"
-snsendpoint = "email@gmail.com"
-slack_webhook_url = "https://hooks.slack.com/services/webhookURLhere"
+snsendpoint = "mail@gmail.com"
+slack_webhook_url = "https://hooks.slack.com/webhook here"
 region         = "ap-southeast-2"
 account_id     = "590183937261"
 vpc_cidr_block = "10.0.0.0/16"
@@ -40,7 +40,7 @@ total_account_cost_cronjob  = "cron(0 0 1,15 * ? *)"     // flexible can be set 
 prometheus_layer            = "lambda_layers/python.zip" // s3 key for lambda layer
 memory_size                 = 128
 timeout                     = 300
-project                     = "xc3team12nb"
+project                     = "xc3team12nilanshu"
 create_cloudtrail_kms       = false
 create_cloudtrail           = false
 create_cloudtrail_s3_bucket = false

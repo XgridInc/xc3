@@ -3,7 +3,7 @@
 # This resource block defines an IAM role for the Lambda function named resource_notification_lambda.
 
 resource "aws_iam_role" "resource_notification_lambda_role" {
-  name = "resource_notification_lambda_execution_role"  # Name of the IAM role
+  name = "${var.namespace}-resource_notification_lambda_execution_role"  # Name of the IAM role
   
   # Policy allowing Lambda service to assume the role
   assume_role_policy = jsonencode({
@@ -25,6 +25,7 @@ resource "aws_iam_role" "resource_notification_lambda_role" {
     "arn:aws:iam::aws:policy/AmazonSNSFullAccess",
     "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
   ]
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource-notification-lambda-execution-role" }))
 }
 
 
@@ -34,7 +35,7 @@ resource "aws_iam_role" "resource_notification_lambda_role" {
 
 data "archive_file" "resource_notification_lambda_zip" {
   type        = "zip"
-  source_dir  = "src/federated_user"
+  source_dir  = "../src/federated_user"
   output_path = "${path.module}/resource_notification_lambda.zip"
 }
 
@@ -45,7 +46,7 @@ data "archive_file" "resource_notification_lambda_zip" {
 
 resource "aws_lambda_function" "resource_notification_lambda" {
   filename      = data.archive_file.resource_notification_lambda_zip.output_path  # Path to the Lambda function code zip archive
-  function_name = "resource_notification_lambda"  # Name of the Lambda function
+  function_name = "${var.namespace}-resource_notification_lambda"  # Name of the Lambda function
   role          = aws_iam_role.resource_notification_lambda_role.arn  # IAM role ARN attached to the Lambda function
   handler       = "resource_notification.lambda_handler"  # Entry point to the Lambda function
   runtime       = "python3.8"  # Runtime environment for the Lambda function
@@ -59,12 +60,7 @@ resource "aws_lambda_function" "resource_notification_lambda" {
   }
 
 # Add tags for better organization and management
-  tags = {
-
-    Owner   = var.owner_email
-    Creator = var.creator_email
-    Project = var.project
-  }
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-resource-notification-lambda" }))
 
 }
 

@@ -16,7 +16,7 @@
 
 terraform {
   backend "s3" {
-    bucket         = "terraform-state-team12nb" // S3 bucket for terraform state management
+    bucket         = "terraform-state-team12nilanshu" // S3 bucket for terraform state management
     key            = "xc3/xc3.tfstate"        // Specifies the S3 object key for storing the Terraform state file
     region         = "ap-southeast-2"
     dynamodb_table = "terraform-lock"
