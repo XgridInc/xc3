@@ -165,6 +165,7 @@ def lambda_handler(event, context):
         labelnames=[
             "TimeSlot",
             "iam_role_of_service",
+            "iam_role_service_name",
             "iam_role_service_region",
             "iam_role_service_account",
             "iam_role_service_resource_id",
@@ -205,6 +206,7 @@ def lambda_handler(event, context):
                         "%Y-%m-%d %H:%M:%S"
                     ),
                     role,
+                    "None",
                     role_region,
                     account_id,
                     "None",
@@ -250,6 +252,7 @@ def lambda_handler(event, context):
                                             )
                                         ).strftime("%Y-%m-%d %H:%M:%S"),
                                         role,
+                                        detail["Service"],
                                         f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                                         account_id,
                                         ec2,
@@ -276,6 +279,7 @@ def lambda_handler(event, context):
                                             )
                                         ).strftime("%Y-%m-%d %H:%M:%S"),
                                         role,
+                                        detail["Service"],
                                         f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                                         account_id,
                                         ec2,
@@ -298,6 +302,7 @@ def lambda_handler(event, context):
                                 )
                             ).strftime("%Y-%m-%d %H:%M:%S"),
                             role,
+                            detail["Service"],
                             f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                             account_id,
                             lambda_function,
@@ -311,6 +316,7 @@ def lambda_handler(event, context):
                             "%Y-%m-%d %H:%M:%S"
                         ),
                         role,
+                        "None",
                         f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                         account_id,
                         detail,
