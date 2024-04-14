@@ -110,7 +110,7 @@ def get_cur_data():
     try:
         response = s3.get_object(Bucket=bucket, Key=key)
         resource_file = response["Body"].read()
-        cur_data = {}
+        cur_data = []
         with gzip.GzipFile(fileobj=io.BytesIO(resource_file), mode="rb") as data:
             cur_data = pd.read_csv(io.BytesIO(data.read()))
             cur_data = cur_data[[
@@ -118,14 +118,14 @@ def get_cur_data():
                 "lineItem/ResourceId",
                 "lineItem/UnblendedCost",
             ]]
-            return cur_data.to_json(orient='records')
+            return cur_data
     except Exception as e:
         logging.error(
             "Error getting object {} from bucket {}. Make sure they exist and your bucket is in the same region as this function.".format(
                 key, bucket
             )
         )
-        return {"statusCode": 500, "body": json.dumps({"Error": str(e)})}
+        raise
 
 # Get the cost and usage report data
 cur_data = get_cur_data()
@@ -140,7 +140,7 @@ def get_cumulative_cost(resource_id):
     Returns:
         The cumulative cost of the resource in the Cost and Usage Report.
     """
-    df = pd.json_normalize(json.loads(cur_data))
+    df = cur_data
     cost = df.loc[df["lineItem/ResourceId"] == resource_id].sum()["lineItem/UnblendedCost"]
     return cost
 
