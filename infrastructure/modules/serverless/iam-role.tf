@@ -225,8 +225,8 @@ resource "aws_lambda_function" "IamRolesService" {
     subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
-
-  layers = [var.prometheus_layer]
+  // layer arn for pandas
+  layers = [var.prometheus_layer, "arn:aws:lambda:ap-southeast-2:336392948345:layer:AWSSDKPandas-Python39:18"]
 
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-iamroleservice" }))
 

@@ -21,7 +21,6 @@ from urllib.parse import unquote_plus
 
 import boto3
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
-import pandas as pd
 
 try:
     s3 = boto3.client("s3")
