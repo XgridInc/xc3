@@ -23,10 +23,6 @@ from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from urllib.parse import unquote_plus
 from datetime import datetime
 
-#Needed to invoke Untagged Resource Lambda
-untagged_resource_lambda_arn = os.environ['UNTAGGED_RESOURCE_LAMBDA_ARN']
-lambda_client = boto3.client('lambda')
-
 try:
     s3 = boto3.client("s3")
     bucket_name = os.environ["bucket_name"]
@@ -61,11 +57,11 @@ def get_resources_for_account_id(account_id):
         for page in paginator.paginate(ResourceTypeFilters=['s3', 'lambda', 'ec2:instance']):
             for resource in page.get('ResourceTagMappingList', []):
                 resource_arn = resource['ResourceARN']
-                
-                tags = {tag['Key']: tag['Value'] for tag in resource.get('Tags', [])}
-                
-                resources.append({'ResourceARN': resource_arn, 'Tags': tags, 'Compliance': verify_tags(tags)})
-                
+                if account_id in resource_arn or 's3' in resource_arn:
+                    tags = {tag['Key']: tag['Value'] for tag in resource.get('Tags', [])}
+                    
+                    resources.append({'ResourceARN': resource_arn, 'Tags': tags, 'Compliance': verify_tags(tags)})
+        
     except Exception as e:
         print(f"Error retrieving resources: {str(e)}")
     
@@ -84,14 +80,6 @@ def lambda_handler(event, context):
 
     # Initialize IAM client
     iam = boto3.client('iam')
-    sts_client = boto3.client('sts')
-    
-    # Call list_users method
-    
-    # response = iam.list_groups()
-    
-    # Extract user information from the response
-    # users = response['Users']
     response = iam.list_roles()
     account_ids = set()
     # Process the response
@@ -106,44 +94,20 @@ def lambda_handler(event, context):
     
     # Convert the set of account IDs to a list
     accounts = list(account_ids)
-    
-    # Return the formatted user information
     all_resources = {}
     for account_id in account_ids:
         resources = get_resources_for_account_id(account_id)
         all_resources.update({account_id:resources})
         
-    
-    # # Define the parameters for invoking untagged resource lambda
-    # invoke_params = {
-    #     'FunctionName': untagged_resource_lambda_arn, 
-    #     'InvocationType': 'Event'  # Asynchronous invocation
-    # }
-
     current_date = datetime.now()
     year = str(current_date.year)
     month = current_date.strftime('%m')
     day = current_date.strftime('%d')
 
     # Set the destination key
-    # bucket = event["Records"][0]["s3"]["bucket"]["name"]
     destination_key = f"fed-resources/{year}/{month}/{day}/resources.json"
     try:
         s3.put_object(Bucket=bucket_name, Key=destination_key, Body=json.dumps({'body':all_resources}))
-        # Invoke untagged resource
-        # response = lambda_client.invoke(**invoke_params)
-        # Invoke another Lambda function with the untagged resources as payload
-        invoke_response = lambda_client.invoke(
-            FunctionName=untagged_resource_lambda_arn,
-            InvocationType='RequestResponse',
-            Payload=json.dumps({"accId": accounts})
-        )
-        # Check the response from untagged resource
-        if response['StatusCode'] == 202:
-            print("Untagged Resource invoked successfully")
-            print(response)
-        else:
-            print("Error invoking Untagged resource")
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchBucket":
             raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
@@ -158,4 +122,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': all_resources
     }
-   

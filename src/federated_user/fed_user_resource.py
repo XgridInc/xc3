@@ -62,7 +62,6 @@ def cost_of_instance(event, client, resource_id):
     total_amount = sum(float(item["Total"]["UnblendedCost"]["Amount"]) for item in ce_response["ResultsByTime"])
     return total_amount
 
-
 def lambda_handler(event, context):
     """
     List resources under ownership of specific IAM User.
@@ -71,8 +70,8 @@ def lambda_handler(event, context):
     Returns:
         It return list of resources under ownership of specific IAM user in aws .
     Raises:
-        KeyError: Raise error if cost explorer api  call not execute."""
-   
+        KeyError: Raise error if cost explorer api  call not execute.
+    """
     try:
         current_date = datetime.now()
         year = str(current_date.year)
@@ -97,7 +96,9 @@ def lambda_handler(event, context):
                 "resource",
                 "cost",
                 "account_id",
-                'region'
+                'region',
+                'resource_name',
+                'month'
             ],
             registry=registry,
         )
@@ -108,14 +109,19 @@ def lambda_handler(event, context):
                 if resource['Compliance']:
                     resource_id = resource['ResourceARN']
                     resource_type = resource_id.split(':')[2]
+                    resource_name = resource_id.split(':')[-1]
+                    if 'arn:aws:ec2' in resource['ResourceARN']:
+                        resource_name = resource['Tags']['Name']
                     if resource['ResourceARN'].startswith('arn:aws:s3'):
                         region = ''
                     else:
                         region = resource_id.split(':')[3]
                     cost = cost_of_instance(event, client, resource_id)
-                    ec2_instances.append({'resource_id': resource_id, 'cost': cost, 'region': region, 'resource': resource_type, 'account_id': account})
+                    current_month_name = datetime.now().strftime("%B")
+                    month = (datetime.now() - timedelta(days=datetime.now().day - 1)).strftime("%B") if datetime.now().day == 1 else current_month_name
+                    ec2_instances.append({'resource_id': resource_id, 'cost': cost, 'region': region, 'resource': resource_type, 'resource_name': resource_name, 'account_id': account})
                     gauge.labels(
-                        resource_id, resource, cost, account_id, region
+                        resource_id, resource_type, cost, account_id, region, resource_name, month
                     ).set(cost)
                     push_to_gateway(
                     os.environ["prometheus_ip"],
