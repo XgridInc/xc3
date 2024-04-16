@@ -122,7 +122,7 @@ def lambda_handler(event, context):
             Payload=json.dumps({"accId": accounts})
         )
         # Check the response from untagged resource
-        if response['StatusCode'] == 202:
+        if invoke_response['StatusCode'] == 202:
             print("Untagged Resource invoked successfully")
             print(response)
         else:
