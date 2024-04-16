@@ -23,6 +23,9 @@ from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from urllib.parse import unquote_plus
 from datetime import datetime
 
+#Needed to invoke Untagged Resource Lambda
+untagged_resource_lambda_arn = os.environ['UNTAGGED_RESOURCE_LAMBDA_ARN']
+lambda_client = boto3.client('lambda')
 try:
     s3 = boto3.client("s3")
     bucket_name = os.environ["bucket_name"]
@@ -98,6 +101,8 @@ def lambda_handler(event, context):
     for account_id in account_ids:
         resources = get_resources_for_account_id(account_id)
         all_resources.update({account_id:resources})
+
+    
         
     current_date = datetime.now()
     year = str(current_date.year)
@@ -108,6 +113,20 @@ def lambda_handler(event, context):
     destination_key = f"fed-resources/{year}/{month}/{day}/resources.json"
     try:
         s3.put_object(Bucket=bucket_name, Key=destination_key, Body=json.dumps({'body':all_resources}))
+        # Invoke untagged resource
+        # response = lambda_client.invoke(**invoke_params)
+        # Invoke another Lambda function with the untagged resources as payload
+        invoke_response = lambda_client.invoke(
+            FunctionName=untagged_resource_lambda_arn,
+            InvocationType='RequestResponse',
+            Payload=json.dumps({"accId": accounts})
+        )
+        # Check the response from untagged resource
+        if response['StatusCode'] == 202:
+            print("Untagged Resource invoked successfully")
+            print(response)
+        else:
+            print("Error invoking Untagged resource")
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchBucket":
             raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
