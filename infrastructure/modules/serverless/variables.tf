@@ -100,6 +100,10 @@ variable "lambda_names" {
     "iamrolesservice"        = "../src/iam_roles/iamrolesservice.py"
     "iamrolesservicemapping" = "../src/iam_roles/iamrolesservicemapping.py"
     "instancestatechange"    = "../src/iam_roles/instancestatechange.py"
+    "mappinglambda"           = "../src/iam_roles/mappinglambda.py"
+    "roleslambda"          = "../src/iam_roles/roleslambda.py"
+    "costlambda"          = "../src/iam_roles/costlambda.py"
+
   }
 }
 
