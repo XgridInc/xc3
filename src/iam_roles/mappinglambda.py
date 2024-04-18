@@ -37,20 +37,43 @@ def get_lambda_functions_for_role(role_name):
     return []
 
 def get_s3_buckets_for_role(role_name):
-    s3_client = boto3.client('s3')
-
     try:
-        # List S3 buckets associated with the IAM role
-        buckets_response = s3_client.list_buckets()
+        # Create an IAM client
+        iam_client = boto3.client('iam')
 
-        # Filter S3 buckets associated with the IAM role
-        s3_buckets = [bucket['Name'] for bucket in buckets_response['Buckets'] if role_name in bucket['Name']]
+        # Get the IAM policies attached to the role
+        role_policies_response = iam_client.list_attached_role_policies(RoleName=role_name)
+        role_policy_arns = [policy['PolicyArn'] for policy in role_policies_response['AttachedPolicies']]
+
+        # Initialize a list to store bucket names associated with the role
+        s3_buckets = []
+
+        # Create an S3 client
+        s3_client = boto3.client('s3')
+
+        # Iterate through each IAM policy attached to the role
+        for policy_arn in role_policy_arns:
+            # Get the policy document
+            policy_document_response = iam_client.get_policy_version(
+                PolicyArn=policy_arn,
+                VersionId='v1'  # Assuming there's only one version
+            )
+            policy_document = policy_document_response['PolicyVersion']['Document']
+
+            # Parse the policy document to find S3 related permissions
+            for statement in policy_document['Statement']:
+                if statement['Effect'] == 'Allow':
+                    if 's3' in statement.get('Resource', '') or 's3' in statement.get('Resource', ''):
+                        # If the statement has s3 in the resource, it's likely an S3 permission
+                        # Add all S3 buckets to the list as we cannot infer bucket names directly from IAM policies
+                        buckets_response = s3_client.list_buckets()
+                        s3_buckets.extend(bucket['Name'] for bucket in buckets_response['Buckets'])
 
         return s3_buckets
+
     except Exception as e:
         print(f"Error fetching S3 buckets for role '{role_name}': {str(e)}")
-
-    return []
+        return []
 
 def get_ec2_instances_for_role(role_name):
     try:
@@ -124,18 +147,48 @@ def get_rds_instances_for_role(role_name):
 
 def get_dynamodb_tables_for_role(role_name):
     try:
+        # Create an IAM client
+        iam_client = boto3.client('iam')
+
+        # Get the IAM policies attached to the role
+        role_policies_response = iam_client.list_attached_role_policies(RoleName=role_name)
+        role_policy_arns = [policy['PolicyArn'] for policy in role_policies_response['AttachedPolicies']]
+
+        # Create a DynamoDB client
         dynamodb_client = boto3.client('dynamodb')
-        
-        # Describe DynamoDB tables associated with the IAM role
-        tables_response = dynamodb_client.list_tables()
-        
-        # Extract DynamoDB table names
-        dynamodb_tables = [table_name for table_name in tables_response['TableNames'] if role_name in table_name]
-        
+
+        # Initialize a list to store table names associated with the role
+        dynamodb_tables = []
+
+        # Iterate through each IAM policy attached to the role
+        for policy_arn in role_policy_arns:
+            # Get the policy document
+            policy_document_response = iam_client.get_policy_version(
+                PolicyArn=policy_arn,
+                VersionId='v1'  # Assuming there's only one version
+            )
+            policy_document = policy_document_response['PolicyVersion']['Document']
+
+            # Parse the policy document to find DynamoDB related permissions
+            for statement in policy_document['Statement']:
+                if statement['Effect'] == 'Allow':
+                    if 'dynamodb' in statement['Resource']:
+                        # Extract DynamoDB table ARN
+                        table_arn = statement['Resource']
+                        
+                        # Extract table name from ARN
+                        table_name = table_arn.split(':table/')[1]
+
+                        # Add the table name to the list if it's not already there
+                        if table_name not in dynamodb_tables:
+                            dynamodb_tables.append(table_name)
+
         return dynamodb_tables
+
     except Exception as e:
         print(f"Error fetching DynamoDB tables for role '{role_name}': {str(e)}")
         return []
+
 
 def parse_roles_from_payload(iam_roles):
     parsed_roles = []
