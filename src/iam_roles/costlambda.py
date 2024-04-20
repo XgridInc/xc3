@@ -133,7 +133,7 @@ def get_costs_and_push_to_prometheus(parsed_roles, start_date, end_date):
                     iam_role_resource_gauge.labels(role_name=role_name, service=service, resource_name=lambda_function_arn).set(cost)
                     lambda_costs.append({"LambdaFunctionArn": lambda_function_arn, "Cost": cost})
                     service_cost += cost
-                role["LambdaCosts"] = lambda_costs
+                
             elif service == "s3":
                 s3_costs = []
                 for s3_bucket_name in role["S3Buckets"]:
@@ -141,7 +141,7 @@ def get_costs_and_push_to_prometheus(parsed_roles, start_date, end_date):
                     iam_role_resource_gauge.labels(role_name=role_name, service=service, resource_name=s3_bucket_name).set(cost)
                     s3_costs.append({"S3BucketName": s3_bucket_name, "Cost": cost})
                     service_cost += cost
-                role["S3Costs"] = s3_costs
+                
             elif service == "ec2":
                 ec2_costs = []
                 for ec2_instance_name in role["EC2Instances"]:
@@ -149,7 +149,7 @@ def get_costs_and_push_to_prometheus(parsed_roles, start_date, end_date):
                     iam_role_resource_gauge.labels(role_name=role_name, service=service, resource_name=ec2_instance_name).set(cost)
                     ec2_costs.append({"EC2InstanceName": ec2_instance_name, "Cost": cost})
                     service_cost += cost
-                role["EC2Costs"] = ec2_costs
+                
             elif service == "rds":
                 rds_costs = []
                 for db_instance_identifier in role.get("RDSInstances", []):
@@ -157,7 +157,7 @@ def get_costs_and_push_to_prometheus(parsed_roles, start_date, end_date):
                     iam_role_resource_gauge.labels(role_name=role_name, service=service, resource_name=db_instance_identifier).set(cost)
                     rds_costs.append({"DBInstanceIdentifier": db_instance_identifier, "Cost": cost})
                     service_cost += cost
-                role["RDSCosts"] = rds_costs
+              
             elif service == "dynamodb":
                 dynamodb_costs = []
                 for table_name in role.get("DynamoDBTables", []):
@@ -165,13 +165,9 @@ def get_costs_and_push_to_prometheus(parsed_roles, start_date, end_date):
                     iam_role_resource_gauge.labels(role_name=role_name, service=service, resource_name=table_name).set(cost)
                     dynamodb_costs.append({"TableName": table_name, "Cost": cost})
                     service_cost += cost
-                role["DynamoDBCosts"] = dynamodb_costs
-            
-            # Append the total service cost to the role dictionary
-            role[f"Total{service.capitalize()}Cost"] = service_cost
+               
 
             # Set the total service cost as a Prometheus metric for service costs
-            total_service_cost += service_cost
             service_cost_gauge.labels(role_name=role_name, service=service).set(service_cost)
 			
 			# Set IAM role info gauge
