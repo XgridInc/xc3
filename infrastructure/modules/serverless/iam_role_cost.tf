@@ -148,7 +148,7 @@ resource "aws_iam_role_policy_attachment" "iam_role_cost" {
 resource "aws_cloudwatch_event_rule" "lambda_schedule" {
   name                = "iam_role_cost_schedule"
   description         = "Schedule rule for triggering iam_role_cost Lambda"
-  schedule_expression = "cron(0/1 * * * ? *)" # Runs every day "cron(0 0 * * ? *)" 
+  schedule_expression = "cron(0 0 * * ? *)"  # Runs every min "cron(0/1 * * * ? *)" 
 }
 
 # Creating CloudWatch Event Target for Lambda function
