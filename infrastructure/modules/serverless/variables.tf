@@ -17,15 +17,25 @@ variable "namespace" {
   description = "The namespace referring to an env"
 }
 
-variable "owner_email" {
+variable "receiver_email_address" {
   type        = string
-  description = "Email address of a owner who is leading the team"
+  description = "The email address for receiver"
 }
 
+variable "ses_email_address" {
+  type        = string
+  description = "The email address for SES identity"
+}
 variable "creator_email" {
   type        = string
-  description = "Email of the the Creator who is provisioning the infrastructure"
+  description = "Email address of a person who is provisioning the infrastructure"
 }
+
+variable "owner_email" {
+  type        = string
+  description = "Email address of a person who is owner of the team/project"
+}
+
 
 variable "project" {
   type        = string
@@ -67,6 +77,11 @@ variable "total_account_cost_lambda" {
   description = "The name of the lambda function that will be used to calculate cost metrics of provided AWS Account"
 }
 
+variable "iam_role_cost_lambda" {
+    type = string
+  description = "Name of the Lambda function of Team 01 getting cost from IAM ROLE "
+}
+
 variable "account_id" {
   type        = string
   description = "AWS Account ID"
@@ -96,6 +111,7 @@ variable "lambda_names" {
   type        = map(string)
   description = "The names of lambda functions in IAM Role Workflow"
   default = {
+    "iam_role_cost"          = "../src/iam_roles/iam_role_cost.py"
     "iam_roles_all"          = "../src/iam_roles/iam_roles_all.py"
     "iamrolesservice"        = "../src/iam_roles/iamrolesservice.py"
     "iamrolesservicemapping" = "../src/iam_roles/iamrolesservicemapping.py"
@@ -119,10 +135,6 @@ variable "s3_prefixes" {
   }
 }
 
-variable "slack_channel_url" {
-  description = "Slack Channel URL"
-  type        = string
-}
 
 variable "create_cloudtrail_kms" {
   description = "Fetch the KMS if exist"
@@ -143,4 +155,33 @@ variable "env" {
   description = "Env variable for Dev/Prod"
   type        = string
 }
+
+variable "CUR_s3_bucket_name"{
+  description = "bucket name where CUR is located"
+  type        = string
+}
+
+variable "CUR_s3_file_key"{
+  description = "path of csv file where cur is located"
+  type        = string
+}
+
+variable "slack_channel_url"{
+  description = "slack web hook url to send notification via slack"
+  type        = string
+}
+variable "slack_username"{
+  description = "user_name"
+  type        = string
+}
+variable "slack_icon_emoji"{
+  description = "emoji"
+  type        = string
+}
+
+variable "slack_channel"{
+  description = "Name of channel of slack"
+  type        = string
+}
+
 
