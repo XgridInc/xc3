@@ -94,7 +94,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "iam_role_service_resource_id",
+        "xField": "iam_role_service_resource_name",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -116,7 +116,7 @@
           "useBackend": false
         }
       ],
-      "title": "Panel Title",
+      "title": "Resource Cost",
       "type": "barchart"
     }
   ],
