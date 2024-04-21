@@ -169,6 +169,7 @@ def lambda_handler(event, context):
             "iam_role_service_region",
             "iam_role_service_account",
             "iam_role_service_resource_id",
+            "iam_role_service_resource_name",
             "iam_role_service_cost",
             "iam_role_service_state",
         ],
@@ -209,6 +210,7 @@ def lambda_handler(event, context):
                     "None",
                     role_region,
                     account_id,
+                    "None",
                     "None",
                     "0",
                     "Start",
@@ -256,6 +258,7 @@ def lambda_handler(event, context):
                                         f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                                         account_id,
                                         ec2,
+                                        ec2,
                                         cumulative,
                                         "Stop",
                                     ).set(cumulative)
@@ -283,6 +286,7 @@ def lambda_handler(event, context):
                                         f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                                         account_id,
                                         ec2,
+                                        ec2,
                                         cumulative,
                                         "Start",
                                     ).set(cumulative)
@@ -293,6 +297,7 @@ def lambda_handler(event, context):
                         # extract the "Function" field
                         function = detail["Function"]
                         lambda_function = "lambda:function/" + function
+                        lambda_function_name = "lambda:function/" + function.split(":")[-1]
                         lambda_cost = get_cumulative_cost(function)
 
                         iam_service_gauge.labels(
@@ -306,6 +311,7 @@ def lambda_handler(event, context):
                             f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                             account_id,
                             lambda_function,
+                            lambda_function_name,
                             lambda_cost,
                             "None",
                         ).set(lambda_cost)
@@ -319,6 +325,7 @@ def lambda_handler(event, context):
                         "None",
                         f"{role_region} ({region_names.get(role_region, 'unknown region name')})",
                         account_id,
+                        detail,
                         detail,
                         "0",
                         "Start",

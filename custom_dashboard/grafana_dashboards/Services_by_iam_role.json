@@ -197,7 +197,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "iam_role_service_resource_id",
+        "xField": "iam_role_service_resource_name",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -219,7 +219,7 @@
           "useBackend": false
         }
       ],
-      "title": "Cost by roles",
+      "title": "Cost by resources",
       "type": "barchart"
     }
   ],
