@@ -158,3 +158,8 @@ variable "env" {
   type        = string
   default     = "dev"
 }
+
+variable "report_bucket_name" {
+  type        = string
+  description = "The name of the bucket containing the Cost and Usage Report"
+}

@@ -171,7 +171,8 @@ resource "aws_iam_role_policy" "IamRolesServiceMapping" {
         "Effect" : "Allow",
         "Action" : [
           "iam:ListInstanceProfilesForRole",
-          "iam:PassRole"
+          "iam:PassRole",
+          "lambda:ListFunctions"
         ],
         "Resource" : ["*"]
       },
@@ -215,6 +216,7 @@ resource "aws_lambda_function" "IamRolesService" {
     variables = {
       prometheus_ip = "${var.prometheus_ip}:9091"
       region_names_path = "/${var.namespace}/region_names"
+      report_bucket_name = var.report_bucket_name
     }
   }
   memory_size = var.memory_size
@@ -223,8 +225,8 @@ resource "aws_lambda_function" "IamRolesService" {
     subnet_ids         = [var.subnet_id[0]]
     security_group_ids = [var.security_group_id]
   }
-
-  layers = [var.prometheus_layer]
+  // layer arn for pandas
+  layers = [var.prometheus_layer, "arn:aws:lambda:ap-southeast-2:336392948345:layer:AWSSDKPandas-Python39:18"]
 
   tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-iamroleservice" }))
 
@@ -271,6 +273,15 @@ resource "aws_iam_role_policy" "IamRolesService" {
           "ec2:AttachNetworkInterface"
         ],
         "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::${var.report_bucket_name}/*"
+        ]
       }
     ]
   })

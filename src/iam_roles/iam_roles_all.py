@@ -56,6 +56,7 @@ def get_region_names():
 # Get the region names dictionary
 region_names = get_region_names()
 
+
 def lambda_handler(event, context):
     """
     Lambda handler function that extracts IAM role information

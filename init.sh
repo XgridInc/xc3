@@ -343,7 +343,7 @@ done
 echo "Changing Directory: $(pwd)"
 cd infrastructure || { echo "Failure : cd infrastructure not working"; exit 1; }
 mkdir python
-pip3 install -t python/ prometheus-client
+pip3 install -t python/ prometheus-client pandas==2.2 numpy==1.22.4 pytz==2020.1 python-dateutil==2.8.2 tzdata==2022.7
 zip -r python.zip ./python
 echo "Packaging Prometheus Done"
 

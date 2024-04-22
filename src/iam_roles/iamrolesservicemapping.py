@@ -125,10 +125,44 @@ def lambda_handler(event, context):
                                         "AvailabilityZone"
                                     ][:-1]
                                     instance_detail = {
+                                        "Service": "ec2",
                                         "Instance_Region": instance_region,
                                         "Instance": instance_id,
                                     }
                                     service_mapping.append(instance_detail)
+                    elif resource == "lambda":
+                        if role_region == "None":
+                            # role is not in use
+                            continue
+                        else:
+                            service_client = boto3.client(
+                                resource
+                            )
+                        try:
+                            list_of_lambdas = service_client.list_functions()
+                        except Exception as e:
+                            logging.error("Error getting list of lambdas" + str(e))
+                            return {
+                                "statusCode": 500,
+                                "body": json.dumps({"Error": str(e)}),
+                            }
+
+                        # getting lambdas description from the above list
+                        lambdas_iterator = list_of_lambdas["Functions"]
+                        for function in lambdas_iterator:
+                            function_arn = function["FunctionArn"]
+                            function_region = function["FunctionArn"].split(':')[3]
+                            function_role_arn = function["Role"]
+                            if function_role_arn != role_arn:
+                                # if the lambda is not assuming this role
+                                continue
+                            else:
+                                function_detail = {
+                                    "Service": "lambda",
+                                    "Function_Region": function_region,
+                                    "Function": function_arn
+                                }
+                                service_mapping.append(function_detail)
                     else:
                         # adding other services
                         service_mapping.append(resource)

@@ -42,6 +42,7 @@ project                     = "testing"
 create_cloudtrail_kms       = true
 create_cloudtrail           = true
 create_cloudtrail_s3_bucket = true
+report_bucket_name          = "report-bucket" // bucket name which contains Cost and Usage Report
 security_group_ingress = {
   "pushgateway" = {
     description = "PushGateway"

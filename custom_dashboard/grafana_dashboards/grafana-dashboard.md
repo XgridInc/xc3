@@ -6,9 +6,10 @@ We have a total of 4 Grafana Dashboards.
 
 The home dashboard consists of the following panels:
 - Tracking Total Costs Across Multiple Accounts
-- A specific account cost for he last 3 months
+- A specific account cost for the last 3 months
 - Project Spend cost
 - Top 5 most expensive services
+- Top 5 most expensive roles
 
 ## **Associated Service Dashboard**
 
@@ -28,6 +29,15 @@ The IAM Role Dashboard consists of the following panels:
 - IAM Roles Service Detail (Last 14 days)
 - Resource Cost (Last 14 days)
 - Start/Stop Action
+
+## **Service By Role Dashboard**
+- Service details (last 14 days)
+- Resource Details (last 14 days)
+- To5 5 service and resource filtered by a role
+
+## ## **Resource By Role and Service Dashboard**
+- Resource Details (last 14 days)
+- To5 5 resources filtered by role and service
 
 ## **IAM User Dashboard**
 
