@@ -14,8 +14,8 @@
 
 namespace      = "xc3team12nilanshu"
 env            = "dev"
-snsendpoint = "mail@gmail.com"
-slack_webhook_url = "webHook here"
+snsendpoint = ""
+slack_webhook_url = ""
 region         = "ap-southeast-2"
 account_id     = "590183937261"
 vpc_cidr_block = "10.0.0.0/16"
