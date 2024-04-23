@@ -28,31 +28,31 @@ To use this module, follow these steps:
 ```hcl
 module "codepipeline" {
   source = "git::https://github.com/your-repo/path-to-module"
-  
+
   # Input variables
-  tags                     = var.tags
-  namespace_name           = var.namespace_name
-  account_id               = var.account_id
-  domain_name              = var.domain_name
-  s3_bucket_name           = var.s3_bucket_name
-  xc3_codepipeline_role    = var.xc3_codepipeline_role
-  codebuild_service_role   = var.codebuild_service_role
-  codestar_connections     = var.codestar_connections
-  full_repository_id       = var.full_repository_id
-  full_branch_name         = var.full_branch_name
-  approve_comment_for_apply  = var.approve_comment_for_apply
+  tags                         = var.tags
+  namespace_name               = var.namespace_name
+  account_id                   = var.account_id
+  domain_name                  = var.domain_name
+  s3_bucket_name               = var.s3_bucket_name
+  xc3_codepipeline_role        = var.xc3_codepipeline_role
+  codebuild_service_role       = var.codebuild_service_role
+  codestar_connections         = var.codestar_connections
+  full_repository_id           = var.full_repository_id
+  full_branch_name             = var.full_branch_name
+  approve_comment_for_apply    = var.approve_comment_for_apply
   approve_comment_for_destroy  = var.approve_comment_for_destroy
-  buildspec_folder_path    = var.buildspec_folder_path
-  init_buildspec           = var.init_buildspec
-  plan_buildspec           = var.plan_buildspec
-  test_buildspec           = var.test_buildspec
-  apply_buildspec          = var.apply_buildspec
-  destroy_buildspec        = var.destroy_buildspec
-  compute_type_for_building = var.compute_type_for_building
-  os_type                  = var.os_type
-  docker_image_used        = var.docker_image_used
-  region                   = var.region
-  key                      = var.key
+  buildspec_folder_path        = var.buildspec_folder_path
+  init_buildspec               = var.init_buildspec
+  plan_buildspec               = var.plan_buildspec
+  test_buildspec               = var.test_buildspec
+  apply_buildspec              = var.apply_buildspec
+  destroy_buildspec            = var.destroy_buildspec
+  compute_type_for_building    = var.compute_type_for_building
+  os_type                      = var.os_type
+  docker_image_used            = var.docker_image_used
+  region                       = var.region
+  key                          = var.key
 }
 ```
 
@@ -79,7 +79,7 @@ module "codepipeline" {
 # Example usage of the codepipeline module
 module "codepipeline" {
   source = "git::https://github.com/your-repo/path-to-module"
-  
+
   # Input variables...
 }
 ```

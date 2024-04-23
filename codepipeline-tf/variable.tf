@@ -26,14 +26,17 @@ variable "namespace_name" {
   description = "Namespace used in project."
   type        = string
 }
+
 variable "account_id" {
   description = "AWS account ID used in module."
   type        = string
 }
+
 variable "domain_name" {
   description = "domain name used in module."
   type        = string
 }
+
 ################ S3 Bucket Variables ################
 variable "s3_bucket_name" {
   description = "S3 bucket varibale"
@@ -44,7 +47,6 @@ variable "s3_bucket_name" {
 variable "xc3_codepipeline_role" {
   description = "This is the main role to run codepipelin."
   type        = string
-
 }
 
 variable "codebuild_service_role" {
@@ -56,26 +58,29 @@ variable "codestar_connections" {
   description = "This is the service role, used to create projects for codepipeline."
   type        = string
 }
+
 ################ Github Variables ################
 variable "full_repository_id" {
   description = "Repository identity used codepipeline module."
   type        = string
-
 }
+
 variable "full_branch_name" {
   description = "Branch name used in codepipeline module."
   type        = string
 }
+
 ################ Comments and Description Variables ################
 variable "approve_comment_for_apply" {
-  description = ""
+  description = "Comment to create the XC3 infrastructure"
   type        = string
+}
 
-}
 variable "approve_comment_for_destroy" {
-  description = ""
+  description = "Comment to destroy the XC3 infrastructure"
   type        = string
 }
+
 ################ Build Spec File Name Variables ################
 variable "buildspec_folder_path" {
   description = "Buildspec folder path used in codepipeline module."
@@ -83,29 +88,31 @@ variable "buildspec_folder_path" {
 }
 
 variable "init_buildspec" {
-  description = ""
+  description = "Initialize and validate terraform configuration file variable"
   type        = string
 }
 
 variable "plan_buildspec" {
-  description = ""
+  description = "Plan run of XC3 infrastructure file variable"
   type        = string
 }
+
 variable "test_buildspec" {
-  description = ""
+  description = "Unit testing file variable"
   type        = string
 }
+
 variable "apply_buildspec" {
-  description = ""
+  description = "Create XC3 infrastructure file variable"
   type        = string
 }
 
 variable "destroy_buildspec" {
-  description = ""
+  description = "Destroy XC3 infrastructure file variable"
   type        = string
 }
-################ Compute Environment Variables ################
 
+################ Compute Environment Variables ################
 variable "compute_type_for_building" {
   description = "Build environment compute type variable."
   type        = string
@@ -123,7 +130,7 @@ variable "docker_image_used" {
 
 variable "region" {
   description = "Region used for pipeline testing."
-   type        = string
+  type        = string
 }
 
 variable "key" {

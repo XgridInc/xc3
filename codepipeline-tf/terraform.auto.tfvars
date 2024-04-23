@@ -30,7 +30,7 @@ s3_bucket_name = "terraform-state-xc3-example-pipeline"
 //delete after deployment
 key = "xc3\\/xc3.tfstate"
 
-xc3_codepipeline_role = "example-pipeline-role"
+xc3_codepipeline_role  = "example-pipeline-role"
 codebuild_service_role = "codebuild-example-service"
 codestar_connections   = "code-star-connection-role"
 

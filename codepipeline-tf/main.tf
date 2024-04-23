@@ -20,8 +20,8 @@ SPDX-License-Identifier: Apache-2.0
 module "xc3_pipeline" {
 
   source = "./modules/xc3_codepipeline"
-  tags = var.tags
-  
+  tags   = var.tags
+
   namespace_name              = var.namespace_name
   account_id                  = var.account_id
   domain_name                 = var.domain_name
@@ -42,6 +42,6 @@ module "xc3_pipeline" {
   s3_bucket_name              = var.s3_bucket_name
   full_repository_id          = var.full_repository_id
   full_branch_name            = var.full_branch_name
-  region = var.region
-  key = var.key
+  region                      = var.region
+  key                         = var.key
 }
