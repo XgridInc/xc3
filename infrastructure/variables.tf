@@ -129,6 +129,7 @@ variable "cron_jobs_schedule" {
     list_linked_accounts_cron    = "cron(0 0 1 * ? *)"
     most_expensive_service_cron  = "cron(0 0 * * ? 1)"
     cost_report_notifier_cronjob = "cron(0 0 1,15 * ? *)"
+    roles_lambda_cron          = "cron(0 0 1,15 * ? *)"
   }
 }
 

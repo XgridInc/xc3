@@ -391,12 +391,275 @@ resource "aws_iam_role" "lambda_execution_role_InstanceChangeState" {
   tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-instance-state-change" }))
 }
 
+resource "aws_lambda_function" "RolesLambda" {
+  function_name = "${var.namespace}-roleslambda"
+  role          = aws_iam_role.lambda_execution_role_RolesLambda.arn
+  runtime       = "python3.9"  # Adjust the runtime as needed
+  handler       = "roleslambda.lambda_handler"  # Adjust the handler as needed
+  filename      = values(data.archive_file.lambda_function_zip)[6].output_path
+
+  environment {
+    variables = {
+      # Add any environment variables specific to MappingLambda function
+      prometheus_ip        = "${var.prometheus_ip}:9091"
+      region_names_path    = "/${var.namespace}/region_names"
+      func_name_mapping_lambda = aws_lambda_function.MappingLambda.arn
+      bucket               = "${var.namespace}-metadata-storage"
+      
+    }
+  }
+
+  memory_size = var.memory_size
+  timeout     = var.timeout
+  vpc_config {
+    subnet_ids         = [var.subnet_id[0]]
+    security_group_ids = [var.security_group_id]
+  }
+
+  layers = [var.prometheus_layer]
+
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-roles_lambda" }))
+}
+
+resource "aws_iam_role_policy" "RolesLambda" {
+  name  = "${var.namespace}-roleslambda-lambda-inline-policy"
+  role  = aws_iam_role.lambda_execution_role_RolesLambda.id
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "s3:*",       # Full S3 access
+          "iam:*",      # Full IAM access
+          "ssm:Get*",
+          "ssm:List*",
+          "ce:GetCostAndUsageWithResources",  # CloudWatch Cost Explorer
+          "ec2:*",
+          "lambda:InvokeFunction",  # Allow invoking Lambda functions
+          "lambda:*"
+        ],
+        Resource = ["*"]
+      }
+    ]
+  })
+}
+
+# Creating IAM Role for RolesLambda function
+resource "aws_iam_role" "lambda_execution_role_RolesLambda" {
+  name = "${var.namespace}-roleslambda"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Sid    = "roleslambdarole",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/IAMFullAccess",
+    "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
+  ]
+
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-RolesLambda" }))
+}
+
+
+resource "aws_lambda_function" "MappingLambda" {
+  function_name = "${var.namespace}-mappinglambda"
+  role          = aws_iam_role.lambda_execution_role_MappingLambda.arn
+  runtime       = "python3.9"  # Adjust the runtime as needed
+  handler       = "mappinglambda.lambda_handler"  # Adjust the handler as needed
+  filename      = values(data.archive_file.lambda_function_zip)[5].output_path
+
+  environment {
+    variables = {
+      # Add any environment variables specific to Mapping Lambda function
+      prometheus_ip                      = "${var.prometheus_ip}:9091"
+      region_names_path                   = "/${var.namespace}/region_names"
+      func_name_cost_lambda = aws_lambda_function.CostLambda.arn
+      bucket               = "${var.namespace}-metadata-storage"
+    }
+  }
+
+  memory_size = var.memory_size
+  timeout     = var.timeout
+  vpc_config {
+    subnet_ids         = [var.subnet_id[0]]
+    security_group_ids = [var.security_group_id]
+  }
+
+  layers = [var.prometheus_layer]
+
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-mapping_lambda" }))
+}
+
+
+resource "aws_iam_role_policy" "MappingLambda" {
+  name        = "${var.namespace}--mappinglambda-lambda-inline-policy"
+  role = aws_iam_role.lambda_execution_role_MappingLambda.id
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:*",       # Full S3 access
+          "iam:*",      # Full IAM access
+          "ssm:Get*",
+          "ssm:List*",
+          "ce:GetCostAndUsageWithResources",  # CloudWatch Cost Explorer
+          "ec2:*",
+          "lambda:*"
+        ],
+        Resource = ["*"]
+      }
+    ]
+  })
+}
+
+# Creating IAM Role for Mapping Lambda function
+resource "aws_iam_role" "lambda_execution_role_MappingLambda" {
+  name = "${var.namespace}-Mappinglambda"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Sid    = "mappinglambdarole",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/IAMFullAccess",
+    "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
+  ]
+
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-MappingLambda" }))
+}
+
+resource "aws_lambda_function" "CostLambda" {
+  function_name = "${var.namespace}-costlambda"
+  role          = aws_iam_role.lambda_execution_role_CostLambda.arn
+  runtime       = "python3.9"  # Adjust the runtime as needed
+  handler       = "costlambda.lambda_handler"  # Adjust the handler as needed
+  filename      = values(data.archive_file.lambda_function_zip)[0].output_path
+
+  environment {
+    variables = {
+      # Add any environment variables specific to CostLambda function
+      prometheus_ip        = "${var.prometheus_ip}:9091"
+      region_names_path    = "/${var.namespace}/region_names"
+      bucket               = "${var.namespace}-metadata-storage"
+      
+    }
+  }
+
+  memory_size = var.memory_size
+  timeout     = var.timeout
+  vpc_config {
+    subnet_ids         = [var.subnet_id[0]]
+    security_group_ids = [var.security_group_id]
+  }
+
+  layers = [var.prometheus_layer]
+
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-cost_lambda" }))
+}
+
+resource "aws_iam_role_policy" "CostLambda" {
+  name  = "${var.namespace}-costlambda-lambda-inline-policy"
+  role  = aws_iam_role.lambda_execution_role_CostLambda.id
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "s3:*",       # Full S3 access
+          "iam:*",      # Full IAM access
+          "ssm:Get*",
+          "ssm:List*",
+          "ce:GetCostAndUsageWithResources",  # CloudWatch Cost Explorer
+          "ec2:*",
+          "lambda:InvokeFunction",  # Allow invoking Lambda functions
+          "lambda:*"
+        ],
+        Resource = ["*"]
+      }
+    ]
+  })
+}
+
+# Creating IAM Role for CostLambda function
+resource "aws_iam_role" "lambda_execution_role_CostLambda" {
+  name = "${var.namespace}-costlambda"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Sid    = "costlambdarole",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+    "arn:aws:iam::aws:policy/IAMFullAccess",
+    "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
+  ]
+
+  tags = merge(local.tags, tomap({ "Name" = "${var.namespace}-IAM-Role-CostLambda" }))
+}
+
+
+
+
 resource "aws_lambda_permission" "allow_bucket_for_irtg" {
   statement_id  = "AllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.IamRolestoGrafana.arn
   principal     = "s3.amazonaws.com"
   source_arn    = var.s3_xc3_bucket.arn
+}
+
+  resource "aws_cloudwatch_event_rule" "RolesLambda" {
+  name                = "${var.namespace}-RolesLambda-rule"
+  description         = "Trigger the Lambda function every week on Monday"
+  schedule_expression = var.cron_jobs_schedule["roles_lambda_cron"]
+  tags                = merge(local.tags, tomap({ "Name" = "${var.namespace}-RolesLambda" }))
+}
+
+# Define the EventBridge target to invoke the Lambda function
+resource "aws_cloudwatch_event_target" "RolesLambda" {
+  rule = aws_cloudwatch_event_rule.RolesLambda.name
+  arn  = aws_lambda_function.RolesLambda.arn
+}
+
+resource "aws_lambda_permission" "RolesLamnda" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.RolesLambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.RolesLambda.arn
 }
 
 resource "aws_s3_bucket_notification" "IamRolestoGrafana_trigger" {

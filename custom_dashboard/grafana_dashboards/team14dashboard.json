@@ -1,0 +1,833 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 9,
+    "links": [],
+    "panels": [
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "links": [],
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        },
+        "hideTimeOverride": true,
+        "id": 9,
+        "interval": "5m",
+        "maxDataPoints": 986,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "10.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "expr": "iam_role_resource_costs_testing{}",
+            "format": "table",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "timeFrom": "24h",
+        "title": "IAM Roles Detail",
+        "transformations": [
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "byVariable": false,
+              "include": {
+                "names": [
+                  "role_name",
+                  "rolearn"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {
+                "role_arn": 1,
+                "role_name": 0
+              },
+              "renameByName": {
+                "role_arn": "Role Arn",
+                "role_name": "Role ",
+                "rolearn": "Role ARN"
+              }
+            }
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "Cost",
+              "axisPlacement": "auto",
+              "fillOpacity": 80,
+              "gradientMode": "opacity",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineWidth": 1,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "percentage",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 70
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "currencyUSD"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        },
+        "id": 13,
+        "interval": "1h",
+        "options": {
+          "barRadius": 0,
+          "barWidth": 0.7,
+          "colorByField": "Service",
+          "fullHighlight": true,
+          "groupWidth": 0.7,
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "right",
+            "showLegend": false
+          },
+          "orientation": "auto",
+          "showValue": "always",
+          "stacking": "none",
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          },
+          "xField": "Service",
+          "xTickLabelRotation": 0,
+          "xTickLabelSpacing": 0
+        },
+        "pluginVersion": "10.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "service_costs_testing{role_name=\"$Role\"}",
+            "format": "table",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "Services and Cost",
+        "transformations": [
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "include": {
+                "names": [
+                  "service",
+                  "Value"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "Value": "Cost",
+                "service": "Service"
+              }
+            }
+          }
+        ],
+        "type": "barchart"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "filterable": false,
+              "inspect": false
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "currencyUSD"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 10
+        },
+        "id": 12,
+        "interval": "1h",
+        "options": {
+          "cellHeight": "md",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "10.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "iam_role_resource_costs_testing{role_name=\"$Role\", service=\"$Service\"}",
+            "format": "table",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "Resource Detail",
+        "transformations": [
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "include": {
+                "names": [
+                  "resource_name",
+                  "Value"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "Value": "Cost",
+                "resource_name": "Resource Name"
+              }
+            }
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "axisBorderShow": true,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "fillOpacity": 80,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineWidth": 1,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            },
+            "fieldMinMax": false,
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 60
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "currencyUSD"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 12,
+          "y": 10
+        },
+        "id": 11,
+        "interval": "1h",
+        "options": {
+          "barRadius": 0,
+          "barWidth": 0.76,
+          "fullHighlight": true,
+          "groupWidth": 0.7,
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "right",
+            "showLegend": false
+          },
+          "orientation": "auto",
+          "showValue": "always",
+          "stacking": "none",
+          "text": {},
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          },
+          "xTickLabelRotation": -45,
+          "xTickLabelSpacing": 0
+        },
+        "pluginVersion": "10.4.2",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "topk(5, sum by(resource_name) (iam_role_resource_costs_testing{role_name=\"$Role\", service=\"$Service\"}))",
+            "format": "table",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "IAM Roles top 5 Resources for service",
+        "transformations": [
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "include": {
+                "names": [
+                  "resource_name",
+                  "Value"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "Value": "Cost",
+                "resource_name": "Resource"
+              }
+            }
+          }
+        ],
+        "type": "barchart"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "axisBorderShow": true,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisGridShow": true,
+              "axisLabel": "Cost ($)",
+              "axisPlacement": "auto",
+              "fillOpacity": 80,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineWidth": 1,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "thresholdsStyle": {
+                "mode": "dashed+area"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 50
+                },
+                {
+                  "color": "red",
+                  "value": 90
+                }
+              ]
+            },
+            "unit": "currencyUSD"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 20
+        },
+        "id": 10,
+        "interval": "45m",
+        "options": {
+          "barRadius": 0,
+          "barWidth": 0.73,
+          "colorByField": "Resource",
+          "fullHighlight": true,
+          "groupWidth": 0.7,
+          "legend": {
+            "calcs": [],
+            "displayMode": "table",
+            "placement": "right",
+            "showLegend": true
+          },
+          "orientation": "auto",
+          "showValue": "always",
+          "stacking": "none",
+          "tooltip": {
+            "mode": "multi",
+            "sort": "none"
+          },
+          "xField": "Resource",
+          "xTickLabelMaxLength": 8,
+          "xTickLabelRotation": -60,
+          "xTickLabelSpacing": 0
+        },
+        "pluginVersion": "10.4.1",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "PBFA97CFB590B2093"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "topk(5, sum by(resource_name) (iam_role_resource_costs_testing{role_name=\"$Role\"}))",
+            "format": "table",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "Top 5 most expensive resources",
+        "transformations": [
+          {
+            "id": "filterFieldsByName",
+            "options": {
+              "byVariable": false,
+              "include": {
+                "names": [
+                  "resource_name",
+                  "Value"
+                ]
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {},
+              "includeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "Value": "Cost",
+                "resource_name": "Resource"
+              }
+            }
+          },
+          {
+            "id": "limit",
+            "options": {}
+          }
+        ],
+        "transparent": true,
+        "type": "barchart"
+      },
+      {
+        "datasource": {
+          "type": "prometheus"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 20
+        },
+        "id": 8,
+        "options": {
+          "afterRender": "",
+          "content": "<div id=\"table-data\">\n  {{#each data}}\n  <table>\n    <tr>\n      <td class=\"resourceid\">{{iam_role_service_resource_id}}</td>\n      <td>{{iam_role_service_cost}}</td>\n      <td class=\"status\"><button class=\"editbtn\" id=\"checking\" type=\"submit\" >{{iam_role_service_state}}</button></td>\n    </tr>\n  </table>\n  {{/each}}\n</div>",
+          "defaultContent": "The query didn't return any results.",
+          "editor": {
+            "format": "auto",
+            "height": 428,
+            "language": "html"
+          },
+          "editors": [],
+          "externalScripts": [],
+          "externalStyles": [],
+          "helpers": "$(\"#table-data\").on('click', '.editbtn', function (e) {\n  e.preventDefault();\n  var currentRow = $(this).closest(\"tr\");\n  var $resource_id = currentRow.find(\".resourceid\").text();\n  var $status = currentRow.find(\".status\").text();\n  alert(\"Clicked!\")\n  var res_id = $resource_id,\n    status = $status;\n  var resource_id = res_id.split(\"/\")[1];\n  alert(resource_id);\n  $.ajax({\n    type: \"POST\",\n    url: 'https://bz8p90fgzb.execute-api.eu-west-1.amazonaws.com/deploy/cost-details',\n    contentType: 'application/json',\n    data: JSON.stringify({\n      'resource_id': resource_id,\n      'status': status\n    }),\n    success: function (res) {\n      alert(\"Success\");\n    },\n    error: function () {\n      alert(\"Something went wrong!!\")\n    }\n  })\n    .done(function (res) {\n      console.log(res)\n    });\n})",
+          "renderMode": "allRows",
+          "styles": "",
+          "wrap": true
+        },
+        "pluginVersion": "4.5.0",
+        "targets": [
+          {
+            "editorMode": "builder",
+            "expr": "IAM_Role_Service{job=\"IAM-roles-service-data\", iam_role_service_region=\"$Region\", iam_role_of_service=\"$IAMRole\"}",
+            "format": "table",
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A"
+          }
+        ],
+        "title": "Start / Stop Action",
+        "type": "marcusolsson-dynamictext-panel"
+      }
+    ],
+    "refresh": "",
+    "schemaVersion": 39,
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "selected": false,
+            "text": "All",
+            "value": "$__all"
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "definition": "label_values()",
+          "hide": 0,
+          "includeAll": true,
+          "label": "Account",
+          "multi": false,
+          "name": "Account",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values()",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
+        },
+        {
+          "current": {
+            "selected": false,
+            "text": "All",
+            "value": "$__all"
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "definition": "label_values()",
+          "hide": 0,
+          "includeAll": true,
+          "label": "Region",
+          "multi": false,
+          "name": "Region",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values()",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
+        },
+        {
+          "current": {
+            "selected": false,
+            "text": "DummyRole1",
+            "value": "DummyRole1"
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "definition": "label_values(iam_role_resource_costs_testing,role_name)",
+          "hide": 0,
+          "includeAll": false,
+          "label": "IAM Role",
+          "multi": false,
+          "name": "Role",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values(iam_role_resource_costs_testing,role_name)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
+        },
+        {
+          "current": {
+            "selected": false,
+            "text": "lambda",
+            "value": "lambda"
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "definition": "label_values(service_costs_testing{role_name=\"$Role\"},service)",
+          "hide": 0,
+          "includeAll": false,
+          "label": "Service",
+          "multi": false,
+          "name": "Service",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values(service_costs_testing{role_name=\"$Role\"},service)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "type": "query"
+        }
+      ]
+    },
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Dummy Data",
+    "uid": "2711",
+    "version": 7,
+    "weekStart": ""
+  }
