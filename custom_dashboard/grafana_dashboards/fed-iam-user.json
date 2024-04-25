@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 5,
   "links": [],
   "panels": [
     {
@@ -643,8 +643,8 @@
         "allValue": "",
         "current": {
           "selected": true,
-          "text": "All",
-          "value": "$__all"
+          "text": "Pradhumna-Dhungana",
+          "value": "Pradhumna-Dhungana"
         },
         "datasource": {
           "type": "prometheus",
@@ -653,7 +653,7 @@
         "definition": "label_values(FED_USER_Resource_Cost_List,account_id)",
         "hide": 0,
         "includeAll": true,
-        "label": "Account ID",
+        "label": "Fed User",
         "multi": false,
         "name": "Account_ID",
         "options": [],
@@ -700,7 +700,7 @@
       {
         "allValue": "",
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "All",
           "value": "$__all"
         },

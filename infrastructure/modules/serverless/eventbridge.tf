@@ -3,7 +3,7 @@ resource "aws_cloudwatch_event_rule" "federated_cron_job" {
   name                = "federated-cron-job"
   description         = "Cron job to invoke lambda to get all the federated users and resources provisioned by them."
   #schedule_expression = "cron(0 0 */14 * ? *)"  # Runs every 14 days
-  schedule_expression = "cron(0 0 * * *)"
+  schedule_expression = "cron(0 0 * * ? *)"
 
   # Runs every minute
   # schedule_expression = "cron(*/1 * * * ? *)"
