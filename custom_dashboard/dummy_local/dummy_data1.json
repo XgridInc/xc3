@@ -1,0 +1,150 @@
+{
+    "ec2": [
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:590183937261:function:xc3team12pradhumna-list_linked_accounts",
+        "cost": 120.50,
+        "region": "us-east-1",
+        "resource": "lambda",
+        "account_id": "Pradhumna-Dhungana",
+        "month": "January",
+        "resource_name": "xc3team12bhavabc-metadata-storage"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:123456789012:function:xc3team12pradhumna-iamrolesservicemapping",
+        "cost": 85.75,
+        "region": "ap-southeast-2",
+        "resource": "lambda",
+        "account_id": "Pradhumna-Dhungana",
+        "month": "February",
+        "resource_name": "xc3team12bhavabc-iamrolestografana"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:234567890123:function:xc3team12pradhumna-list_iam_users",
+        "cost": 67.30,
+        "region": "ap-southeast-2",
+        "resource": "lambda",
+        "account_id": "Pradhumna-Dhungana",
+        "month": "March",
+        "resource_name": "xc3team12bhavabc-iamrolesservicemapping"
+      },
+      {
+        "resource_id": "arn:aws:ec2:ap-southeast-2:345678901234:instance/i-0a3ea6b780458b3f5",
+        "cost": 215.00,
+        "region": "us-east-1",
+        "resource": "ec2",
+        "account_id": "Pradhumna-Dhungana",
+        "month": "April",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:456789012345:function:xc3team12pradhumna-project-cost-breakdown",
+        "cost": 50.25,
+        "region": "ap-southeast-2",
+        "resource": "lambda",
+        "account_id": "Nilanshu-Basnet",
+        "month": "January",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:567890123456:function:xc3team12pradhumna-iamrolestografana",
+        "cost": 33.10,
+        "region": "ap-southeast-2",
+        "resource": "lambda",
+        "account_id": "Nilanshu-Basnet",
+        "month": "February",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:s3:::xc3team12pradhumna-metadata-storage",
+        "cost": 45.00,
+        "region": "us-west-1",
+        "resource": "s3",
+        "account_id": "Nilanshu-Basnet",
+        "month": "March",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      
+      },
+      {
+        "resource_id": "arn:aws:s3:::xc3team12sb-metadata-storage",
+        "cost": 27.15,
+        "region": "us-west-1",
+        "resource": "s3",
+        "account_id": "Nilanshu-Basnet",
+        "month": "April",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:890123456789:function:xc3team12pradhumna-resource_parsing_lambda",
+        "cost": 95.00,
+        "region": "ap-southeast-2",
+        "resource": "lambda",
+        "account_id": "Nilanshu-Basnet",
+        "month": "January",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:901234567890:function:xc3team12pradhumna-list_iam_user_resources_cost",
+        "cost": 120.00,
+        "region": "ap-southeast-2",
+        "resource": "lambda",
+        "account_id": "Nilanshu-Basnet",
+        "month": "February",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:012345678901:function:xc3team12pradhumna-resource_list_lambda",
+        "cost": 60.40,
+        "region": "ap-southeast-2",
+        "resource": "lambda",
+        "account_id": "Nilanshu-Basnet",
+        "month": "March",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:590183937261:function:xc3team12pradhumna-total_account_cost",
+        "cost": 130.50,
+        "region": "ap-southeast-2",
+        "resource": "lambda",
+        "account_id": "Pradhumna-Dhungana",
+        "month": "April",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:s3:ap-southeast-2:590183937261:function:xc3team12pradhumna-most_expensive_service_lambda",
+        "cost": 175.75,
+        "region": "ap-southeast-2",
+        "resource": "s3",
+        "account_id": "Pradhumna-Dhungana",
+        "month": "January",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:590183937261:function:xc3team12pradhumna-cost_metrics_of_expensive_services",
+        "cost": 49.95,
+        "region": "eu-west-1",
+        "resource": "lambda",
+        "account_id": "Pradhumna-Dhungana",
+        "month": "February",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:ec2:ap-southeast-2:590183937261:function:xc3team12pradhumna-instancestatechange",
+        "cost": 23.20,
+        "region": "ap-southeast-2",
+        "resource": "ec2",
+        "account_id": "Nilanshu-Basnet",
+        "month": "March",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      },
+      {
+        "resource_id": "arn:aws:lambda:ap-southeast-2:590183937261:function:xc3team12pradhumna-project-spend-cost",
+        "cost": 88.40,
+        "region": "eu-west-1",
+        "resource": "lambda",
+        "account_id": "Nilanshu-Basnet",
+        "month": "April",
+        "resource_name": "xc3team12bhavabc-cost_metrics_of_expensive_services"
+      }
+    ]
+  }
+  

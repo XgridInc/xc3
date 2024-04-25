@@ -83,4 +83,6 @@ module "serverless" {
   create_cloudtrail           = var.create_cloudtrail
   create_cloudtrail_s3_bucket = var.create_cloudtrail_s3_bucket
   env                         = var.env
+  slack_webhook_url = var.slack_webhook_url
+  snsendpoint = var.snsendpoint
 }

@@ -37,6 +37,17 @@ The IAM User Dashboard consists of the following panels:
 - Resource Cost (Last 14 days)
 - Total Services Cost of IAM User
 
+## **Federated IAM User Dashboard**
+
+The Federated IAM User Dashboard consists of the following panels:
+-Total Spent on Federated IAM Users
+-Active Federated IAM Users
+-Cost by Month
+-Total Cost of all the Federated IAM Users
+-Cost Split in AWS Services
+-Region-wise Cost
+
+
 ## **Tagging Compliance**
 
 The tagging compliance dashboard consists of the following panel:
