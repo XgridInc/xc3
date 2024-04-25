@@ -24,7 +24,8 @@ resource "aws_iam_role_policy" "fed_user_policy" {
           "lambda:ListTags",
           "s3:PutObject",
           "s3:GetObject",
-          "tag:GetResources"
+          "tag:GetResources",
+          "cloudtrail:LookupEvents"
         ]
          Effect   = "Allow"
         "Resource" : "*"

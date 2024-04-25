@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 import io
 import gzip
 import json
@@ -21,7 +22,8 @@ import os
 import logging
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from urllib.parse import unquote_plus
-from datetime import datetime
+from datetime import datetime, timedelta
+import time
 
 #Needed to invoke Untagged Resource Lambda
 untagged_resource_lambda_arn = os.environ['UNTAGGED_RESOURCE_LAMBDA_ARN']
@@ -40,6 +42,38 @@ except Exception as e:
 runtime_region = 'ap-southeast-2' #os.environ["REGION"]
 # topic_arn = os.environ["sns_topic"]
 
+def lookup_events(next_token=None, attribute=None):
+    cloud_trail_client = boto3.client('cloudtrail')
+    # log = []
+    if next_token:
+        response = cloud_trail_client.lookup_events(
+            LookupAttributes=[
+                {
+                    'AttributeKey': 'EventName',
+                    'AttributeValue': attribute
+                },
+            ],
+            StartTime=datetime.now() - timedelta(days=1),
+            EndTime=datetime.now(),
+            NextToken=next_token
+        )
+    else:
+        response = cloud_trail_client.lookup_events(
+            LookupAttributes=[
+                {
+                    'AttributeKey': 'EventName',
+                    'AttributeValue': attribute
+                },
+            ],
+            StartTime=datetime.now() - timedelta(days=1),
+            EndTime=datetime.now()
+        )
+    
+    return response 
+
+    
+    # for event in lookupevents:
+    
 def verify_tags(tags):
     required_tags = ['Owner','Creator', 'Project']
     if all(tag in tags for tag in required_tags):
@@ -47,7 +81,7 @@ def verify_tags(tags):
     else:
         return False
 
-def get_resources_for_account_id(account_id):
+def get_resources_with_tags():
     # Initialize the Resource Groups Tagging API client
     client = boto3.client('resourcegroupstaggingapi')
     
@@ -60,10 +94,11 @@ def get_resources_for_account_id(account_id):
         for page in paginator.paginate(ResourceTypeFilters=['s3', 'lambda', 'ec2:instance']):
             for resource in page.get('ResourceTagMappingList', []):
                 resource_arn = resource['ResourceARN']
-                if account_id in resource_arn or 's3' in resource_arn:
-                    tags = {tag['Key']: tag['Value'] for tag in resource.get('Tags', [])}
-                    
+                tags = {tag['Key']: tag['Value'] for tag in resource.get('Tags', [])}
+                if tags:
                     resources.append({'ResourceARN': resource_arn, 'Tags': tags, 'Compliance': verify_tags(tags)})
+                else:
+                    resources.append({'ResourceARN': resource_arn, 'Tags': tags})
         
     except Exception as e:
         print(f"Error retrieving resources: {str(e)}")
@@ -71,16 +106,6 @@ def get_resources_for_account_id(account_id):
     return resources
 
 def lambda_handler(event, context):
-    """
-    List IAM User Details.
-    Args:
-        Account ID: AWS account id.
-    Returns:
-        It returns a list of IAM Users details in provided aws account.
-    Raises:
-        Lambda Invoke Error: Raise error if message doesn't publish in SNS topic
-    """
-
     # Initialize IAM client
     iam = boto3.client('iam')
     response = iam.list_roles()
@@ -94,16 +119,60 @@ def lambda_handler(event, context):
             # Extract the account ID from the federated ARN
             account_id = federated_value.split(':')[4]
             account_ids.add(account_id)
-    
-    # Convert the set of account IDs to a list
     accounts = list(account_ids)
-    all_resources = {}
-    for account_id in account_ids:
-        resources = get_resources_for_account_id(account_id)
-        all_resources.update({account_id:resources})
+    usernames = []
+    response = iam.list_users()
+    for account in account_ids:
+        for user in response.get('Users'):
+            if account in user.get('Arn').split(":")[4]:
+                usernames.append(user.get('UserName'))
+    resources_from_trail = []
+    attributes = ['RunInstances', 'CreateFunction20150331', 'CreateBucket']
+    for attribute in attributes:
+        response = lookup_events(attribute=attribute)
+        for event in response['Events']:
+            for x in event['Resources']:
+                if attribute == 'RunInstances' and x['ResourceType'] != 'AWS::EC2::Instance':
+                    continue
+                resources_from_trail.append({event['Username']:x['ResourceName']})
+        while 'NextToken' in response:
+            response = lookup_events(next_token=response.get('NextToken'), attribute=attribute)
+            for event in response['Events']:
+                for x in event['Resources']:
+                    resources_from_trail.append({event['Username']:x['ResourceName']})
+                    
+    resources_by_user = {}
 
+    for entry in resources_from_trail:
+        for username, resource in entry.items():
+            if username not in resources_by_user:
+                resources_by_user[username] = set()
+            resources_by_user[username].add(resource)
+            
+    tagging_resource = get_resources_with_tags()
     
-        
+    # Initialize combined dictionary
+    combined_resources = {}
+    
+    # Iterate over resources from trail
+    for username, resources in resources_by_user.items():
+        combined_resources[username] = {'compliant': [], 'non-compliant': [], 'untagged': []}
+        for x in resources:
+            flag = False
+            for data in tagging_resource:
+                if 'Compliance' not in data:
+                    continue
+                if x in data['ResourceARN'] and data.get('Compliance'):
+                    combined_resources[username]['compliant'].append({x:data['ResourceARN']})
+                    flag=True
+                elif x in data['ResourceARN'] and not data.get('Compliance'):
+                    combined_resources[username]['non-compliant'].append({x:data['ResourceARN']})
+                    flag=True
+            if not flag:
+                combined_resources[username]['untagged'].append(x)
+    
+    # print(combined_resources)
+
     current_date = datetime.now()
     year = str(current_date.year)
     month = current_date.strftime('%m')
@@ -112,21 +181,12 @@ def lambda_handler(event, context):
     # Set the destination key
     destination_key = f"fed-resources/{year}/{month}/{day}/resources.json"
     try:
-        s3.put_object(Bucket=bucket_name, Key=destination_key, Body=json.dumps({'body':all_resources}))
-        # Invoke untagged resource
-        # response = lambda_client.invoke(**invoke_params)
-        # Invoke another Lambda function with the untagged resources as payload
+        s3.put_object(Bucket=bucket_name, Key=destination_key, Body=json.dumps({'body':combined_resources}))
+
         invoke_response = lambda_client.invoke(
             FunctionName=untagged_resource_lambda_arn,
-            InvocationType='RequestResponse',
-            Payload=json.dumps({"accId": accounts})
+            InvocationType='Event'
         )
-        # Check the response from untagged resource
-        if invoke_response['StatusCode'] == 202:
-            print("Untagged Resource invoked successfully")
-            print(response)
-        else:
-            print("Error invoking Untagged resource")
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchBucket":
             raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
@@ -136,8 +196,8 @@ def lambda_handler(event, context):
             )
         else:
             raise ValueError(f"Failed to upload data to S3 bucket: {str(e)}")
-    
+    # print(resources_from_trail) 
+    # print(resources_by_user)
     return {
         'statusCode': 200,
-        'body': all_resources
     }
