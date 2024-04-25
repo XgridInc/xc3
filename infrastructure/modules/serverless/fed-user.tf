@@ -145,7 +145,7 @@ resource "aws_lambda_function" "list_fed_user" {
       REGION        = var.region
       sns_topic     = var.sns_topic_arn
       bucket_name   = var.s3_xc3_bucket.bucket
-      UNTAGGED_RESOURCE_LAMBDA_ARN = aws_lambda_function.untagged_resource_lambda.arn
+      UNTAGGED_RESOURCE_LAMBDA_ARN = aws_lambda_function.resource_notification_lambda.arn
 
     }
   }
