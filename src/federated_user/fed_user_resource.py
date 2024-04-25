@@ -19,6 +19,7 @@ import os
 from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
 from datetime import date, datetime, timedelta
 import botocore
+import traceback
 
 case_list = []
 regionName = os.environ["AWS_REGION"]
@@ -45,7 +46,7 @@ def cost_of_instance(event, client, resource_id):
     Raises:
         KeyError: Error if Cost Explorer API call doesn't execute.
     """
-    cost_by_days = 14
+    cost_by_days = 1
     end_date = str(date.today())
     start_date = str(date.today() - timedelta(days=cost_by_days))
     ce_response = client.get_cost_and_usage_with_resources(
@@ -105,14 +106,16 @@ def lambda_handler(event, context):
         
         for account_id, resources in file_content['body'].items():
             account = account_id
-            for resource in resources:
-                if resource['Compliance']:
-                    resource_id = resource['ResourceARN']
+            for v in resources['compliant']:
+                for name,arn in v.items():
+                    resource_id = arn
                     resource_type = resource_id.split(':')[2]
-                    resource_name = resource_id.split(':')[-1]
-                    if 'arn:aws:ec2' in resource['ResourceARN']:
-                        resource_name = resource['Tags']['Name']
-                    if resource['ResourceARN'].startswith('arn:aws:s3'):
+        #     for resource in resources:
+        #         if resource['Compliance']:
+        #             resource_id = resource['ResourceARN']
+                    resource_type = resource_id.split(':')[2]
+                    resource_name = name
+                    if resource_id.startswith('arn:aws:s3'):
                         region = ''
                     else:
                         region = resource_id.split(':')[3]
@@ -129,18 +132,10 @@ def lambda_handler(event, context):
                         registry=registry,
                     )
                     
-                # elif resource['ResourceARN'].startswith('arn:aws:lambda'):
                     
-        s3.put_object(Bucket=bucket_name, Key=destination_key, Body=json.dumps({'ec2':ec2_instances}))
+        #         # elif resource['ResourceARN'].startswith('arn:aws:lambda'):
+                    
     except Exception as f:
-        s3.put_object(Bucket=bucket_name, Key=destination_key, Body=json.dumps({'data': str(f)}))
-    except botocore.exceptions.ClientError as e:
-        if e.response["Error"]["Code"] == "NoSuchBucket":
-            raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
-        elif e.response["Error"]["Code"] == "AccessDenied":
-            raise ValueError(
-                f"Access denied to S3 bucket: {os.environ['bucket_name']}"
-            )
-        else:
-            raise ValueError(f"Failed to upload data to S3 bucket: {str(e)}")
+        print(str(traceback.format_exc()))
+   
     return {"statusCode": 200}
