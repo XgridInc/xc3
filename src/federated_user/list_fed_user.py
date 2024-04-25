@@ -150,10 +150,8 @@ def lambda_handler(event, context):
             resources_by_user[username].add(resource)
             
     tagging_resource = get_resources_with_tags()
-    
     # Initialize combined dictionary
     combined_resources = {}
-    
     # Iterate over resources from trail
     for username, resources in resources_by_user.items():
         combined_resources[username] = {'compliant': [], 'non-compliant': [], 'untagged': []}
@@ -162,10 +160,10 @@ def lambda_handler(event, context):
             for data in tagging_resource:
                 if 'Compliance' not in data:
                     continue
-                if x in data['ResourceARN'] and data.get('Compliance'):
+                if (x in data['ResourceARN'].split(":") or x in data['ResourceARN'].split("/")) and data.get('Compliance'):
                     combined_resources[username]['compliant'].append({x:data['ResourceARN']})
                     flag=True
-                elif x in data['ResourceARN'] and not data.get('Compliance'):
+                elif (x in data['ResourceARN'].split(":") or x in data['ResourceARN'].split("/")) and not data.get('Compliance'):
                     combined_resources[username]['non-compliant'].append({x:data['ResourceARN']})
                     flag=True
             if not flag:
@@ -187,6 +185,12 @@ def lambda_handler(event, context):
             FunctionName=untagged_resource_lambda_arn,
             InvocationType='Event'
         )
+    #     # Check the response from untagged resource
+    #     if invoke_response['StatusCode'] == 202:
+    #         print("Untagged Resource invoked successfully")
+    #         print(response)
+    #     else:
+    #         print("Error invoking Untagged resource")
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchBucket":
             raise ValueError(f"Bucket not found: {os.environ['bucket_name']}")
@@ -199,5 +203,5 @@ def lambda_handler(event, context):
     # print(resources_from_trail) 
     # print(resources_by_user)
     return {
-        'statusCode': 200,
+        'statusCode': 200
     }
