@@ -56,6 +56,7 @@ resource "aws_lambda_function" "resource_notification_lambda" {
     variables = {
       SNS_TOPIC_ARN = aws_sns_topic.resource_alert.arn  # Pass the ARN of the SNS topic as an environment variable
       SLACK_WEBHOOK_URL = var.slack_webhook_url
+      NAME_SPACE = var.namespace
     }
   }
 
@@ -64,18 +65,9 @@ resource "aws_lambda_function" "resource_notification_lambda" {
 
 }
 
-# Grant permission to EventBridge to invoke the Lambda function
-# -------------------------------------------------------------
-#resource "aws_lambda_permission" "allow_eventbridge_invoke" {
- # statement_id  = "AllowExecutionFromEventBridge"
- # action        = "lambda:InvokeFunction"
- # function_name = aws_lambda_function.resource_notification_lambda.function_name
- # principal     = "events.amazonaws.com"
- # source_arn    = aws_cloudwatch_event_rule.federated_cron_job.arn
-#}
 
-resource "aws_lambda_permission" "allow_untagged_resource_lambda_invoke" {
-  statement_id  = "AllowExecutionFromUntaggedResourceLambda"
+resource "aws_lambda_permission" "allow_list_fed_user_invoke" {
+  statement_id  = "AllowExecutionFromListFedUserLambda"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.resource_notification_lambda.arn
   principal     = "lambda.amazonaws.com"

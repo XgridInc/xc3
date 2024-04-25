@@ -1,34 +1,71 @@
-import boto3  # Importing boto3 library for AWS interactions
-import json  # Importing json library for JSON operations
-import csv   # Importing csv library for CSV file operations
-import io    # Importing io library for input and output operations
-import os    # Importing os library for operating system related operations
-
-import urllib3   # Importing urllib3 library for HTTP requests
-
+import json
+import boto3
+import os
+from datetime import datetime
+import urllib3
 
 sns_topic_arn = os.environ['SNS_TOPIC_ARN']  # Retrieve SNS topic ARN from environment variable
+namespace = os.environ['NAME_SPACE']
 http = urllib3.PoolManager()  # Creating an HTTP connection pool manager
 
-sns = boto3.client('sns')  # Creating an SNS client
+s3 = boto3.client('s3')
 
-def lambda_handler(event, context):
+def get_resources_from_s3():
+    # Current Date and time to access file in S3 bucket
+    current_date = datetime.now()
+    year = str(current_date.year)
+    month = current_date.strftime('%m')
+    day = current_date.strftime('%d')
+    
+    # Retrieve the file from S3
+    bucket_name = (f"{namespace}-metadata-storage")
+    file_key = f"fed-resources/{year}/{month}/{day}/resources.json"
+    
+    try:
+        # Retrieve the file from S3
+        response = s3.get_object(Bucket=bucket_name, Key=file_key)
+        data = response['Body'].read().decode('utf-8')
+        
+        # Parse the JSON data
+        json_data = json.loads(data)
+        metadata = json_data['body']
+        
+        untagged_resources = []
+        non_compliant_resources = []
+        
+        # Iterate over each user in metadata
+        for user, resources in metadata.items():
+            # Extract non-compliant resources
+            non_compliant = resources.get('non-compliant', [])
+            for item in non_compliant:
+                non_compliant_resources.append(item)
+            
+            # Extract untagged resources
+            untagged = resources.get('untagged', [])
+            for item in untagged:
+                untagged_resources.append(item)
+        
+        # return {
+        #     "non_compliant_resources": non_compliant_resources,
+        #     "untagged_resources": untagged_resources
+        # }
+        
+        print(non_compliant_resources)
+        print(untagged_resources)
+        return non_compliant_resources, untagged_resources
+    
+    except s3.exceptions.NoSuchKey:
+        return {
+            "errorMessage": "The specified key does not exist in the S3 bucket."
+        }
+    
+    except Exception as e:
+        return {
+            "errorMessage": str(e)
+        }
 
+def send_notification(non_compliant_resources, untagged_resources):
     url = os.environ["SLACK_WEBHOOK_URL"]  # Slack webhook URL
-    # List of untagged resources
-    untagged_resources = []
-    non_compliant_resources = []
-
-  # Extract payload data from the event
-    payload1 = event.get('Payload1')  # Assuming payload is passed directly
-    payload2 = event.get('Payload2')
-
-    if payload1:
-        # Append payload data to the untagged_resources list
-        untagged_resources.extend(payload1)
-    if payload2:
-        non_compliant_resources.extend(payload2)
-
     # Prepare message
     message = "Dear Team and Administrator,\n\n"+ "I hope this message finds you well. I wanted to bring to your attention a list of untagged resources and the resources that does not have proper tags for proper cost allocation.\n"+ "Below is the list of resources found without proper tags for cost allocation.\n\n\n"
 
@@ -53,10 +90,8 @@ def lambda_handler(event, context):
 
     # Sending Message to Slack Channel
     msg = {
-        "channel": "#untagged-resources",  # Slack channel where the message will be posted
-        "username": "WEBHOOK_USERNAME",    # Username for the message
+        "channel": "#untagged-resources",  # Slack channel where the message will be posted 
         "text": message,  # Message content obtained from SNS event
-        "icon_emoji": "",  # Icon emoji for the message
     }
 
     # Encode message as JSON
@@ -73,8 +108,7 @@ def lambda_handler(event, context):
             "response": resp.data,       # Response data
         }
     )
-
-    return {
-        'statusCode': 200,
-        'body': json.dumps('Notification sent to SNS topic and Slack channel.')
-    }
+    
+def lambda_handler(event, context):
+    non_compliant_resources, untagged_resources = get_resources_from_s3()
+    send_notification(non_compliant_resources, untagged_resources)
