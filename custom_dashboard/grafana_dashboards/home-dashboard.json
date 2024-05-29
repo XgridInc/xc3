@@ -415,7 +415,7 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "Expensive_Services_Detail{job=\"Most_Expensive_Services\", region=\"$region\", account=\"$Account\"}",
+          "expr": "Expensive_Services_Detail{job=\"$Account\", region=\"$region\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",

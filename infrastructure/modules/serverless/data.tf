@@ -15,5 +15,4 @@
 # tflint-ignore: terraform_unused_declarations
 data "aws_kms_alias" "check_existing_kms" {
   name = "alias/${var.namespace}-kms-key"
-
 }
