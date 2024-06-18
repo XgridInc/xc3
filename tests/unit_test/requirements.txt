@@ -26,6 +26,6 @@ rsa==4.9
 s3transfer==0.6.1
 six==1.16.0
 types-PyYAML==6.0.12.10
-urllib3==1.26.18
+urllib3==1.26.19
 Werkzeug==2.3.6
 xmltodict==0.13.0
